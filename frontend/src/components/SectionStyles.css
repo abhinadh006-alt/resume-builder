@@ -1,0 +1,186 @@
+/* 🌟 Common Section Container */
+.section-container {
+    background: #f9f9ff;
+    border: 1px solid #e0e4ff;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(91, 104, 255, 0.08);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    transition: box-shadow 0.2s ease;
+    width: 270px;
+    /* fixed consistent width */
+}
+
+.section-container:hover {
+    box-shadow: 0 3px 8px rgba(91, 104, 255, 0.12);
+}
+
+/* 🌟 Header (icon + title + add button) */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-header h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #283b70;
+    margin: 0;
+}
+
+/* 🌟 Add Button (Centered text + icon) */
+.add-btn {
+    background: linear-gradient(135deg, #5b68ff, #7c83ff);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 18px;
+    width: 60px;
+    /* fixed width */
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* ✅ Center text and icon */
+    gap: 4px;
+    transition: 0.25s ease;
+}
+
+.add-btn:hover {
+    background: linear-gradient(135deg, #4a57f5, #6a73ff);
+    transform: translateY(-1px);
+}
+
+/* 🌟 Section Item List */
+.section-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* 🌟 Section Item Card (fixed width + safe text area) */
+.section-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    border: 1px solid #e2e6f3;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    background: #fff;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.2s ease;
+}
+
+.section-item:hover {
+    background: #f7f8ff;
+}
+
+.section-item span:hover {
+    color: #4f46e5;
+    text-decoration: underline;
+}
+
+
+.item-actions button {
+    pointer-events: auto;
+    position: relative;
+    z-index: 2;
+}
+
+.item-title {
+    flex: 1;
+    cursor: pointer;
+    color: #1a1a2e;
+    font-size: 14px;
+}
+
+.item-title:hover {
+    text-decoration: underline;
+    color: #4f46e5;
+}
+
+/* Make edit/delete icons always visible and clickable */
+.item-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: #4f46e5;
+    opacity: 1;
+    /* ensure visible */
+    pointer-events: auto;
+    transition: transform 0.1s ease;
+}
+
+.icon-btn:hover {
+    transform: scale(1.1);
+}
+
+.remove-btn {
+    color: #ff5c5c;
+}
+
+.remove-btn:hover {
+    color: #e04343;
+}
+
+/* 🌟 Placeholder Text */
+.placeholder {
+    font-size: 13px;
+    color: #a0a3b0;
+    text-align: left;
+}
+
+/* === Certification title style (bold like Education) === */
+.cert-title {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* 🔹 Make all section headers visually identical */
+.section-header svg {
+    width: 18px;
+    height: 18px;
+    color: #4f46e5;
+}
+
+/* 🔹 Ensure all section items have equal height */
+.section-item {
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+}
+
+/* 🔹 Standardize title font size and spacing */
+.item-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+    flex: 1;
+}
+
+/* 🔹 Equalize spacing between cards */
+.section-container {
+    margin-bottom: 14px;
+    padding: 12px 14px;
+}

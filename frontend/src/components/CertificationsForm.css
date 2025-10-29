@@ -1,0 +1,7 @@
+/* Reuse experience-form structure */
+@import "./ExperienceForm.css";
+
+/* Customize slightly */
+.cert-form .form-group label {
+    color: #334155;
+}

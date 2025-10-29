@@ -1,0 +1,220 @@
+/* === EDUCATION FORM (matches ExperienceForm layout) === */
+.experience-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Row for two side-by-side fields (Degree & School) */
+.form-row {
+    display: flex;
+    gap: 10px;
+}
+
+.form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #374151;
+    margin-bottom: 4px;
+}
+
+input:not([type="checkbox"]),
+textarea {
+    padding: 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+}
+
+textarea {
+    resize: none;
+}
+
+.form-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.cancel-btn {
+    background: #e5e7eb;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.cancel-btn:hover {
+    background: #d6d8db;
+}
+
+.submit-btn {
+    background: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.submit-btn:hover {
+    background: #4338ca;
+}
+
+/* === Month-Year Picker Layout === */
+.month-picker-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.month-picker-col {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.small-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #4b5563;
+    margin-bottom: 4px;
+}
+
+.month-picker-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #b8bce9;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #fafaff;
+    color: #1a1a2e;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.month-picker-input:focus {
+    border-color: #5b68ff;
+    box-shadow: 0 0 4px rgba(91, 104, 255, 0.3);
+    background: #ffffff;
+}
+
+/* === Checkbox Styling (same as Experience) === */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: #333;
+    margin-top: 10px;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #5b68ff;
+    cursor: pointer;
+}
+
+/* === DatePicker popup styling === */
+.react-datepicker {
+    font-family: inherit;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.react-datepicker__month-year-dropdown-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    text-align: center;
+}
+
+.react-datepicker__header {
+    background-color: #f9f9ff;
+    border-bottom: 1px solid #ddd;
+    padding-top: 6px;
+}
+
+.react-datepicker__current-month {
+    color: #4f46e5;
+    font-weight: 600;
+}
+
+/* === Smooth transitions for modal input elements === */
+input,
+textarea,
+button {
+    transition: all 0.2s ease-in-out;
+}
+
+/* === Compact Month-Year Picker (React-Day-Picker version) === */
+.month-year-picker {
+    width: 100%;
+    background: #fff;
+    border: 1px solid #b8bce9;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 14px;
+    box-sizing: border-box;
+    color: #1a1a2e;
+    text-align: center;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.month-year-picker:focus-within {
+    border-color: #5b68ff;
+    box-shadow: 0 0 4px rgba(91, 104, 255, 0.3);
+}
+
+/* Center the dropdowns */
+.month-year-picker .rdp-caption {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 6px 0;
+}
+
+/* Style the month & year dropdowns */
+.month-year-picker select {
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 14px;
+    color: #1e293b;
+    background: #fafaff;
+    cursor: pointer;
+    outline: none;
+}
+
+.month-year-picker select:focus {
+    border-color: #5b68ff;
+}
+
+/* Arrange the month and year dropdowns in a single line */
+.month-year-picker .rdp-dropdowns {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Hide the actual day grid — only month & year visible */
+.month-year-picker .rdp-table {
+    display: none !important;
+}
+
+/* Hide navigation arrows */
+.month-year-picker .rdp-nav {
+    display: none !important;
+}

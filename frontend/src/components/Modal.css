@@ -1,0 +1,217 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(17, 24, 39, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.modal-content {
+    background: white;
+    width: 700px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    animation: slideIn 0.3s ease;
+    overflow: visible !important;
+}
+
+.modal-content {
+    background: #ffffff;
+    border: 1px solid #e0e4ff;
+    /* subtle edge border */
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15),
+        0 0 0 2px rgba(91, 104, 255, 0.05);
+    /* soft blue outer glow */
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 10px;
+}
+
+.modal-header h2 {
+    font-size: 18px;
+    color: #4f46e5;
+    margin: 0;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #555;
+}
+
+.modal-body {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* 🌟 Inputs inside modal (Experience, Education, Skills, etc.) */
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+    width: 100%;
+    border: 1px solid #b8bce9 !important;
+    /* ✅ Make it visible always */
+    background: #fafaff !important;
+    /* ✅ Soft contrast */
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 14px;
+    color: #1a1a2e;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    box-sizing: border-box;
+    z-index: 2;
+}
+
+/* ✨ On hover or focus (click/typing) */
+.modal-content input:hover,
+.modal-content textarea:hover,
+.modal-content select:hover {
+    border-color: #a0a7f2 !important;
+}
+
+.modal-content input:focus,
+.modal-content textarea:focus,
+.modal-content select:focus {
+    border-color: #5b68ff !important;
+    background: #ffffff;
+    box-shadow: 0 0 6px rgba(91, 104, 255, 0.3);
+}
+
+.modal-content input::placeholder,
+.modal-content textarea::placeholder {
+    color: #a0a0b8;
+    /* Softer placeholder text for clarity */
+    opacity: 1;
+}
+
+.modal-content input,
+.modal-content textarea {
+    background-clip: padding-box;
+}
+
+/* =============================
+   🎯 Consistent Modal Footer Buttons
+============================= */
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    /* ✅ always right-aligned */
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.modal-footer button {
+    border-radius: 6px;
+    font-size: 14px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-weight: 500;
+    min-width: 70px;
+    transition: all 0.25s ease-in-out;
+}
+
+/* Cancel Button */
+.modal-footer .cancel-btn {
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    color: #555;
+}
+
+.modal-footer .cancel-btn:hover {
+    background: #e5e7eb;
+}
+
+/* Save Button */
+.modal-footer .save-btn {
+    background: #5b68ff;
+    border: none;
+    color: white;
+}
+
+.modal-footer .save-btn:hover {
+    background: #4a57f5;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 700px;
+    max-height: 90vh;
+    /* ✅ Limit total height */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    /* keep header fixed */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    animation: popupFade 0.3s ease;
+}
+
+.modal-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fafafa;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    /* ✅ scrollable inner area */
+    flex: 1;
+    scroll-behavior: smooth;
+}
+
+.modal-content {
+    max-height: 90vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f1f5f9;
+}
