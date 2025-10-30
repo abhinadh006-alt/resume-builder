@@ -6,20 +6,14 @@ import toast, { Toaster } from "react-hot-toast";
 function App() {
   const [template, setTemplate] = useState("modern");
   const [chatId, setChatId] = useState(null);
-
-  // eslint-disable-next-line no-unused-vars
-  const [auth, setAuth] = useState(null);
-
+  const [, setAuth] = useState(null); // keep setter, ignore unused var
   const [formData, setFormData] = useState({});
-
-  // eslint-disable-next-line no-unused-vars
-  const [downloadLink, setDownloadLink] = useState("");
-
+  const [, setDownloadLink] = useState(""); // keep setter, ignore unused var
   const [testMsg, setTestMsg] = useState("");
   const [loading, setLoading] = useState(false);
 
   /* ==============================
-     1️⃣ Auto-fetch daily key
+     1️⃣ Auto-fetch daily key from Render
   ============================== */
   useEffect(() => {
     async function fetchAuthKey() {
@@ -82,7 +76,7 @@ function App() {
         return;
       }
 
-      console.log("🧾 Sending to Worker:", formData);
+      console.log("🧾 Sending to Render:", formData);
 
       const res = await fetch(
         "https://resume-builder-jv01.onrender.com/api/secure/generate-cv",
