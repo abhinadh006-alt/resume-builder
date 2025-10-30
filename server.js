@@ -170,6 +170,11 @@ app.use("/api/resume", resumeRoutes);
 app.use("/api/pending", pendingRoutes);
 app.use("/webhook", telegramWebhook);
 
+// ✅ Direct secure endpoint for frontend (generate-cv)
+import { generateResume } from "./controllers/resumeController.js";
+
+app.post("/api/secure/generate-cv", generateResume);
+
 /* ================================
    7️⃣  Resume File Delivery
 ================================ */
