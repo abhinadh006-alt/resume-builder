@@ -41,3 +41,26 @@ export const getResumePDF = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 };
+
+// ✅ Export for secure route
+export async function generateResume(req, res) {
+    try {
+        const { name, email, phone, experience, education, skills, certifications, template = "modern" } = req.body;
+
+        if (!name || !email) {
+            return res.status(400).json({ error: "Name and email are required" });
+        }
+
+        // Import and use your existing PDF generator
+        const { generatePDF } = await import("../utils/generatePDF.js");
+        const downloadURL = await generatePDF(
+            { name, email, phone, experience, education, skills, certifications },
+            template
+        );
+
+        res.json({ success: true, file: downloadURL });
+    } catch (err) {
+        console.error("❌ generateResume error:", err.message);
+        res.status(500).json({ error: err.message });
+    }
+}
