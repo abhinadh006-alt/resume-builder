@@ -1,23 +1,22 @@
 import axios from "axios";
 
 /* ================================
-   1️⃣  API Base URL
+   1️⃣ API Base URL (Render only)
 ================================ */
 const API_BASE =
     window.location.hostname.includes("localhost")
-        ? "https://resume-builder-worker.safetycrewindiaresumebuilder.workers.dev" // ✅ use your deployed URL
-        : "https://resume-builder-worker.safetycrewindiaresumebuilder.workers.dev";
-
+        ? "http://localhost:5000/api/resume"
+        : "https://resume-builder-jv01.onrender.com/api/resume";
 
 /* ================================
-   2️⃣  Read stored key (if present)
+   2️⃣ Read stored key
 ================================ */
 function getAuthKey() {
     return localStorage.getItem("RB_AUTH");
 }
 
 /* ================================
-   3️⃣  Create an Axios instance
+   3️⃣ Axios instance
 ================================ */
 const axiosInstance = axios.create({
     baseURL: API_BASE,
@@ -27,7 +26,7 @@ const axiosInstance = axios.create({
 });
 
 /* ================================
-   4️⃣  Interceptor to add Authorization automatically
+   4️⃣ Add Authorization automatically
 ================================ */
 axiosInstance.interceptors.request.use((config) => {
     const token = getAuthKey();
@@ -36,43 +35,27 @@ axiosInstance.interceptors.request.use((config) => {
 });
 
 /* ================================
-   5️⃣  Optional: Handle expired or invalid key
+   5️⃣ Handle expired key
 ================================ */
 axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
             console.warn("Unauthorized — invalid or expired access key");
-            // Optional: clear key and redirect to login page
             localStorage.removeItem("RB_AUTH");
-            window.location.href = "/login";
+            window.location.reload();
         }
         return Promise.reject(error);
     }
 );
 
 /* ================================
-   6️⃣  Example endpoints
+   6️⃣ API Methods
 ================================ */
 export const api = {
-    // Example: Check secure access
     testSecure: () => axiosInstance.get("/api/secure/ping"),
-
-    // Example: Generate resume (existing)
     generateResume: (formData) =>
-        axiosInstance.post("/api/secure/generate-cv", formData),
-
-    // Example: Upload CV (coming soon)
-    uploadCV: (file) => {
-        const form = new FormData();
-        form.append("file", file);
-        return axiosInstance.post("/api/secure/upload", form, {
-            headers: { "Content-Type": "multipart/form-data" },
-        });
-    },
+        axiosInstance.post("/secure/generate-cv", formData),
 };
 
-// ✅ Add these two lines at the bottom:
-export const generateResume = api.generateResume;
 export default api;
-

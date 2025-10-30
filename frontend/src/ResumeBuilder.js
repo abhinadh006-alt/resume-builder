@@ -29,27 +29,23 @@ export default function ResumeBuilder({ loading, handleSubmit }) {
         languages: [],
     });
 
-    // ===== EXPERIENCE =====
+    // ===== MODAL STATES =====
     const [showExperienceModal, setShowExperienceModal] = useState(false);
     const [editingExperienceIndex, setEditingExperienceIndex] = useState(null);
     const [experienceInitialData, setExperienceInitialData] = useState(null);
 
-    // ===== EDUCATION =====
     const [showEducationModal, setShowEducationModal] = useState(false);
     const [editingEducationIndex, setEditingEducationIndex] = useState(null);
     const [educationInitialData, setEducationInitialData] = useState(null);
 
-    // ===== CERTIFICATIONS =====
     const [showCertModal, setShowCertModal] = useState(false);
     const [editingCertIndex, setEditingCertIndex] = useState(null);
     const [certInitialData, setCertInitialData] = useState(null);
 
-    // ===== SKILLS =====
     const [showSkillModal, setShowSkillModal] = useState(false);
     const [editingSkillIndex, setEditingSkillIndex] = useState(null);
     const [skillInitialData, setSkillInitialData] = useState(null);
 
-    // ===== LANGUAGES =====
     const [showLanguageModal, setShowLanguageModal] = useState(false);
     const [editingLanguageIndex, setEditingLanguageIndex] = useState(null);
     const [languageInitialData, setLanguageInitialData] = useState(null);
@@ -73,39 +69,20 @@ export default function ResumeBuilder({ loading, handleSubmit }) {
     };
 
     // ===== Edit Handlers =====
-    const handleEditExperience = (index) => {
-        const selected = formData.experience[index];
-        setEditingExperienceIndex(index);
-        setExperienceInitialData(selected);
-        setShowExperienceModal(true);
-    };
+    const handleEditItem = (type, index) => {
+        const selected = formData[type][index];
+        const setters = {
+            experience: [setEditingExperienceIndex, setExperienceInitialData, setShowExperienceModal],
+            education: [setEditingEducationIndex, setEducationInitialData, setShowEducationModal],
+            certifications: [setEditingCertIndex, setCertInitialData, setShowCertModal],
+            skills: [setEditingSkillIndex, setSkillInitialData, setShowSkillModal],
+            languages: [setEditingLanguageIndex, setLanguageInitialData, setShowLanguageModal],
+        };
 
-    const handleEditEducation = (index) => {
-        const selected = formData.education[index];
-        setEditingEducationIndex(index);
-        setEducationInitialData(selected);
-        setShowEducationModal(true);
-    };
-
-    const handleEditCert = (index) => {
-        const selected = formData.certifications[index];
-        setEditingCertIndex(index);
-        setCertInitialData(selected);
-        setShowCertModal(true);
-    };
-
-    const handleEditSkill = (index) => {
-        const selected = formData.skills[index];
-        setEditingSkillIndex(index);
-        setSkillInitialData(selected);
-        setShowSkillModal(true);
-    };
-
-    const handleEditLanguage = (index) => {
-        const selected = formData.languages[index];
-        setEditingLanguageIndex(index);
-        setLanguageInitialData(selected);
-        setShowLanguageModal(true);
+        const [setIndex, setInitialData, setShow] = setters[type];
+        setIndex(index);
+        setInitialData(selected);
+        setShow(true);
     };
 
     return (
@@ -113,12 +90,15 @@ export default function ResumeBuilder({ loading, handleSubmit }) {
             <aside className="sidebar">
                 {/* ===== PERSONAL DETAILS ===== */}
                 <h3>Personal Details</h3>
-                <input name="name" placeholder="Name" value={formData.name} onChange={handleChange} />
-                <input name="title" placeholder="Title" value={formData.title} onChange={handleChange} />
-                <input name="email" placeholder="Email" value={formData.email} onChange={handleChange} />
-                <input name="phone" placeholder="Phone" value={formData.phone} onChange={handleChange} />
-                <input name="location" placeholder="Location" value={formData.location} onChange={handleChange} />
-                <input name="website" placeholder="Website / Social Media" value={formData.website} onChange={handleChange} />
+                {["name", "title", "email", "phone", "location", "website"].map((field) => (
+                    <input
+                        key={field}
+                        name={field}
+                        placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                        value={formData[field]}
+                        onChange={handleChange}
+                    />
+                ))}
 
                 {/* ===== SUMMARY ===== */}
                 <h3>Summary</h3>
@@ -138,7 +118,7 @@ export default function ResumeBuilder({ loading, handleSubmit }) {
                         setExperienceInitialData(null);
                         setShowExperienceModal(true);
                     }}
-                    onEdit={handleEditExperience}
+                    onEdit={(index) => handleEditItem("experience", index)}
                     onRemove={(index) => {
                         const updated = formData.experience.filter((_, i) => i !== index);
                         setFormData({ ...formData, experience: updated });
@@ -153,7 +133,7 @@ export default function ResumeBuilder({ loading, handleSubmit }) {
                         setEducationInitialData(null);
                         setShowEducationModal(true);
                     }}
-                    onEdit={handleEditEducation}
+                    onEdit={(index) => handleEditItem("education", index)}
                     onRemove={(index) => {
                         const updated = formData.education.filter((_, i) => i !== index);
                         setFormData({ ...formData, education: updated });
@@ -168,7 +148,7 @@ export default function ResumeBuilder({ loading, handleSubmit }) {
                         setCertInitialData(null);
                         setShowCertModal(true);
                     }}
-                    onEdit={handleEditCert}
+                    onEdit={(index) => handleEditItem("certifications", index)}
                     onRemove={(index) => {
                         const updated = formData.certifications.filter((_, i) => i !== index);
                         setFormData({ ...formData, certifications: updated });
@@ -183,7 +163,7 @@ export default function ResumeBuilder({ loading, handleSubmit }) {
                         setSkillInitialData(null);
                         setShowSkillModal(true);
                     }}
-                    onEdit={handleEditSkill}
+                    onEdit={(index) => handleEditItem("skills", index)}
                     onRemove={(index) => {
                         const updated = formData.skills.filter((_, i) => i !== index);
                         setFormData({ ...formData, skills: updated });
@@ -198,7 +178,7 @@ export default function ResumeBuilder({ loading, handleSubmit }) {
                         setLanguageInitialData(null);
                         setShowLanguageModal(true);
                     }}
-                    onEdit={handleEditLanguage}
+                    onEdit={(index) => handleEditItem("languages", index)}
                     onRemove={(index) => {
                         const updated = formData.languages.filter((_, i) => i !== index);
                         setFormData({ ...formData, languages: updated });
@@ -207,27 +187,20 @@ export default function ResumeBuilder({ loading, handleSubmit }) {
 
                 {/* ===== TEMPLATE SELECTION ===== */}
                 <h3>Select Resume Style</h3>
-                <button
-                    type="button"
-                    className={`template-btn ${template === "modern" ? "active" : ""}`}
-                    onClick={() => setTemplate("modern")}
-                >
-                    💼 Modern (Experienced)
-                </button>
-                <button
-                    type="button"
-                    className={`template-btn ${template === "classic" ? "active" : ""}`}
-                    onClick={() => setTemplate("classic")}
-                >
-                    📘 Classic (Fresher)
-                </button>
-                <button
-                    type="button"
-                    className={`template-btn ${template === "hybrid" ? "active" : ""}`}
-                    onClick={() => setTemplate("hybrid")}
-                >
-                    🧩 Hybrid (Two Column)
-                </button>
+                {["modern", "classic", "hybrid"].map((style) => (
+                    <button
+                        key={style}
+                        type="button"
+                        className={`template-btn ${template === style ? "active" : ""}`}
+                        onClick={() => setTemplate(style)}
+                    >
+                        {style === "modern"
+                            ? "💼 Modern (Experienced)"
+                            : style === "classic"
+                                ? "📘 Classic (Fresher)"
+                                : "🧩 Hybrid (Two Column)"}
+                    </button>
+                ))}
 
                 {/* ===== PREVIEW TOGGLE ===== */}
                 <div className="preview-toggle">
@@ -242,28 +215,22 @@ export default function ResumeBuilder({ loading, handleSubmit }) {
                 </div>
 
                 {/* ===== GENERATE BUTTON ===== */}
-                <button onClick={handleSubmit} className="generate-btn" disabled={loading}>
+                <button onClick={() => handleSubmit({ formData, template })} className="generate-btn" disabled={loading}>
                     {loading ? "⏳ Generating..." : "✅ Generate Resume"}
                 </button>
             </aside>
 
-            {/* ====== MAIN PREVIEW PANEL ====== */}
             <main className="main-panel">
                 <ResumePreview formData={formData} template={template} isFinalView={isFinalView} />
             </main>
 
-            {/* ====== MODALS ====== */}
-            <Modal
-                isOpen={showExperienceModal}
-                onClose={() => setShowExperienceModal(false)}
-                title="Experience"
-            >
+            {/* ===== MODALS ===== */}
+            <Modal isOpen={showExperienceModal} onClose={() => setShowExperienceModal(false)} title="Experience">
                 <ExperienceForm
                     initialData={experienceInitialData}
                     onSave={(newExp) => {
                         const updated = [...formData.experience];
-                        if (editingExperienceIndex !== null)
-                            updated[editingExperienceIndex] = newExp;
+                        if (editingExperienceIndex !== null) updated[editingExperienceIndex] = newExp;
                         else updated.push(newExp);
                         setFormData({ ...formData, experience: updated });
                         setShowExperienceModal(false);
@@ -276,8 +243,7 @@ export default function ResumeBuilder({ loading, handleSubmit }) {
                     initialData={educationInitialData}
                     onSave={(newEdu) => {
                         const updated = [...formData.education];
-                        if (editingEducationIndex !== null)
-                            updated[editingEducationIndex] = newEdu;
+                        if (editingEducationIndex !== null) updated[editingEducationIndex] = newEdu;
                         else updated.push(newEdu);
                         setFormData({ ...formData, education: updated });
                         setShowEducationModal(false);
@@ -290,8 +256,7 @@ export default function ResumeBuilder({ loading, handleSubmit }) {
                     initialData={certInitialData}
                     onSave={(newCert) => {
                         const updated = [...formData.certifications];
-                        if (editingCertIndex !== null)
-                            updated[editingCertIndex] = newCert;
+                        if (editingCertIndex !== null) updated[editingCertIndex] = newCert;
                         else updated.push(newCert);
                         setFormData({ ...formData, certifications: updated });
                         setShowCertModal(false);
@@ -304,8 +269,7 @@ export default function ResumeBuilder({ loading, handleSubmit }) {
                     initialData={skillInitialData}
                     onSave={(newSkill) => {
                         const updated = [...formData.skills];
-                        if (editingSkillIndex !== null)
-                            updated[editingSkillIndex] = newSkill;
+                        if (editingSkillIndex !== null) updated[editingSkillIndex] = newSkill;
                         else updated.push(newSkill);
                         setFormData({ ...formData, skills: updated });
                         setShowSkillModal(false);
@@ -318,8 +282,7 @@ export default function ResumeBuilder({ loading, handleSubmit }) {
                     initialData={languageInitialData}
                     onSave={(newLang) => {
                         const updated = [...formData.languages];
-                        if (editingLanguageIndex !== null)
-                            updated[editingLanguageIndex] = newLang;
+                        if (editingLanguageIndex !== null) updated[editingLanguageIndex] = newLang;
                         else updated.push(newLang);
                         setFormData({ ...formData, languages: updated });
                         setShowLanguageModal(false);
