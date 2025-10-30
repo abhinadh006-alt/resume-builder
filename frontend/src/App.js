@@ -6,9 +6,15 @@ import toast, { Toaster } from "react-hot-toast";
 function App() {
   const [template, setTemplate] = useState("modern");
   const [chatId, setChatId] = useState(null);
+
+  // eslint-disable-next-line no-unused-vars
   const [auth, setAuth] = useState(null);
+
   const [formData, setFormData] = useState({});
+
+  // eslint-disable-next-line no-unused-vars
   const [downloadLink, setDownloadLink] = useState("");
+
   const [testMsg, setTestMsg] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -19,7 +25,7 @@ function App() {
     async function fetchAuthKey() {
       try {
         const res = await fetch(
-          "https://resume-builder-worker.safetycrewindiaresumebuilder.workers.dev/api/daily-key"
+          "https://resume-builder-jv01.onrender.com/api/daily-key"
         );
         const data = await res.json();
         if (data.key) {
@@ -79,7 +85,7 @@ function App() {
       console.log("🧾 Sending to Worker:", formData);
 
       const res = await fetch(
-        "https://resume-builder-worker.safetycrewindiaresumebuilder.workers.dev/api/secure/generate-cv",
+        "https://resume-builder-jv01.onrender.com/api/secure/generate-cv",
         {
           method: "POST",
           headers: {
