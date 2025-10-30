@@ -1,0 +1,19 @@
+# dependencies
+node_modules/
+
+# build output
+frontend/build/
+
+# environment files
+.env
+
+# IDE/editor settings
+.vscode/
+.DS_Store
+
+# logs and generated PDFs
+logs/
+public/resumes/*.pdf
+
+# cloudflare worker (deprecated)
+resume-builder-worker/

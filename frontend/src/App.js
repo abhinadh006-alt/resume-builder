@@ -6,6 +6,10 @@ import toast, { Toaster } from "react-hot-toast";
 function App() {
   const [template, setTemplate] = useState("modern");
   const [chatId, setChatId] = useState(null);
+  // eslint-disable-next-line no-unused-vars
+  const [auth, setAuth] = useState(null);
+  // eslint-disable-next-line no-unused-vars
+  const [downloadLink, setDownloadLink] = useState("");
   const [formData, setFormData] = useState({});
   const [testMsg, setTestMsg] = useState("");
   const [loading, setLoading] = useState(false);
