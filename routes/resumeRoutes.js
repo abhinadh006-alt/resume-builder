@@ -4,6 +4,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import axios from "axios";
+import fs from "fs";
+import FormData from "form-data";
 
 import Resume from "../models/Resume.js";
 import { generatePDF } from "../utils/generatePDF.js";
@@ -15,26 +17,29 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, "../.env") });
 
 const TELEGRAM_API = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}`;
+const PUBLIC_PATH = path.join(process.cwd(), "public", "resumes");
 
-// --- sanity check first ---
+// --- sanity check ---
 router.get("/test", (_req, res) => {
     console.log("✅ /api/resume/test hit");
     res.json({ success: true, message: "Route working fine!" });
 });
 
-/* 1) CREATE */
+/* 1️⃣ CREATE */
 router.post("/", async (req, res) => {
     try {
         const resume = new Resume(req.body);
         await resume.save();
 
         if (process.env.N8N_WEBHOOK_URL) {
-            axios.post(process.env.N8N_WEBHOOK_URL, {
-                event: "resume_saved",
-                resumeId: resume._id.toString(),
-                name: resume.name,
-                template: resume.template,
-            }).catch(() => { });
+            axios
+                .post(process.env.N8N_WEBHOOK_URL, {
+                    event: "resume_saved",
+                    resumeId: resume._id.toString(),
+                    name: resume.name,
+                    template: resume.template,
+                })
+                .catch(() => { });
         }
 
         res.status(201).json(resume);
@@ -44,7 +49,7 @@ router.post("/", async (req, res) => {
     }
 });
 
-/* 2) GET ALL (handy for testing) */
+/* 2️⃣ GET ALL */
 router.get("/", async (_req, res) => {
     try {
         const items = await Resume.find().sort({ createdAt: -1 });
@@ -54,7 +59,7 @@ router.get("/", async (_req, res) => {
     }
 });
 
-/* 3) GET BY ID */
+/* 3️⃣ GET BY ID */
 router.get("/:id", async (req, res) => {
     try {
         const r = await Resume.findById(req.params.id);
@@ -65,19 +70,21 @@ router.get("/:id", async (req, res) => {
     }
 });
 
-/* 4) UPDATE */
+/* 4️⃣ UPDATE */
 router.put("/:id", async (req, res) => {
     try {
         const updated = await Resume.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!updated) return res.status(404).json({ message: "Not found" });
 
         if (process.env.N8N_WEBHOOK_URL) {
-            axios.post(process.env.N8N_WEBHOOK_URL, {
-                event: "resume_updated",
-                resumeId: updated._id.toString(),
-                name: updated.name,
-                template: updated.template,
-            }).catch(() => { });
+            axios
+                .post(process.env.N8N_WEBHOOK_URL, {
+                    event: "resume_updated",
+                    resumeId: updated._id.toString(),
+                    name: updated.name,
+                    template: updated.template,
+                })
+                .catch(() => { });
         }
 
         res.json(updated);
@@ -86,7 +93,7 @@ router.put("/:id", async (req, res) => {
     }
 });
 
-/* 5) DELETE */
+/* 5️⃣ DELETE */
 router.delete("/:id", async (req, res) => {
     try {
         const deleted = await Resume.findByIdAndDelete(req.params.id);
@@ -97,9 +104,8 @@ router.delete("/:id", async (req, res) => {
     }
 });
 
-/* 6) GENERATE PDF (via Telegram / web) */
+/* 6️⃣ GENERATE PDF (existing method) */
 router.post("/generate", verifyTgLink, async (req, res) => {
-
     try {
         const { name, email, phone, experience, education, skills, certifications, template = "modern", chatId, auth } = req.body;
         if (!name || !email) return res.status(400).json({ message: "Name and Email required." });
@@ -131,7 +137,7 @@ router.post("/generate", verifyTgLink, async (req, res) => {
     }
 });
 
-/* 7) GENERATE PDF FOR SAVED RESUME */
+/* 7️⃣ GENERATE PDF FOR SAVED RESUME */
 router.get("/pdf/:id", async (req, res) => {
     try {
         const resume = await Resume.findById(req.params.id);
@@ -142,6 +148,69 @@ router.get("/pdf/:id", async (req, res) => {
     } catch (err) {
         console.error("PDF error:", err.message);
         res.status(500).json({ message: err.message });
+    }
+});
+
+/* 🆕 8️⃣ SECURE RESUME GENERATION (Cloudflare Worker + Telegram) */
+router.post("/secure/generate-cv", async (req, res) => {
+    try {
+        const { name, template = "modern", chatId, ...rest } = req.body;
+        const pdfFileName = `${name || "resume"}-${Date.now()}.pdf`;
+        const pdfPath = path.join(PUBLIC_PATH, pdfFileName);
+
+        // Ensure folder exists
+        if (!fs.existsSync(PUBLIC_PATH)) fs.mkdirSync(PUBLIC_PATH, { recursive: true });
+
+        console.log("🧾 Fetching PDF from Worker...");
+        const workerRes = await fetch(
+            "https://resume-builder-worker.safetycrewindiaresumebuilder.workers.dev/api/secure/generate-cv",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: req.headers.authorization, // reuse daily key
+                },
+                body: JSON.stringify({ name, template, chatId, ...rest }),
+            }
+        );
+
+        if (!workerRes.ok) {
+            const errText = await workerRes.text();
+            console.error("❌ Worker error:", errText);
+            return res.status(500).json({ error: "Worker PDF generation failed" });
+        }
+
+        // Save locally
+        const arrayBuffer = await workerRes.arrayBuffer();
+        fs.writeFileSync(pdfPath, Buffer.from(arrayBuffer));
+        console.log("✅ PDF saved:", pdfFileName);
+
+        // Send to Telegram if chatId present
+        if (chatId) {
+            try {
+                const formData = new FormData();
+                formData.append("chat_id", chatId);
+                formData.append("document", fs.createReadStream(pdfPath));
+                formData.append("caption", `✅ Your ${template} resume is ready, ${name || "Candidate"}!`);
+
+                const tgRes = await axios.post(`${TELEGRAM_API}/sendDocument`, formData, {
+                    headers: formData.getHeaders(),
+                });
+
+                console.log("📤 Telegram sendDocument response:", tgRes.data);
+            } catch (tgErr) {
+                console.error("❌ Telegram sendDocument failed:", tgErr.message);
+            }
+        }
+
+        res.json({
+            ok: true,
+            file: `/resumes/${pdfFileName}`,
+            sentToTelegram: !!chatId,
+        });
+    } catch (err) {
+        console.error("❌ /secure/generate-cv error:", err.message);
+        res.status(500).json({ error: err.message });
     }
 });
 

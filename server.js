@@ -6,11 +6,51 @@ import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
-import axios from "axios";  // ✅ Add this import
+import axios from "axios"; // ✅ Add this import
 
 import resumeRoutes from "./routes/resumeRoutes.js";
 import telegramWebhook from "./routes/telegramWebhook.js";
 import pendingRoutes from "./routes/pendingRoutes.js";
+
+// 📜 Helper: Log valid key usage
+function logKeyUsage(req, authHeader) {
+  try {
+    const logDir = path.join(process.cwd(), "logs");
+    if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
+
+    const logFile = path.join(logDir, "key-usage.log");
+
+    const entry = {
+      time: new Date().toISOString(),
+      ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown",
+      keyPrefix: authHeader ? authHeader.slice(0, 20) + "..." : "(none)",
+      route: req.originalUrl || req.url,
+      method: req.method,
+    };
+
+    fs.appendFileSync(logFile, JSON.stringify(entry) + "\n");
+    console.log("🪵 Logged secure key usage:", entry);
+  } catch (err) {
+    console.error("⚠️ Failed to log key usage:", err.message);
+  }
+}
+
+// 🔐 Helper: Validate daily key from Worker
+function isValidDailyKey(authHeader) {
+  if (!authHeader || !authHeader.startsWith("Bearer TG-SECRET-")) return false;
+
+  const token = authHeader.replace("Bearer TG-SECRET-", "").trim();
+
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+
+  // Expected base pattern (your format: MM06YYYYD11D)
+  const expectedBase = `${mm}06${yyyy}D11D`.replace(/[^\d]/g, "");
+
+  // Check if token starts with today’s pattern
+  return token.startsWith(expectedBase);
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,7 +64,6 @@ const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_API = `https://api.telegram.org/bot${TELEGRAM_TOKEN}`;
 const WEBHOOK_URL = `${process.env.FRONTEND_URL}/webhook/telegram`;
 
-
 async function manageTelegramWebhook() {
   try {
     console.log("🔄 Checking Telegram webhook status...");
@@ -35,17 +74,14 @@ async function manageTelegramWebhook() {
     console.log("🔍 Current Telegram Webhook:", currentUrl || "(none)");
     console.log("📨 Pending updates:", pending);
 
-    // If webhook already matches current FRONTEND_URL, no action needed
     if (currentUrl === WEBHOOK_URL) {
       console.log("✅ Webhook already up-to-date.");
       return;
     }
 
-    // Otherwise, delete old one (cleanup)
     console.log("🧹 Removing old webhook...");
     await axios.get(`${TELEGRAM_API}/deleteWebhook`);
 
-    // Register the new webhook
     console.log("⚙️ Registering new Telegram webhook...");
     const res = await axios.get(`${TELEGRAM_API}/setWebhook`, {
       params: { url: WEBHOOK_URL },
@@ -53,7 +89,6 @@ async function manageTelegramWebhook() {
 
     console.log("🤖 Telegram Webhook update:", res.data.description || res.data);
 
-    // Verify again after registration
     const verify = await axios.get(`${TELEGRAM_API}/getWebhookInfo`);
     console.log("✅ Verified Telegram Webhook URL:", verify.data?.result?.url);
   } catch (err) {
@@ -66,34 +101,59 @@ manageTelegramWebhook();
 
 const app = express();
 
-// basic middleware
+// middleware
 app.use(cors());
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-// request logger (keep for now)
+// Request logger
 app.use((req, _res, next) => {
   console.log("➡️", req.method, req.url);
   next();
 });
 
-// static folders (for generated PDFs & uploads)
+// static folders
 app.use("/resumes", express.static(path.join(__dirname, "public", "resumes")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// API routes
+// ✅ SECURE MIDDLEWARE for /api/secure/*
+app.use("/api/secure", (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  console.log("🔑 Checking secure key:", authHeader || "(none)");
+
+  if (!isValidDailyKey(authHeader)) {
+    console.warn("❌ Invalid or expired TG-SECRET key detected.");
+    return res.status(401).json({ error: "Unauthorized: Invalid or expired key" });
+  }
+  // ✅ Key validated — log usage
+  logKeyUsage(req, authHeader);
+
+  console.log("✅ Daily key validated successfully.");
+  next();
+});
+
+// Example protected route (test)
+app.get("/api/secure/ping", (req, res) => {
+  res.json({ ok: true, msg: "Secure route access granted ✅" });
+});
+
+// Routes
 app.use("/api/resume", resumeRoutes);
 app.use("/api/pending", pendingRoutes);
 app.use("/webhook", telegramWebhook);
 
-// secure-ish PDF delivery (kept from your version)
+// secure-ish PDF delivery
 const FRONTEND_URL = process.env.FRONTEND_URL || "";
 app.get("/resumes/:fileName", (req, res) => {
   try {
     const filePath = path.join(__dirname, "public", "resumes", req.params.fileName);
     if (!fs.existsSync(filePath)) return res.status(404).send("❌ File not found");
+
     const referer = req.get("referer") || "";
-    const allowed = ["t.me", "telegram.org", "localhost", FRONTEND_URL].some(s => referer.includes(s));
+    const allowed = ["t.me", "telegram.org", "localhost", FRONTEND_URL].some(s =>
+      referer.includes(s)
+    );
+
     if (!allowed) return res.send(`<script>alert('Restricted');</script>`);
     res.sendFile(filePath);
   } catch (e) {
@@ -102,7 +162,7 @@ app.get("/resumes/:fileName", (req, res) => {
   }
 });
 
-// (optional) serve React build if you drop it into /frontend/build
+// React build (optional)
 const FRONTEND_BUILD_PATH = path.join(__dirname, "frontend", "build");
 app.use(express.static(FRONTEND_BUILD_PATH));
 app.get(/^\/(?!api|webhook).*/, (_req, res) =>
