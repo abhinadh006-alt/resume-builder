@@ -1,6 +1,6 @@
 // controllers/resumeController.js
 import Resume from "../models/Resume.js";
-import generateResumePDF from "../utils/pdfGenerator.js";
+import { generatePDF } from "../utils/generatePDF.js";
 
 export const createResume = async (req, res) => {
     try {
