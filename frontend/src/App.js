@@ -6,9 +6,7 @@ import toast, { Toaster } from "react-hot-toast";
 function App() {
   const [template, setTemplate] = useState("modern");
   const [chatId, setChatId] = useState(null);
-  const [, setAuth] = useState(null); // keep setter, ignore unused var
   const [formData, setFormData] = useState({});
-  const [, setDownloadLink] = useState(""); // keep setter, ignore unused var
   const [testMsg, setTestMsg] = useState("");
   const [loading, setLoading] = useState(false);
 
