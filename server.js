@@ -114,20 +114,22 @@ app.get("/api/daily-key", (req, res) => {
 
 // ✅ CORS setup
 const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  process.env.CORS_ORIGIN,
-  "http://localhost:5173", // for Vite dev
+  process.env.FRONTEND_URL || "https://safetycrewindiaresumes.netlify.app",
+  process.env.CORS_ORIGIN || "https://safetycrewindiaresumes.netlify.app",
+  "http://localhost:5173",
+  "http://localhost:3000", // just in case
 ];
-app.use(
-  cors({
-    origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
-      console.warn("❌ Blocked by CORS:", origin);
-      return callback(new Error("Not allowed by CORS"));
-    },
-    credentials: true,
-  })
-);
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    console.warn("Blocked by CORS:", origin);
+    callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+}));
+
 
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true }));
