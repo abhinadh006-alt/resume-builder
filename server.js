@@ -13,7 +13,7 @@ import telegramWebhook from "./routes/telegramWebhook.js";
 import pendingRoutes from "./routes/pendingRoutes.js";
 import bodyParser from "body-parser";
 import { generateResume } from "./controllers/resumeController.js";
-import { isValidDailyKey, logKeyUsage } from "./middleware/verifyTgLink.js";
+import { isValidDailyKey, logKeyUsage } from "./middleware/verifyTgLink.js"; // ✅ keep only this import
 
 /* ================================
    1️⃣  Setup + Load Environment
@@ -26,43 +26,7 @@ console.log("🧩 MONGO_URI:", process.env.MONGO_URI ? "✅" : "❌");
 console.log("🧩 FRONTEND_URL:", process.env.FRONTEND_URL || "(none)");
 
 /* ================================
-   2️⃣  Helpers
-================================ */
-function logKeyUsage(req, authHeader) {
-  try {
-    const logDir = path.join(process.cwd(), "logs");
-    if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
-
-    const logFile = path.join(logDir, "key-usage.log");
-    const entry = {
-      time: new Date().toISOString(),
-      ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown",
-      keyPrefix: authHeader ? authHeader.slice(0, 20) + "..." : "(none)",
-      route: req.originalUrl || req.url,
-      method: req.method,
-    };
-
-    fs.appendFileSync(logFile, JSON.stringify(entry) + "\n");
-    console.log("🪵 Logged secure key usage:", entry);
-  } catch (err) {
-    console.error("⚠️ Failed to log key usage:", err.message);
-  }
-}
-
-function isValidDailyKey(authHeader) {
-  if (!authHeader || !authHeader.startsWith("Bearer TG-SECRET-")) return false;
-
-  const token = authHeader.replace("Bearer TG-SECRET-", "").trim();
-  const now = new Date();
-  const yyyy = now.getFullYear();
-  const mm = String(now.getMonth() + 1).padStart(2, "0");
-  const expectedBase = `${mm}06${yyyy}D11D`.replace(/[^\d]/g, "");
-
-  return token.startsWith(expectedBase);
-}
-
-/* ================================
-   3️⃣  Telegram Webhook Management
+   2️⃣  Telegram Webhook Management
 ================================ */
 const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_API = `https://api.telegram.org/bot${TELEGRAM_TOKEN}`;
@@ -100,7 +64,7 @@ async function manageTelegramWebhook() {
 manageTelegramWebhook();
 
 /* ================================
-   4️⃣  Initialize App + Middleware
+   3️⃣  Initialize App + Middleware
 ================================ */
 const app = express();
 
@@ -115,7 +79,7 @@ app.get("/api/daily-key", (req, res) => {
   res.json({ key: dailyKey });
 });
 
-// ✅ Flexible CORS: allows your Netlify + localhost
+// ✅ Flexible CORS: allow your Netlify + localhost
 const allowedOrigins = [
   "https://safetycrewindiaresumes.netlify.app",
   "http://localhost:3000",
@@ -124,8 +88,8 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true); // allow mobile/localhost
-    const cleanOrigin = origin.replace(/\/$/, ""); // strip trailing slash
+    if (!origin) return callback(null, true);
+    const cleanOrigin = origin.replace(/\/$/, "");
     if (allowedOrigins.includes(cleanOrigin)) {
       return callback(null, true);
     }
@@ -149,7 +113,7 @@ app.use("/resumes", express.static(path.join(__dirname, "public", "resumes")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 /* ================================
-   5️⃣  Secure Route Middleware
+   4️⃣  Secure Route Middleware
 ================================ */
 app.use("/api/secure", (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -159,6 +123,7 @@ app.use("/api/secure", (req, res, next) => {
     console.warn("❌ Invalid or expired TG-SECRET key detected.");
     return res.status(401).json({ error: "Unauthorized: Invalid or expired key" });
   }
+
   logKeyUsage(req, authHeader);
   next();
 });
@@ -168,19 +133,17 @@ app.get("/api/secure/ping", (_req, res) =>
 );
 
 // ✅ Direct secure endpoint for frontend (generate-cv)
-import { generateResume } from "./controllers/resumeController.js";
-
 app.post("/api/secure/generate-cv", generateResume);
 
 /* ================================
-   6️⃣  API Routes
+   5️⃣  API Routes
 ================================ */
 app.use("/api/resume", resumeRoutes);
 app.use("/api/pending", pendingRoutes);
 app.use("/webhook", telegramWebhook);
 
 /* ================================
-   7️⃣  Resume File Delivery
+   6️⃣  Resume File Delivery
 ================================ */
 const FRONTEND_URL = process.env.FRONTEND_URL || "";
 app.get("/resumes/:fileName", (req, res) => {
@@ -202,7 +165,7 @@ app.get("/resumes/:fileName", (req, res) => {
 });
 
 /* ================================
-   8️⃣  Database + Server Start
+   7️⃣  Database + Server Start
 ================================ */
 mongoose
   .connect(process.env.MONGO_URI)
