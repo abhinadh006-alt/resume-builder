@@ -11,6 +11,9 @@ import axios from "axios";
 import resumeRoutes from "./routes/resumeRoutes.js";
 import telegramWebhook from "./routes/telegramWebhook.js";
 import pendingRoutes from "./routes/pendingRoutes.js";
+import bodyParser from "body-parser";
+import { generateResume } from "./controllers/resumeController.js";
+import { isValidDailyKey, logKeyUsage } from "./middleware/verifyTgLink.js";
 
 /* ================================
    1️⃣  Setup + Load Environment
@@ -111,9 +114,6 @@ app.get("/api/daily-key", (req, res) => {
     .substring(2, 8)}`;
   res.json({ key: dailyKey });
 });
-
-// ✅ CORS setup
-import cors from "cors";
 
 // ✅ Flexible CORS: allows your Netlify + localhost
 const allowedOrigins = [
