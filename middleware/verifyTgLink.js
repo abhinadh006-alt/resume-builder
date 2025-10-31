@@ -1,8 +1,39 @@
-// verifyTgLink.js
 import fs from "fs";
 import path from "path";
+import crypto from "crypto";
 
-// ✅ Define and export isValidDailyKey
+/**
+ * ✅ Default export — middleware for Telegram verification
+ */
+export default function verifyTgLink(req, res, next) {
+    try {
+        const { chatId, date, access } = req.body;
+        if (!chatId || !date || !access) {
+            console.warn("⚠️ Missing security params:", req.body);
+            return res.status(401).json({ message: "Missing access parameters" });
+        }
+
+        const expected = crypto
+            .createHmac("sha256", process.env.APP_SECRET)
+            .update(`${chatId}|${date}`)
+            .digest("hex");
+
+        const today = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+        if (access !== expected || date !== today) {
+            console.warn("🚫 Invalid or expired access:", { chatId, date });
+            return res.status(403).json({ message: "Access expired or invalid" });
+        }
+
+        next();
+    } catch (err) {
+        console.error("❌ verifyTgLink error:", err.message);
+        res.status(500).json({ message: "Server error validating link" });
+    }
+}
+
+/**
+ * ✅ Named exports for secure routes
+ */
 export function isValidDailyKey(authHeader) {
     if (!authHeader || !authHeader.startsWith("Bearer TG-SECRET-")) return false;
 
@@ -15,7 +46,6 @@ export function isValidDailyKey(authHeader) {
     return token.startsWith(expectedBase);
 }
 
-// ✅ Define and export logKeyUsage
 export function logKeyUsage(req, authHeader) {
     try {
         const logDir = path.join(process.cwd(), "logs");
