@@ -123,12 +123,24 @@ const allowedOrigins = [
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    console.warn("Blocked by CORS:", origin);
-    callback(new Error("Not allowed by CORS"));
+
+    const cleanOrigin = origin.replace(/\/$/, ""); // remove trailing slash
+    const allowedOrigins = [
+      "https://safetycrewindiaresumes.netlify.app",
+      "http://localhost:3000",
+      "http://localhost:5173",
+    ];
+
+    if (allowedOrigins.includes(cleanOrigin)) {
+      return callback(null, true);
+    }
+
+    console.warn("🚫 Blocked by CORS:", origin);
+    return callback(new Error("Not allowed by CORS"));
   },
   credentials: true,
 }));
+
 
 
 app.use(express.json({ limit: "2mb" }));
