@@ -1,44 +1,74 @@
-// frontend/src/api.js  (or frontend/src/apis/api.js)
+// frontend/src/api.js
 import axios from "axios";
 
-const API_BASE = import.meta?.env?.VITE_API_BASE_URL
-    || "https://resume-builder-jv01.onrender.com/api/resume"; // <<— important
+/* ================================
+   1️⃣  API Base URL (Render backend)
+================================ */
+const API_BASE = "https://resume-builder-jv01.onrender.com";
 
-function getAuthKey() {
-    return localStorage.getItem("RB_AUTH");
+/* ================================
+   2️⃣  Helper to get daily TG-SECRET key
+================================ */
+async function fetchDailyKey() {
+    try {
+        const res = await axios.get(`${API_BASE}/api/daily-key`);
+        return res.data.key;
+    } catch (err) {
+        console.error("❌ Failed to fetch daily key:", err.message);
+        throw new Error("Cannot get daily access key");
+    }
 }
 
-const axiosInstance = axios.create({
-    baseURL: API_BASE,
-    headers: {
-        "Content-Type": "application/json",
-    },
-});
-
-axiosInstance.interceptors.request.use((config) => {
-    const token = getAuthKey();
-    if (token) config.headers.Authorization = `Bearer ${token}`;
-    return config;
-});
-
-// ✅ Automatically fetch daily key, then send secure request
+/* ================================
+   3️⃣  Secure Resume Generator
+================================ */
 export const generateResume = async (formData) => {
     try {
-        // Step 1: Get today's TG-SECRET key from backend
-        const keyRes = await axios.get("https://resume-builder-jv01.onrender.com/api/daily-key");
-        const authKey = keyRes.data.key;
+        // Fetch valid TG-SECRET key for today
+        const authKey = await fetchDailyKey();
 
-        // Step 2: Call secure generate endpoint with Authorization header
-        const response = await axios.post(
-            "https://resume-builder-jv01.onrender.com/api/secure/generate-cv",
+        // Post data with Authorization header
+        const res = await axios.post(
+            `${API_BASE}/api/secure/generate-cv`,
             formData,
-            { headers: { Authorization: `Bearer ${authKey}` } }
+            {
+                headers: {
+                    Authorization: `Bearer ${authKey}`,
+                    "Content-Type": "application/json",
+                },
+            }
         );
 
-        return response;
+        console.log("✅ Resume generated successfully:", res.data);
+        return res.data;
     } catch (err) {
         console.error("❌ Secure generateResume failed:", err.message);
         throw err;
     }
 };
 
+/* ================================
+   4️⃣  Secure test endpoint
+================================ */
+export const testSecure = async () => {
+    try {
+        const key = await fetchDailyKey();
+        const res = await axios.get(`${API_BASE}/api/secure/ping`, {
+            headers: { Authorization: `Bearer ${key}` },
+        });
+        return res.data;
+    } catch (err) {
+        console.error("❌ Secure test failed:", err.message);
+        throw err;
+    }
+};
+
+/* ================================
+   5️⃣  Export default for other imports
+================================ */
+export default {
+    generateResume,
+    testSecure,
+};
+
+export const api = { generateResume, testSecure };
