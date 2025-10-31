@@ -1,11 +1,8 @@
-// ✅ api.js — Centralized API helpers for Resume Builder
-// Works for both local dev and Render/Netlify deployment
-
-// ✅ Base URL setup (supports both CRA and Vite)
 const BASE_URL =
     process.env.REACT_APP_API_BASE_URL ||
     import.meta?.env?.VITE_API_BASE_URL ||
     "https://resume-builder-jv01.onrender.com/api";
+
 
 // 🧩 Helper — Fetch secure daily key if not stored
 async function getAuthKey() {
