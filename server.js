@@ -113,35 +113,27 @@ app.get("/api/daily-key", (req, res) => {
 });
 
 // ✅ CORS setup
+import cors from "cors";
+
+// ✅ Flexible CORS: allows your Netlify + localhost
 const allowedOrigins = [
-  process.env.FRONTEND_URL || "https://safetycrewindiaresumes.netlify.app",
-  process.env.CORS_ORIGIN || "https://safetycrewindiaresumes.netlify.app",
-  "http://localhost:5173",
-  "http://localhost:3000", // just in case
+  "https://safetycrewindiaresumes.netlify.app",
+  "http://localhost:3000",
+  "http://localhost:5173"
 ];
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-
-    const cleanOrigin = origin.replace(/\/$/, ""); // remove trailing slash
-    const allowedOrigins = [
-      "https://safetycrewindiaresumes.netlify.app",
-      "http://localhost:3000",
-      "http://localhost:5173",
-    ];
-
+    if (!origin) return callback(null, true); // allow mobile/localhost
+    const cleanOrigin = origin.replace(/\/$/, ""); // strip trailing slash
     if (allowedOrigins.includes(cleanOrigin)) {
       return callback(null, true);
     }
-
-    console.warn("🚫 Blocked by CORS:", origin);
+    console.warn("❌ Blocked by CORS:", origin);
     return callback(new Error("Not allowed by CORS"));
   },
   credentials: true,
 }));
-
-
 
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true }));
