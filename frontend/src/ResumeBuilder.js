@@ -11,7 +11,7 @@ import LanguagesSection from "./components/LanguagesSection";
 import LanguageForm from "./components/LanguageForm";
 import Modal from "./components/Modal";
 import ResumePreview from "./components/ResumePreview";
-import { generateResume } from "../api"; // ✅ adjust path if needed
+import { generateResume } from "./api"; // ✅ adjust path if needed
 import { toast } from "react-toastify";
 import "./App.css";
 
