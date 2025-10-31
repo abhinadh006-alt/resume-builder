@@ -11,9 +11,11 @@ import LanguagesSection from "./components/LanguagesSection";
 import LanguageForm from "./components/LanguageForm";
 import Modal from "./components/Modal";
 import ResumePreview from "./components/ResumePreview";
+import { generateResume } from "../api"; // ✅ adjust path if needed
+import { toast } from "react-toastify";
 import "./App.css";
 
-export default function ResumeBuilder({ loading, handleSubmit }) {
+export default function ResumeBuilder() {
     const [formData, setFormData] = useState({
         name: "",
         title: "",
@@ -67,6 +69,31 @@ export default function ResumeBuilder({ loading, handleSubmit }) {
         setShowLanguageModal(false);
         setIsFinalView(!isFinalView);
     };
+
+    const [loading, setLoading] = useState(false);
+
+    // ✅ Handle resume generation
+    const handleSubmit = async () => {
+        try {
+            setLoading(true);
+
+            // Call secure backend generator
+            const result = await generateResume({ ...formData, template });
+
+            if (result?.file) {
+                toast.success("✅ Resume generated successfully!");
+                window.open(`https://resume-builder-jv01.onrender.com${result.file}`, "_blank");
+            } else {
+                toast.error("⚠️ Unexpected server response");
+            }
+        } catch (err) {
+            console.error("❌ Resume generation failed:", err.message);
+            toast.error("❌ Failed to generate resume. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     // ===== Edit Handlers =====
     const handleEditItem = (type, index) => {
@@ -215,9 +242,10 @@ export default function ResumeBuilder({ loading, handleSubmit }) {
                 </div>
 
                 {/* ===== GENERATE BUTTON ===== */}
-                <button onClick={() => handleSubmit({ formData, template })} className="generate-btn" disabled={loading}>
+                <button onClick={handleSubmit} className="generate-btn" disabled={loading}>
                     {loading ? "⏳ Generating..." : "✅ Generate Resume"}
                 </button>
+
             </aside>
 
             <main className="main-panel">
