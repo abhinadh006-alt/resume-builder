@@ -47,6 +47,8 @@ export async function generateResume(req, res) {
     try {
         const { name, email, phone, experience, education, skills, certifications, template = "modern" } = req.body;
 
+        console.log("📩 Received resume data:", req.body);
+
         if (!name || !email) {
             return res.status(400).json({ error: "Name and email are required" });
         }

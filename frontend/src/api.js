@@ -21,13 +21,24 @@ axiosInstance.interceptors.request.use((config) => {
     return config;
 });
 
-export const api = {
-    testSecure: () => axiosInstance.get("/secure/ping"),
-    generateResume: (formData) => axiosInstance.post("/secure/generate-cv", formData),
-    uploadCV: (file) => {
-        const form = new FormData();
-        form.append("file", file);
-        return axiosInstance.post("/secure/upload", form, { headers: { "Content-Type": "multipart/form-data" } });
-    },
+// ✅ Automatically fetch daily key, then send secure request
+export const generateResume = async (formData) => {
+    try {
+        // Step 1: Get today's TG-SECRET key from backend
+        const keyRes = await axios.get("https://resume-builder-jv01.onrender.com/api/daily-key");
+        const authKey = keyRes.data.key;
+
+        // Step 2: Call secure generate endpoint with Authorization header
+        const response = await axios.post(
+            "https://resume-builder-jv01.onrender.com/api/secure/generate-cv",
+            formData,
+            { headers: { Authorization: `Bearer ${authKey}` } }
+        );
+
+        return response;
+    } catch (err) {
+        console.error("❌ Secure generateResume failed:", err.message);
+        throw err;
+    }
 };
-export default api;
+

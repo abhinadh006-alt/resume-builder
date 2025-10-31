@@ -48,7 +48,7 @@ export default function ResumePreview({ formData, template }) {
                 <div className="contact-info">
                     {showText(formData.email, "Email@example.com")} &nbsp;|&nbsp;
                     {showText(formData.phone, "+91 9876543210")} &nbsp;|&nbsp;
-                    {showText(formData.address, "City, Country")}
+                    {showText(formData.location, "City, Country")}
                 </div>
             </header>
 
