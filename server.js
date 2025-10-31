@@ -1,9 +1,8 @@
 // ===============================
 // 📄 server.js — Clean & Correct Order
 // ===============================
-
-import express from "express";
 import cors from "cors";
+import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import path from "path";
