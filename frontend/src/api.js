@@ -1,74 +1,75 @@
-// frontend/src/api.js
-import axios from "axios";
+// ✅ api.js — Centralized API helpers for Resume Builder
+// Works for both local dev and Render/Netlify deployment
 
-/* ================================
-   1️⃣  API Base URL (Render backend)
-================================ */
-const API_BASE = "https://resume-builder-jv01.onrender.com";
+// 🌍 Base URL for your backend (Render server)
+const BASE_URL =
+    import.meta.env.VITE_API_BASE_URL ||
+    "https://resume-builder-jv01.onrender.com/api";
 
-/* ================================
-   2️⃣  Helper to get daily TG-SECRET key
-================================ */
-async function fetchDailyKey() {
-    try {
-        const res = await axios.get(`${API_BASE}/api/daily-key`);
-        return res.data.key;
-    } catch (err) {
-        console.error("❌ Failed to fetch daily key:", err.message);
-        throw new Error("Cannot get daily access key");
+// 🧩 Helper — Fetch secure daily key if not stored
+async function getAuthKey() {
+    let token = localStorage.getItem("RB_AUTH");
+    if (!token) {
+        try {
+            const res = await fetch(`${BASE_URL}/daily-key`);
+            const data = await res.json();
+            if (data.key) {
+                localStorage.setItem("RB_AUTH", data.key);
+                token = data.key;
+                console.log("✅ Fetched new daily key:", token);
+            }
+        } catch (err) {
+            console.error("❌ Could not fetch daily key:", err);
+        }
     }
+    return token;
 }
 
-/* ================================
-   3️⃣  Secure Resume Generator
-================================ */
-export const generateResume = async (formData) => {
-    try {
-        // Fetch valid TG-SECRET key for today
-        const authKey = await fetchDailyKey();
+// 🧾 Generate resume (PDF) — secure route
+export async function generateResume(formData) {
+    const token = await getAuthKey();
+    if (!token) throw new Error("Authorization key missing.");
 
-        // Post data with Authorization header
-        const res = await axios.post(
-            `${API_BASE}/api/secure/generate-cv`,
-            formData,
-            {
-                headers: {
-                    Authorization: `Bearer ${authKey}`,
-                    "Content-Type": "application/json",
-                },
-            }
-        );
+    const res = await fetch(`${BASE_URL}/secure/generate-cv`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+    });
 
-        console.log("✅ Resume generated successfully:", res.data);
-        return res.data;
-    } catch (err) {
-        console.error("❌ Secure generateResume failed:", err.message);
-        throw err;
+    if (!res.ok) {
+        const text = await res.text();
+        console.error("❌ Server responded with error:", text);
+        throw new Error(`Server error (${res.status})`);
     }
-};
 
-/* ================================
-   4️⃣  Secure test endpoint
-================================ */
-export const testSecure = async () => {
-    try {
-        const key = await fetchDailyKey();
-        const res = await axios.get(`${API_BASE}/api/secure/ping`, {
-            headers: { Authorization: `Bearer ${key}` },
-        });
-        return res.data;
-    } catch (err) {
-        console.error("❌ Secure test failed:", err.message);
-        throw err;
+    // Expect JSON response: { success: true, file: "/resumes/filename.pdf" }
+    const data = await res.json();
+    return data;
+}
+
+// 🔒 Test secure API route
+export async function testSecure() {
+    const token = await getAuthKey();
+    if (!token) throw new Error("Authorization key missing.");
+
+    const res = await fetch(`${BASE_URL}/secure/ping`, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Server error (${res.status}): ${text}`);
     }
-};
 
-/* ================================
-   5️⃣  Export default for other imports
-================================ */
-export default {
+    const data = await res.json();
+    return data;
+}
+
+// ✅ Optional: export as a grouped object if you prefer `api.testSecure()`
+export const api = {
     generateResume,
     testSecure,
 };
-
-export const api = { generateResume, testSecure };
