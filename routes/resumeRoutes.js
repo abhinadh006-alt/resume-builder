@@ -9,7 +9,8 @@ import FormData from "form-data";
 
 import Resume from "../models/Resume.js";
 import { generatePDF } from "../utils/generatePDF.js";
-import verifyTgLink from "../middleware/verifyTgLink.js";
+import { isValidDailyKey, logKeyUsage } from "../middleware/verifyTgLink.js";
+
 
 const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
@@ -105,18 +106,24 @@ router.delete("/:id", async (req, res) => {
 });
 
 /* 6️⃣ GENERATE PDF (existing method) */
-router.post("/generate", verifyTgLink, async (req, res) => {
+/* 6️⃣ GENERATE PDF (secured with Telegram daily key) */
+router.post("/generate", async (req, res) => {
     try {
-        const { name, email, phone, experience, education, skills, certifications, template = "modern", chatId, auth } = req.body;
-        if (!name || !email) return res.status(400).json({ message: "Name and Email required." });
+        const authHeader = req.headers.authorization;
+        if (!isValidDailyKey(authHeader)) {
+            console.warn("❌ Invalid or expired TG-SECRET key on /generate.");
+            return res.status(401).json({ error: "Unauthorized: Invalid or expired key" });
+        }
 
-        const today = new Date().toISOString().split("T")[0].replace(/-/g, "");
-        const expectedKey = `TG-SECRET-${today}`;
-        if (auth && auth !== expectedKey) return res.status(403).json({ message: "Access denied: invalid auth key." });
+        logKeyUsage(req, authHeader);
+
+        const { name, email, phone, experience, education, skills, certifications, template = "modern", chatId } = req.body;
+        if (!name || !email) return res.status(400).json({ message: "Name and Email required." });
 
         const data = { name, email, phone, experience, education, skills, certifications };
         const downloadURL = await generatePDF(data, template);
 
+        // Send PDF to Telegram
         if (chatId) {
             const fileAbsolute = `${process.env.BASE_URL || "http://localhost:5000"}${downloadURL}`;
             try {
@@ -136,6 +143,7 @@ router.post("/generate", verifyTgLink, async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 });
+
 
 /* 7️⃣ GENERATE PDF FOR SAVED RESUME */
 router.get("/pdf/:id", async (req, res) => {
