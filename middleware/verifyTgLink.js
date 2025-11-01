@@ -6,39 +6,29 @@ import path from "path";
 export function isValidDailyKey(authHeader) {
     if (!authHeader) return false;
 
-    // Remove "Bearer " prefix if present
-    let token = authHeader.replace(/^Bearer\s+/i, "").trim();
+    // Accept both "Bearer TG-SECRET-..." and "TG-SECRET-..."
+    const token = authHeader.replace(/^Bearer\s*/i, "").trim();
 
-    // Must start with TG-SECRET-
     if (!token.startsWith("TG-SECRET-")) return false;
 
-    // Extract the part after TG-SECRET-
-    token = token.replace("TG-SECRET-", "");
-
-    // Split by hyphen: [datePart, chatId]
-    const parts = token.split("-");
+    const parts = token.replace("TG-SECRET-", "").split("-");
     if (parts.length < 2) return false;
 
     const datePart = parts[0];
     const chatId = parts[1];
 
-    // Validate chatId is numeric
     if (!/^\d+$/.test(chatId)) return false;
 
-    // Build expected date (YYYYMMDD)
     const now = new Date();
     const yyyy = now.getFullYear();
     const mm = String(now.getMonth() + 1).padStart(2, "0");
     const dd = String(now.getDate()).padStart(2, "0");
     const expectedDate = `${yyyy}${mm}${dd}`;
 
-    console.log("🔍 Validating key:");
-    console.log("   Received datePart:", datePart);
-    console.log("   Expected date:", expectedDate);
-    console.log("   ChatId:", chatId);
-
     return datePart === expectedDate;
 }
+
+
 
 export function logKeyUsage(req, authHeader) {
     try {

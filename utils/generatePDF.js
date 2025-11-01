@@ -16,11 +16,31 @@ export async function generatePDF(data, templateType = "modern") {
     const compiled = Handlebars.compile(html);
 
     const safe = { ...data };
-    if (typeof safe.skills === "string") safe.skills = safe.skills.split(",").map(s => s.trim()).filter(Boolean);
+    if (typeof safe.skills === "string") {
+        safe.skills = safe.skills.split(",").map(s => s.trim()).filter(Boolean);
+    }
 
     const finalHTML = compiled(safe);
 
-    const browser = await puppeteer.launch({ headless: true, args: ["--no-sandbox", "--disable-setuid-sandbox"] });
+    // 🧠 Use correct Chrome path depending on environment
+    const executablePath =
+        process.env.PUPPETEER_EXECUTABLE_PATH ||
+        (process.env.NODE_ENV === "production"
+            ? "/usr/bin/google-chrome-stable"
+            : puppeteer.executablePath());
+
+    const browser = await puppeteer.launch({
+        headless: true,
+        args: [
+            "--no-sandbox",
+            "--disable-setuid-sandbox",
+            "--disable-gpu",
+            "--no-zygote",
+            "--single-process"
+        ],
+        executablePath,
+    });
+
     const page = await browser.newPage();
     await page.setContent(finalHTML, { waitUntil: "networkidle0" });
 
@@ -35,7 +55,7 @@ export async function generatePDF(data, templateType = "modern") {
         path: filePath,
         format: "A4",
         printBackground: true,
-        margin: { top: "15mm", bottom: "15mm", left: "12mm", right: "12mm" }
+        margin: { top: "15mm", bottom: "15mm", left: "12mm", right: "12mm" },
     });
 
     await browser.close();
