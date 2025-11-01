@@ -3,24 +3,24 @@ const BASE_URL =
     import.meta?.env?.VITE_API_BASE_URL ||
     "https://resume-builder-jv01.onrender.com/api";
 
-
-// 🧩 Helper — Fetch secure daily key if not stored
+// 🧩 Helper — Read Telegram key from storage
 async function getAuthKey() {
-    let token = localStorage.getItem("RB_AUTH");
+    const token = localStorage.getItem("RB_AUTH");
     if (!token) {
-        try {
-            const res = await fetch(`${BASE_URL}/daily-key`);
-            const data = await res.json();
-            if (data.key) {
-                localStorage.setItem("RB_AUTH", data.key);
-                token = data.key;
-                console.log("✅ Fetched new daily key:", token);
-            }
-        } catch (err) {
-            console.error("❌ Could not fetch daily key:", err);
-        }
+        console.warn("⚠️ No Telegram authorization key found in localStorage.");
+        return null;
     }
-    return token;
+
+    // ✅ Ensure it starts with TG-SECRET-
+    const cleanToken = token.replace(/^Bearer\s+/i, "").trim();
+
+    if (!cleanToken.startsWith("TG-SECRET-")) {
+        console.error("❌ Invalid token format in storage!");
+        return null;
+    }
+
+    console.log("🔑 Using auth key:", cleanToken.slice(0, 30) + "...");
+    return cleanToken;
 }
 
 // 🧾 Generate resume (PDF) — secure route
@@ -32,7 +32,7 @@ export async function generateResume(formData) {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: token,  // ✅ Don't add "Bearer" prefix
         },
         body: JSON.stringify(formData),
     });
@@ -43,7 +43,6 @@ export async function generateResume(formData) {
         throw new Error(`Server error (${res.status})`);
     }
 
-    // Expect JSON response: { success: true, file: "/resumes/filename.pdf" }
     const data = await res.json();
     return data;
 }
@@ -54,7 +53,7 @@ export async function testSecure() {
     if (!token) throw new Error("Authorization key missing.");
 
     const res = await fetch(`${BASE_URL}/secure/ping`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: token },  // ✅ Don't add "Bearer" prefix
     });
 
     if (!res.ok) {
@@ -66,7 +65,6 @@ export async function testSecure() {
     return data;
 }
 
-// ✅ Optional: export as a grouped object if you prefer `api.testSecure()`
 export const api = {
     generateResume,
     testSecure,

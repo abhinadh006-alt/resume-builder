@@ -1,49 +1,43 @@
+// middleware/verifyTgLink.js
 import fs from "fs";
 import path from "path";
-import crypto from "crypto";
 
-/**
- * ✅ Default export — middleware for Telegram verification
- */
-export default function verifyTgLink(req, res, next) {
-    try {
-        const { chatId, date, access } = req.body;
-        if (!chatId || !date || !access) {
-            console.warn("⚠️ Missing security params:", req.body);
-            return res.status(401).json({ message: "Missing access parameters" });
-        }
-
-        const expected = crypto
-            .createHmac("sha256", process.env.APP_SECRET)
-            .update(`${chatId}|${date}`)
-            .digest("hex");
-
-        const today = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-        if (access !== expected || date !== today) {
-            console.warn("🚫 Invalid or expired access:", { chatId, date });
-            return res.status(403).json({ message: "Access expired or invalid" });
-        }
-
-        next();
-    } catch (err) {
-        console.error("❌ verifyTgLink error:", err.message);
-        res.status(500).json({ message: "Server error validating link" });
-    }
-}
-
-/**
- * ✅ Named exports for secure routes
- */
+// middleware/verifyTgLink.js
 export function isValidDailyKey(authHeader) {
-    if (!authHeader || !authHeader.startsWith("Bearer TG-SECRET-")) return false;
+    if (!authHeader) return false;
 
-    const token = authHeader.replace("Bearer TG-SECRET-", "").trim();
+    // Remove "Bearer " prefix if present
+    let token = authHeader.replace(/^Bearer\s+/i, "").trim();
+
+    // Must start with TG-SECRET-
+    if (!token.startsWith("TG-SECRET-")) return false;
+
+    // Extract the part after TG-SECRET-
+    token = token.replace("TG-SECRET-", "");
+
+    // Split by hyphen: [datePart, chatId]
+    const parts = token.split("-");
+    if (parts.length < 2) return false;
+
+    const datePart = parts[0];
+    const chatId = parts[1];
+
+    // Validate chatId is numeric
+    if (!/^\d+$/.test(chatId)) return false;
+
+    // Build expected date (YYYYMMDD)
     const now = new Date();
     const yyyy = now.getFullYear();
     const mm = String(now.getMonth() + 1).padStart(2, "0");
-    const expectedBase = `${mm}06${yyyy}D11D`.replace(/[^\d]/g, "");
+    const dd = String(now.getDate()).padStart(2, "0");
+    const expectedDate = `${yyyy}${mm}${dd}`;
 
-    return token.startsWith(expectedBase);
+    console.log("🔍 Validating key:");
+    console.log("   Received datePart:", datePart);
+    console.log("   Expected date:", expectedDate);
+    console.log("   ChatId:", chatId);
+
+    return datePart === expectedDate;
 }
 
 export function logKeyUsage(req, authHeader) {
@@ -55,8 +49,8 @@ export function logKeyUsage(req, authHeader) {
         const entry = {
             time: new Date().toISOString(),
             ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown",
-            keyPrefix: authHeader ? authHeader.slice(0, 20) + "..." : "(none)",
-            route: req.originalUrl || req.url,
+            keyPrefix: authHeader ? authHeader.slice(0, 30) + "..." : "(none)",
+            route: req.originalUrl,
             method: req.method,
         };
 

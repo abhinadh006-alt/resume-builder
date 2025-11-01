@@ -73,12 +73,39 @@ export default function ResumeBuilder() {
     const [loading, setLoading] = useState(false);
 
     // ✅ Handle resume generation
+    // ✅ Handle resume generation
     const handleSubmit = async () => {
         try {
             setLoading(true);
 
+            // Ensure required fields
+            if (!formData.name?.trim() || !formData.email?.trim()) {
+                toast.error("❌ Please enter your name and email before generating.");
+                setLoading(false);
+                return;
+            }
+
+            // Construct payload explicitly to ensure backend gets the right structure
+            const chatId = localStorage.getItem("RB_CHAT");
+            const payload = {
+                name: formData.name.trim(),
+                email: formData.email.trim(),
+                title: formData.title,
+                phone: formData.phone,
+                location: formData.location,
+                website: formData.website,
+                summary: formData.summary,
+                experience: formData.experience,
+                education: formData.education,
+                certifications: formData.certifications,
+                skills: formData.skills,
+                languages: formData.languages,
+                template,
+                chatId: chatId || undefined  // ✅ Include chatId
+            };
+
             // Call secure backend generator
-            const result = await generateResume({ ...formData, template });
+            const result = await generateResume(payload);
 
             if (result?.file) {
                 toast.success("✅ Resume generated successfully!");
