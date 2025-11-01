@@ -41,22 +41,28 @@ const allowedOrigins = [
   "http://localhost:5173",
 ];
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true); // allow Postman/server-side calls
-      const normalized = origin.replace(/\/$/, ""); // remove trailing slash
-      if (allowedOrigins.includes(normalized)) {
-        return callback(null, true);
-      }
-      console.warn("❌ Blocked by CORS:", origin);
-      return callback(new Error("Not allowed by CORS"));
-    },
-    methods: ["GET", "POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && allowedOrigins.includes(origin.replace(/\/$/, ""))) {
+    res.header("Access-Control-Allow-Origin", origin);
+  }
+  res.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
+
+  // ✅ Handle preflight requests fast
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+
+  next();
+});
+
+app.use((req, res, next) => {
+  console.log("🌍 Incoming origin:", req.headers.origin);
+  next();
+});
+
 
 // ===============================
 // 4️⃣ Body Parsers & Logging
@@ -76,31 +82,34 @@ app.use((req, _res, next) => {
 app.use("/resumes", express.static(path.join(__dirname, "public", "resumes")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// ===============================
-// 6️⃣ Public Route — Daily Key
-// ===============================
+// ✅ Public endpoint (used by Telegram bot) — Generates chat-bound daily key
 app.get("/api/daily-key", (req, res) => {
+  const chatId = req.query.chatId;
+  if (!chatId) {
+    return res.status(400).json({ error: "chatId is required" });
+  }
+
   const today = new Date();
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, "0");
-  const dailyKey = `TG-SECRET-${mm}06${yyyy}D11D-${Math.random()
-    .toString(36)
-    .substring(2, 8)}`;
+  const dd = String(today.getDate()).padStart(2, "0");
+
+  const dailyKey = `TG-SECRET-${yyyy}${mm}${dd}-${chatId}`;
   res.json({ key: dailyKey });
 });
 
-// ===============================
-// 7️⃣ Secure Routes
-// ===============================
+
+
+/* ================================
+   4️⃣  Secure Route Middleware
+================================ */
 app.use("/api/secure", (req, res, next) => {
   const authHeader = req.headers.authorization;
   console.log("🔑 Checking secure key:", authHeader || "(none)");
 
   if (!isValidDailyKey(authHeader)) {
     console.warn("❌ Invalid or expired TG-SECRET key detected.");
-    return res
-      .status(401)
-      .json({ error: "Unauthorized: Invalid or expired key" });
+    return res.status(401).json({ error: "Unauthorized: Invalid or expired key" });
   }
 
   logKeyUsage(req, authHeader);
