@@ -23,11 +23,8 @@ export async function generatePDF(data, templateType = "modern") {
     const finalHTML = compiled(safe);
 
     // 🧠 Use correct Chrome path depending on environment
-    const executablePath =
-        process.env.PUPPETEER_EXECUTABLE_PATH ||
-        (process.env.NODE_ENV === "production"
-            ? "/usr/bin/google-chrome-stable"
-            : puppeteer.executablePath());
+    const executablePath = puppeteer.executablePath();
+
 
     const browser = await puppeteer.launch({
         headless: true,
