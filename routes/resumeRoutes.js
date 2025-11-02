@@ -159,24 +159,24 @@ router.get("/pdf/:id", async (req, res) => {
     }
 });
 
-/* 🆕 8️⃣ SECURE RESUME GENERATION (Cloudflare Worker + Telegram) */
-/* 🆕 8️⃣ SECURE RESUME GENERATION — with in-memory queue for burst protection */
+/* 🆕 8️⃣ SECURE RESUME GENERATION — In-memory queue with limited concurrency */
 const jobQueue = [];
-let isProcessing = false;
+const MAX_CONCURRENT_JOBS = 3;
+let activeJobs = 0;
 
 async function processQueue() {
-    if (isProcessing || jobQueue.length === 0) return;
-    isProcessing = true;
+    if (activeJobs >= MAX_CONCURRENT_JOBS || jobQueue.length === 0) return;
 
     const job = jobQueue.shift();
-    console.log(`⚙️ Processing job for chatId ${job.chatId} (${job.template})`);
+    activeJobs++;
 
+    console.log(`⚙️ Processing job for chatId ${job.chatId} (${job.template})`);
     try {
         const { name, template, chatId, rest } = job;
         const pdfFileName = `${name || "resume"}-${Date.now()}.pdf`;
         const pdfPath = path.join(PUBLIC_PATH, pdfFileName);
 
-        // ensure folder exists
+        // Ensure directory exists
         if (!fs.existsSync(PUBLIC_PATH)) fs.mkdirSync(PUBLIC_PATH, { recursive: true });
 
         console.log("🧾 Fetching PDF from Cloudflare Worker...");
@@ -198,10 +198,10 @@ async function processQueue() {
             throw new Error("Worker PDF generation failed");
         }
 
-        // Save PDF
+        // Save file
         const arrayBuffer = await workerRes.arrayBuffer();
         fs.writeFileSync(pdfPath, Buffer.from(arrayBuffer));
-        console.log("✅ PDF saved:", pdfFileName);
+        console.log(`✅ PDF saved: ${pdfFileName}`);
 
         // Send to Telegram
         if (chatId) {
@@ -209,7 +209,10 @@ async function processQueue() {
                 const formData = new FormData();
                 formData.append("chat_id", chatId);
                 formData.append("document", fs.createReadStream(pdfPath));
-                formData.append("caption", `✅ Your ${template} resume is ready, ${name || "Candidate"}!`);
+                formData.append(
+                    "caption",
+                    `✅ Your ${template} resume is ready, ${name || "Candidate"}!`
+                );
 
                 await axios.post(`${TELEGRAM_API}/sendDocument`, formData, {
                     headers: formData.getHeaders(),
@@ -223,8 +226,8 @@ async function processQueue() {
     } catch (err) {
         console.error("❌ Queue job failed:", err.message);
     } finally {
-        isProcessing = false;
-        setTimeout(processQueue, 800); // process next job after short delay
+        activeJobs--;
+        setTimeout(processQueue, 300); // check for next job shortly
     }
 }
 
@@ -232,12 +235,15 @@ router.post("/secure/generate-cv", async (req, res) => {
     try {
         const { name, template = "modern", chatId, ...rest } = req.body;
         const authHeader = req.headers.authorization;
-
         if (!chatId) return res.status(400).json({ error: "Missing chatId" });
 
         jobQueue.push({ name, template, chatId, rest, authHeader });
         console.log(`📥 Queued job for chatId ${chatId} (${template})`);
-        processQueue();
+
+        // Start processing loop
+        for (let i = activeJobs; i < MAX_CONCURRENT_JOBS; i++) {
+            processQueue();
+        }
 
         res.json({
             ok: true,
