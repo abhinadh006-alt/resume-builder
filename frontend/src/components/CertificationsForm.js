@@ -13,7 +13,7 @@ export default function CertificationsForm({ onSave, onCancel, initialData }) {
     });
 
     // ✅ use bullet hook
-    const { handleKeyDown, handleFocus } = useBulletTextarea();
+    const handleBulletInput = useBulletTextarea();
 
     useEffect(() => {
         if (initialData) {
@@ -96,16 +96,13 @@ export default function CertificationsForm({ onSave, onCancel, initialData }) {
                     name="description"
                     value={cert.description}
                     onChange={handleChange}
-                    onFocus={handleFocus}
-                    onKeyDown={handleKeyDown}
-                    rows="5"
+                    onKeyDown={(e) => handleBulletInput(e, (val) =>
+                        setCert((prev) => ({ ...prev, description: val }))
+                    )}
+                    rows="3"
                     placeholder="Add notes like validity, specialization, or key topics..."
-                    style={{
-                        whiteSpace: "pre-wrap",
-                        fontFamily: "Arial, sans-serif",
-                        lineHeight: "1.6",
-                    }}
                 />
+
 
             </div>
 

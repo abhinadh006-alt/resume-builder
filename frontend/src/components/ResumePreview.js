@@ -123,8 +123,11 @@ export default function ResumePreview({ formData, template, isFinalView }) {
                             {showText(cert.organization, "Issuing Organization")}
                             {cert.issueDate && <div className="date-range">{cert.issueDate}</div>}
                             {cert.credentialId && <p className="filled-text">ID/URL: {cert.credentialId}</p>}
-
-
+                            {cert.description && (
+                                <p className="filled-text" style={{ whiteSpace: "pre-line", lineHeight: "1.5" }}>
+                                    {cert.description}
+                                </p>
+                            )}
                             )
                         </div>
                     ))
