@@ -245,9 +245,17 @@ router.post("/secure/generate-cv", async (req, res) => {
     }
 });
 
-/* 🧠 9️⃣ Queue Status — Monitor running & pending jobs */
-router.get("/queue-status", async (_req, res) => {
+/* 🧠 9️⃣ Queue Status — Admin Protected */
+router.get("/queue-status", async (req, res) => {
     try {
+        const authKey = req.query.key || req.headers["x-admin-key"];
+
+        // 🔐 Validate secret key
+        if (authKey !== process.env.ADMIN_SECRET) {
+            return res.status(403).json({ error: "Forbidden: Invalid admin key" });
+        }
+
+        // 🧮 Return queue metrics
         res.json({
             ok: true,
             activeJobs,
@@ -260,6 +268,7 @@ router.get("/queue-status", async (_req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
 
 /* 3️⃣ GET BY ID */
 router.get("/:id", async (req, res) => {
