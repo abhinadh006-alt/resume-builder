@@ -160,23 +160,33 @@ router.get("/pdf/:id", async (req, res) => {
 });
 
 /* 🆕 8️⃣ SECURE RESUME GENERATION (Cloudflare Worker + Telegram) */
-router.post("/secure/generate-cv", async (req, res) => {
+/* 🆕 8️⃣ SECURE RESUME GENERATION — with in-memory queue for burst protection */
+const jobQueue = [];
+let isProcessing = false;
+
+async function processQueue() {
+    if (isProcessing || jobQueue.length === 0) return;
+    isProcessing = true;
+
+    const job = jobQueue.shift();
+    console.log(`⚙️ Processing job for chatId ${job.chatId} (${job.template})`);
+
     try {
-        const { name, template = "modern", chatId, ...rest } = req.body;
+        const { name, template, chatId, rest } = job;
         const pdfFileName = `${name || "resume"}-${Date.now()}.pdf`;
         const pdfPath = path.join(PUBLIC_PATH, pdfFileName);
 
-        // Ensure folder exists
+        // ensure folder exists
         if (!fs.existsSync(PUBLIC_PATH)) fs.mkdirSync(PUBLIC_PATH, { recursive: true });
 
-        console.log("🧾 Fetching PDF from Worker...");
+        console.log("🧾 Fetching PDF from Cloudflare Worker...");
         const workerRes = await fetch(
             "https://resume-builder-worker.safetycrewindiaresumebuilder.workers.dev/api/secure/generate-cv",
             {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: req.headers.authorization, // reuse daily key
+                    Authorization: job.authHeader,
                 },
                 body: JSON.stringify({ name, template, chatId, ...rest }),
             }
@@ -185,15 +195,15 @@ router.post("/secure/generate-cv", async (req, res) => {
         if (!workerRes.ok) {
             const errText = await workerRes.text();
             console.error("❌ Worker error:", errText);
-            return res.status(500).json({ error: "Worker PDF generation failed" });
+            throw new Error("Worker PDF generation failed");
         }
 
-        // Save locally
+        // Save PDF
         const arrayBuffer = await workerRes.arrayBuffer();
         fs.writeFileSync(pdfPath, Buffer.from(arrayBuffer));
         console.log("✅ PDF saved:", pdfFileName);
 
-        // Send to Telegram if chatId present
+        // Send to Telegram
         if (chatId) {
             try {
                 const formData = new FormData();
@@ -201,20 +211,38 @@ router.post("/secure/generate-cv", async (req, res) => {
                 formData.append("document", fs.createReadStream(pdfPath));
                 formData.append("caption", `✅ Your ${template} resume is ready, ${name || "Candidate"}!`);
 
-                const tgRes = await axios.post(`${TELEGRAM_API}/sendDocument`, formData, {
+                await axios.post(`${TELEGRAM_API}/sendDocument`, formData, {
                     headers: formData.getHeaders(),
                 });
 
-                console.log("📤 Telegram sendDocument response:", tgRes.data);
+                console.log(`📤 Sent PDF to Telegram chatId ${chatId}`);
             } catch (tgErr) {
                 console.error("❌ Telegram sendDocument failed:", tgErr.message);
             }
         }
+    } catch (err) {
+        console.error("❌ Queue job failed:", err.message);
+    } finally {
+        isProcessing = false;
+        setTimeout(processQueue, 800); // process next job after short delay
+    }
+}
+
+router.post("/secure/generate-cv", async (req, res) => {
+    try {
+        const { name, template = "modern", chatId, ...rest } = req.body;
+        const authHeader = req.headers.authorization;
+
+        if (!chatId) return res.status(400).json({ error: "Missing chatId" });
+
+        jobQueue.push({ name, template, chatId, rest, authHeader });
+        console.log(`📥 Queued job for chatId ${chatId} (${template})`);
+        processQueue();
 
         res.json({
             ok: true,
-            file: `/resumes/${pdfFileName}`,
-            sentToTelegram: !!chatId,
+            message:
+                "✅ Your resume request is queued. You'll receive it via Telegram shortly.",
         });
     } catch (err) {
         console.error("❌ /secure/generate-cv error:", err.message);
