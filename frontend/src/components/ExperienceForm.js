@@ -2,17 +2,21 @@ import React, { useState, useEffect } from "react";
 import MonthYearPicker from "./MonthYearPicker";
 import { format } from "date-fns";
 import "./ExperienceForm.css";
+import useBulletTextarea from "../hooks/useBulletTextarea"; // ✅ NEW import
 
 export default function ExperienceForm({ onSave, onCancel, initialData }) {
     const [experience, setExperience] = useState({
         title: "",
         company: "",
-        startDate: null, // ✅ store as Date
-        endDate: null,   // ✅ store as Date
+        startDate: null,
+        endDate: null,
         location: "",
         description: "",
         currentlyWorking: false,
     });
+
+    // ✅ use bullet hook
+    const { handleKeyDown, handleFocus } = useBulletTextarea();
 
     useEffect(() => {
         if (initialData) {
@@ -43,7 +47,7 @@ export default function ExperienceForm({ onSave, onCancel, initialData }) {
         setExperience((prev) => ({
             ...prev,
             currentlyWorking: checked,
-            endDate: checked ? null : prev.endDate, // ✅ reset to null not string
+            endDate: checked ? null : prev.endDate,
         }));
     };
 
@@ -55,7 +59,6 @@ export default function ExperienceForm({ onSave, onCancel, initialData }) {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // ✅ Format for saving/export
         const formattedData = {
             ...experience,
             startDate: experience.startDate
@@ -70,7 +73,7 @@ export default function ExperienceForm({ onSave, onCancel, initialData }) {
 
         onSave(formattedData);
 
-        // Reset after save
+        // reset
         setExperience({
             title: "",
             company: "",
@@ -127,7 +130,6 @@ export default function ExperienceForm({ onSave, onCancel, initialData }) {
                             />
                         )}
                     </div>
-
                 </div>
 
                 <div className="checkbox-group">
@@ -150,14 +152,22 @@ export default function ExperienceForm({ onSave, onCancel, initialData }) {
                 />
             </div>
 
+            {/* ✅ BULLETED DESCRIPTION FIELD */}
             <div className="form-group">
                 <label>Description</label>
                 <textarea
                     name="description"
                     value={experience.description}
                     onChange={handleChange}
+                    onFocus={handleFocus}
+                    onKeyDown={handleKeyDown}
                     rows="5"
-                    placeholder="Describe your responsibilities, achievements, or key projects..."
+                    placeholder="• Describe your responsibilities or achievements..."
+                    style={{
+                        whiteSpace: "pre-wrap",
+                        fontFamily: "Arial, sans-serif",
+                        lineHeight: "1.6",
+                    }}
                 />
             </div>
 
