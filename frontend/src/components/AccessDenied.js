@@ -1,6 +1,14 @@
 import React from "react";
 
 export default function AccessDenied() {
+    const params = new URLSearchParams(window.location.search);
+    const hasAuth = params.get("auth");
+    const hasChat = params.get("chatId");
+    const localAuth = localStorage.getItem("RB_AUTH");
+
+    // If valid data already present, don’t block
+    if ((hasAuth && hasChat) || localAuth) return null;
+
     return (
         <div style={{
             textAlign: "center",

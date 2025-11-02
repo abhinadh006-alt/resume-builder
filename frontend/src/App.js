@@ -10,58 +10,64 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   // 🌱 Auto-fetch and validate Telegram daily key once
+  // 🌱 Auto-fetch and validate Telegram daily key once
   useEffect(() => {
     async function fetchAuthKey() {
       try {
         const params = new URLSearchParams(window.location.search);
         const chatId = params.get("chatId");
+        const urlAuth = params.get("auth"); // 👈 New: Telegram-provided key
+        const today = new Date().toISOString().split("T")[0].replace(/-/g, "");
 
-        if (!chatId) {
-          console.warn("⚠️ No chatId found in URL — likely opened directly");
-          setValidAccess(false);
+        // ✅ 1. If Telegram URL includes auth, trust and store it
+        if (urlAuth && chatId) {
+          localStorage.setItem("RB_AUTH", urlAuth);
+          localStorage.setItem("RB_CHAT", chatId);
+          console.log("✅ Using auth from Telegram link:", urlAuth);
+          setValidAccess(true);
           setLoading(false);
           return;
         }
 
+        // ✅ 2. If existing stored key is still valid for today
         const existingKey = localStorage.getItem("RB_AUTH");
-        const today = new Date().toISOString().split("T")[0].replace(/-/g, "");
-
-        // 🧠 If existing key already valid for today and includes this chatId
-        if (existingKey && existingKey.includes(today) && existingKey.includes(chatId)) {
+        if (existingKey && existingKey.includes(today)) {
           console.log("✅ Using existing valid key:", existingKey);
           setValidAccess(true);
           setLoading(false);
           return;
         }
 
-        // 🗝 Fetch a fresh daily key from backend
-        console.log("🗝 Fetching new key for chatId:", chatId);
-        const res = await fetch(
-          `https://resume-builder-jv01.onrender.com/api/daily-key?chatId=${encodeURIComponent(chatId)}`
-        );
+        // ✅ 3. If no auth in URL, fetch a new one if chatId available
+        if (chatId) {
+          console.log("🗝 Fetching new key for chatId:", chatId);
+          const res = await fetch(
+            `https://resume-builder-jv01.onrender.com/api/daily-key?chatId=${encodeURIComponent(chatId)}`
+          );
 
-        if (!res.ok) {
-          console.error("❌ Failed to fetch daily key:", res.status);
-          setValidAccess(false);
+          if (!res.ok) throw new Error("Failed to fetch daily key");
+
+          const data = await res.json();
+          if (data.key) {
+            localStorage.setItem("RB_AUTH", data.key);
+            localStorage.setItem("RB_CHAT", chatId);
+            console.log("✅ Stored new key:", data.key);
+            setValidAccess(true);
+          } else {
+            console.error("❌ No key returned from API");
+            setValidAccess(false);
+          }
           setLoading(false);
           return;
         }
 
-        const data = await res.json();
-
-        if (data.key) {
-          localStorage.setItem("RB_AUTH", data.key);
-          localStorage.setItem("RB_CHAT", chatId);
-          console.log("✅ Stored new key:", data.key);
-          setValidAccess(true);
-        } else {
-          console.error("❌ No key returned:", data);
-          setValidAccess(false);
-        }
+        // ❌ 4. No auth or chatId → show access denied
+        console.warn("⚠️ No chatId or auth in URL — restricted access");
+        setValidAccess(false);
+        setLoading(false);
       } catch (err) {
         console.error("❌ Fetch daily key failed:", err);
         setValidAccess(false);
-      } finally {
         setLoading(false);
       }
     }
