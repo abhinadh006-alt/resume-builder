@@ -1,5 +1,6 @@
 // utils/generatePDF.js
-import puppeteer from "puppeteer";
+import chromium from "@sparticuz/chromium";
+import puppeteer from "puppeteer-core";
 import fs from "fs";
 import path from "path";
 import Handlebars from "handlebars";
@@ -22,20 +23,12 @@ export async function generatePDF(data, templateType = "modern") {
 
     const finalHTML = compiled(safe);
 
-    // 🧠 Use correct Chrome path depending on environment
-    const executablePath = puppeteer.executablePath();
-
-
+    // ✅ Works on Render (uses @sparticuz/chromium)
     const browser = await puppeteer.launch({
-        headless: true,
-        args: [
-            "--no-sandbox",
-            "--disable-setuid-sandbox",
-            "--disable-gpu",
-            "--no-zygote",
-            "--single-process"
-        ],
-        executablePath,
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(),
+        headless: chromium.headless,
     });
 
     const page = await browser.newPage();
