@@ -60,17 +60,6 @@ router.get("/", async (_req, res) => {
     }
 });
 
-/* 3️⃣ GET BY ID */
-router.get("/:id", async (req, res) => {
-    try {
-        const r = await Resume.findById(req.params.id);
-        if (!r) return res.status(404).json({ message: "Not found" });
-        res.json(r);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
 /* 4️⃣ UPDATE */
 router.put("/:id", async (req, res) => {
     try {
@@ -272,5 +261,15 @@ router.get("/queue-status", async (_req, res) => {
     }
 });
 
+/* 3️⃣ GET BY ID */
+router.get("/:id", async (req, res) => {
+    try {
+        const r = await Resume.findById(req.params.id);
+        if (!r) return res.status(404).json({ message: "Not found" });
+        res.json(r);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
 
 export default router;
