@@ -71,8 +71,18 @@ export default function ResumePreview({ formData, template }) {
                         <div key={i} className="resume-item">
                             <strong>{showText(exp.title, "Job Role")}</strong> —{" "}
                             {showText(exp.company, "Company Name")}
-                            <p>
-                                {showText(exp.description, "Describe your work achievements...")}
+
+                            {/* ✅ Fix multiline bullets */}
+                            <p
+                                style={{
+                                    whiteSpace: "pre-line",
+                                    marginTop: "4px",
+                                    lineHeight: "1.5",
+                                }}
+                            >
+                                {exp.description && exp.description.trim() !== ""
+                                    ? exp.description
+                                    : "Describe your work achievements..."}
                             </p>
                         </div>
                     ))
@@ -80,6 +90,7 @@ export default function ResumePreview({ formData, template }) {
                     <p className="placeholder-text">Add your experience details here...</p>
                 )}
             </section>
+
 
             {/* ===== EDUCATION ===== */}
             <section className="resume-section">

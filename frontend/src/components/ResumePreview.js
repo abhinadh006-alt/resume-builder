@@ -61,7 +61,12 @@ export default function ResumePreview({ formData, template, isFinalView }) {
                             {showText(exp.company, "Company Name")} —{" "}
                             {showText(exp.location, "City, Country")}
                             <div className="date-range">{formatDateRange(exp, "e.g., 2019 – 2023")}</div>
-                            <p>{showText(exp.description, "Job responsibilities and achievements...")}</p>
+                            <p style={{ whiteSpace: "pre-line", lineHeight: "1.5" }}>
+                                {exp.description && exp.description.trim() !== ""
+                                    ? exp.description
+                                    : "Job responsibilities and achievements..."}
+                            </p>
+
                         </div>
                     ))
                 ) : (
@@ -87,7 +92,12 @@ export default function ResumePreview({ formData, template, isFinalView }) {
                             {showText(edu.school, "Harvard University")} —{" "}
                             {showText(edu.location, "City, Country")}
                             <div className="date-range">{formatDateRange(edu, "e.g., 2015 – 2019")}</div>
-                            <p>{showText(edu.description, "Add GPA, specialization, or achievements...")}</p>
+                            <p style={{ whiteSpace: "pre-line", lineHeight: "1.5" }}>
+                                {edu.description && edu.description.trim() !== ""
+                                    ? edu.description
+                                    : "Add GPA, specialization, or achievements..."}
+                            </p>
+
                         </div>
                     ))
                 ) : (
@@ -113,7 +123,12 @@ export default function ResumePreview({ formData, template, isFinalView }) {
                             {showText(cert.organization, "Issuing Organization")}
                             {cert.issueDate && <div className="date-range">{cert.issueDate}</div>}
                             {cert.credentialId && <p className="filled-text">ID/URL: {cert.credentialId}</p>}
-                            {cert.description && <p className="filled-text">{cert.description}</p>}
+                            {cert.description && (
+                                <p className="filled-text" style={{ whiteSpace: "pre-line", lineHeight: "1.5" }}>
+                                    {cert.description}
+                                </p>
+                            )}
+
                         </div>
                     ))
                 ) : (

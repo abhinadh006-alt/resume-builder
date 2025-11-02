@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import MonthYearPicker from "./MonthYearPicker";
 import { format } from "date-fns";
 import "./EducationForm.css";
+import useBulletTextarea from "../hooks/useBulletTextarea";
 
 export default function EducationForm({ onSave, onCancel, initialData }) {
     const [education, setEducation] = useState({
@@ -13,6 +14,9 @@ export default function EducationForm({ onSave, onCancel, initialData }) {
         description: "",
         currentlyStudying: false,
     });
+
+    // ✅ use bullet hook
+    const { handleKeyDown, handleFocus } = useBulletTextarea();
 
     useEffect(() => {
         if (initialData) {
@@ -161,9 +165,13 @@ export default function EducationForm({ onSave, onCancel, initialData }) {
                     name="description"
                     value={education.description}
                     onChange={handleChange}
+                    onKeyDown={(e) => handleBulletInput(e, (val) =>
+                        setEducation((prev) => ({ ...prev, description: val }))
+                    )}
                     rows="5"
                     placeholder="Add details like GPA, specialization, projects, etc."
                 />
+
             </div>
 
             {/* === Buttons === */}
