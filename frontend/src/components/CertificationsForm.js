@@ -96,11 +96,15 @@ export default function CertificationsForm({ onSave, onCancel, initialData }) {
                     name="description"
                     value={cert.description}
                     onChange={handleChange}
-                    onKeyDown={(e) => handleBulletInput(e, (val) =>
-                        setCert((prev) => ({ ...prev, description: val }))
-                    )}
-                    rows="3"
+                    onFocus={handleFocus}
+                    onKeyDown={handleKeyDown}
+                    rows="5"
                     placeholder="Add notes like validity, specialization, or key topics..."
+                    style={{
+                        whiteSpace: "pre-wrap",
+                        fontFamily: "Arial, sans-serif",
+                        lineHeight: "1.6",
+                    }}
                 />
 
             </div>

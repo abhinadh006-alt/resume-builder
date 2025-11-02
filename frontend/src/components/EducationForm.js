@@ -165,11 +165,15 @@ export default function EducationForm({ onSave, onCancel, initialData }) {
                     name="description"
                     value={education.description}
                     onChange={handleChange}
-                    onKeyDown={(e) => handleBulletInput(e, (val) =>
-                        setEducation((prev) => ({ ...prev, description: val }))
-                    )}
+                    onFocus={handleFocus}
+                    onKeyDown={handleKeyDown}
                     rows="5"
                     placeholder="Add details like GPA, specialization, projects, etc."
+                    style={{
+                        whiteSpace: "pre-wrap",
+                        fontFamily: "Arial, sans-serif",
+                        lineHeight: "1.6",
+                    }}
                 />
 
             </div>
