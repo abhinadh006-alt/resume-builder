@@ -256,4 +256,21 @@ router.post("/secure/generate-cv", async (req, res) => {
     }
 });
 
+/* 🧠 9️⃣ Queue Status — Monitor running & pending jobs */
+router.get("/queue-status", async (_req, res) => {
+    try {
+        res.json({
+            ok: true,
+            activeJobs,
+            queuedJobs: jobQueue.length,
+            maxConcurrent: MAX_CONCURRENT_JOBS,
+            timestamp: new Date().toISOString(),
+        });
+    } catch (err) {
+        console.error("❌ Queue status error:", err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
 export default router;
