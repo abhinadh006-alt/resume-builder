@@ -38,6 +38,7 @@ const app = express();
 const allowedOrigins = [
   "https://safetycrewindiaresumes.netlify.app",
   "http://localhost:3000",
+  "http://localhost:3001",
   "http://localhost:5173",
 ];
 
@@ -105,15 +106,26 @@ app.get("/api/daily-key", (req, res) => {
 ================================ */
 app.use("/api/secure", (req, res, next) => {
   const authHeader = req.headers.authorization;
-  console.log("🔑 Checking secure key:", authHeader || "(none)");
+  const origin = req.headers.origin || "";
+  const host = req.hostname;
 
-  if (!isValidDailyKey(authHeader)) {
-    console.warn("❌ Invalid or expired TG-SECRET key detected.");
-    return res.status(401).json({ error: "Unauthorized: Invalid or expired key" });
+  console.log("🔑 Secure route access attempt from:", origin || host);
+
+  // ✅ 1️⃣ Allow localhost (development)
+  if (host.includes("localhost") || origin.includes("localhost")) {
+    console.log("🧩 Localhost detected — bypassing Telegram key check for testing");
+    return next();
   }
 
-  logKeyUsage(req, authHeader);
-  next();
+  // ✅ 2️⃣ Telegram / authorized external users
+  if (isValidDailyKey(authHeader)) {
+    logKeyUsage(req, authHeader);
+    return next();
+  }
+
+  // ❌ 3️⃣ Everyone else gets blocked
+  console.warn("🚫 Unauthorized attempt from:", origin || host);
+  return res.status(401).json({ error: "Unauthorized: Invalid or expired key" });
 });
 
 app.get("/api/secure/ping", (_req, res) =>
