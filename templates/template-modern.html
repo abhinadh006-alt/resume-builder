@@ -1,224 +1,204 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8" />
     <title>{{name}} — Resume</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
     <style>
-        body {
-            font-family: "Inter", Arial, sans-serif;
-            color: #222;
-            margin: 0;
-            padding: 0;
-            background: #fff;
-            line-height: 1.4;
+        @page {
+            size: A4;
+            margin: 15mm 12mm 15mm 12mm;
         }
 
-        .page {
-            width: 210mm;
-            min-height: 297mm;
-            padding: 20mm;
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            margin: 0;
+            color: #222;
+            background: #fff;
+            line-height: 1.4;
+            font-size: 12px;
+        }
+
+        .container {
+            padding: 10px 0;
+            width: 100%;
             box-sizing: border-box;
         }
 
-        /* Header */
+        /* HEADER */
         .header {
             text-align: left;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 6px;
         }
 
         .header h1 {
+            margin: 0;
+            color: #1b2b6f;
             font-size: 22px;
             font-weight: 700;
-            color: #1b2b6f;
-            margin: 0;
-        }
-
-        .header h2 {
-            font-size: 12px;
-            color: #6a6a6a;
-            font-style: italic;
-            margin: 4px 0 6px 0;
+            text-transform: uppercase;
         }
 
         .contact {
-            font-size: 12px;
-            color: #444;
+            font-size: 11px;
+            color: #555;
+            margin-top: 4px;
         }
 
         .contact span {
-            margin-right: 6px;
+            margin-right: 10px;
         }
 
-        /* Sections */
+        /* SECTION STYLES */
         .section {
             margin-top: 16px;
-            padding-top: 6px;
-            border-top: 1px solid #e0e0e0;
         }
 
-        .section h2 {
-            font-size: 13px;
-            font-weight: 700;
+        .section-title {
+            font-weight: bold;
             color: #1b2b6f;
-            border-left: 3px solid #3f51b5;
-            padding-left: 6px;
             text-transform: uppercase;
-            margin: 0 0 8px 0;
+            border-left: 3px solid #1b2b6f;
+            padding-left: 6px;
+            font-size: 13px;
+            margin-bottom: 6px;
         }
 
+        /* ENTRY STYLES */
         .entry {
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .entry strong {
-            font-weight: 600;
+            color: #000;
         }
 
-        .entry .meta {
-            color: #333;
-            font-size: 12px;
-            margin-bottom: 3px;
-        }
-
-        .entry .date {
+        .entry small {
+            color: #666;
             font-size: 11px;
-            color: #777;
-            margin-bottom: 4px;
         }
 
+        .bullets {
+            margin: 4px 0 0 18px;
+            padding: 0;
+        }
+
+        .bullets li {
+            margin: 2px 0;
+        }
+
+        /* SKILL TAGS */
+        .skills {
+            margin-top: 4px;
+        }
+
+        .skill-pill {
+            display: inline-block;
+            background: #f0f3ff;
+            border: 1px solid #e1e4ff;
+            border-radius: 12px;
+            padding: 3px 8px;
+            font-size: 11px;
+            color: #1b2b6f;
+            margin: 2px 5px 2px 0;
+        }
+
+        /* CERTIFICATIONS */
         ul {
             margin: 4px 0 0 18px;
             padding: 0;
-            font-size: 12px;
         }
 
         ul li {
-            margin-bottom: 3px;
+            margin: 3px 0;
         }
 
-        .skill-item,
-        .lang-item {
+        /* PROFILE */
+        .summary {
             font-size: 12px;
-            margin-bottom: 4px;
+            color: #333;
+            margin-top: 4px;
         }
     </style>
 </head>
 
 <body>
-    <div class="page">
-        <!-- Header -->
+    <div class="container">
+        <!-- HEADER -->
         <div class="header">
             <h1>{{name}}</h1>
-            <h2>{{title}}</h2>
             <div class="contact">
-                <span>{{email}}</span> |
-                <span>{{phone}}</span> |
-                <span>{{location}}</span> |
-                <span>{{website}}</span>
+                {{#if email}}<span>{{email}}</span>{{/if}}
+                {{#if phone}}<span>{{phone}}</span>{{/if}}
+                {{#if location}}<span>{{location}}</span>{{/if}}
             </div>
         </div>
 
-        <!-- Summary -->
+        <!-- SUMMARY -->
         {{#if summary}}
         <div class="section">
-            <h2>Summary</h2>
-            <p style="font-size: 12px;">{{summary}}</p>
+            <div class="section-title">Summary</div>
+            <div class="summary">{{summary}}</div>
         </div>
         {{/if}}
 
-        <!-- Experience -->
+        <!-- EXPERIENCE -->
         {{#if experience.length}}
         <div class="section">
-            <h2>Experience</h2>
+            <div class="section-title">Experience</div>
             {{#each experience}}
-            <div class="entry">
-                <div class="meta"><strong>{{this.title}}</strong>, {{this.company}} — {{this.location}}</div>
-                {{#if this.start}}
-                <div class="date">{{this.start}} – {{this.end}}</div>
-                {{/if}}
-                {{#if this.points.length}}
-                <ul>
-                    {{#each this.points}}
-                    <li>{{this}}</li>
-                    {{/each}}
-                </ul>
-                {{else if this.description}}
-                <ul>
-                    <li>{{this.description}}</li>
-                </ul>
-                {{/if}}
-            </div>
+            <div class="entry">{{this}}</div>
             {{/each}}
         </div>
         {{/if}}
 
-        <!-- Education -->
+        <!-- EDUCATION -->
         {{#if education.length}}
         <div class="section">
-            <h2>Education</h2>
+            <div class="section-title">Education</div>
             {{#each education}}
-            <div class="entry">
-                <div class="meta"><strong>{{this.degree}}</strong>, {{this.school}} — {{this.location}}</div>
-                <div class="date">{{this.start}} – {{this.end}}</div>
-                {{#if this.points.length}}
-                <ul>
-                    {{#each this.points}}
-                    <li>{{this}}</li>
-                    {{/each}}
-                </ul>
-                {{else if this.description}}
-                <ul>
-                    <li>{{this.description}}</li>
-                </ul>
-                {{/if}}
-            </div>
+            <div class="entry">{{this}}</div>
             {{/each}}
         </div>
         {{/if}}
 
-        <!-- Certifications -->
+        <!-- CERTIFICATIONS -->
         {{#if certifications.length}}
         <div class="section">
-            <h2>Certifications</h2>
-            {{#each certifications}}
-            <div class="entry">
-                <div class="meta"><strong>{{this.name}}</strong> — {{this.organization}}</div>
-                <div class="date">{{this.issueDate}}</div>
-                {{#if this.credentialId}}<div style="font-size: 12px;">ID/URL: {{this.credentialId}}</div>{{/if}}
-                {{#if this.points.length}}
-                <ul>
-                    {{#each this.points}}
-                    <li>{{this}}</li>
-                    {{/each}}
-                </ul>
-                {{else if this.description}}
-                <ul>
-                    <li>{{this.description}}</li>
-                </ul>
-                {{/if}}
-            </div>
-            {{/each}}
+            <div class="section-title">Certifications</div>
+            <ul>
+                {{#each certifications}}
+                <li>{{this}}</li>
+                {{/each}}
+            </ul>
         </div>
         {{/if}}
 
-        <!-- Skills -->
+        <!-- SKILLS -->
         {{#if skills.length}}
         <div class="section">
-            <h2>Skills</h2>
-            {{#each skills}}
-            <div class="skill-item">{{this.skill}} — {{this.proficiency}}</div>
-            {{/each}}
+            <div class="section-title">Skills</div>
+            <div class="skills">
+                {{#each skills}}
+                <span class="skill-pill">{{this}}</span>
+                {{/each}}
+            </div>
         </div>
         {{/if}}
 
-        <!-- Languages -->
+        <!-- LANGUAGES -->
         {{#if languages.length}}
         <div class="section">
-            <h2>Languages</h2>
-            {{#each languages}}
-            <div class="lang-item">{{this.language}} - {{this.proficiency}}</div>
-            {{/each}}
+            <div class="section-title">Languages</div>
+            <div>
+                {{#each languages}}
+                <span class="skill-pill">{{this}}</span>
+                {{/each}}
+            </div>
         </div>
         {{/if}}
 
