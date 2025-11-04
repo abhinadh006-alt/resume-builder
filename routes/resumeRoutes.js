@@ -222,28 +222,15 @@ async function processQueue() {
 
 router.post("/secure/generate-cv", async (req, res) => {
     try {
-        const { name, template = "modern", chatId, ...rest } = req.body;
-        const authHeader = req.headers.authorization;
-        if (!chatId) return res.status(400).json({ error: "Missing chatId" });
-
-        jobQueue.push({ name, template, chatId, rest, authHeader });
-        console.log(`📥 Queued job for chatId ${chatId} (${template})`);
-
-        // Start processing loop
-        for (let i = activeJobs; i < MAX_CONCURRENT_JOBS; i++) {
-            processQueue();
-        }
-
-        res.json({
-            ok: true,
-            message:
-                "✅ Your resume request is queued. You'll receive it via Telegram shortly.",
-        });
+        const { template = "modern" } = req.body;
+        console.log("🧾 Generating PDF for template:", template);
+        await generatePDF(req.body, template, res); // Streams PDF directly
     } catch (err) {
         console.error("❌ /secure/generate-cv error:", err.message);
-        res.status(500).json({ error: err.message });
+        res.status(500).send("Failed to generate PDF");
     }
 });
+
 
 /* 🧠 9️⃣ Queue Status — Admin Protected */
 router.get("/queue-status", async (req, res) => {
