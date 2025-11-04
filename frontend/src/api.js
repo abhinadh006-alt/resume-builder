@@ -1,19 +1,26 @@
-const BASE_URL =
-    process.env.REACT_APP_API_BASE_URL ||
-    import.meta?.env?.VITE_API_BASE_URL ||
-    "https://resume-builder-jv01.onrender.com/api";
+const BASE_URL = "http://localhost:5000/api";
+
+// 🧩 Helper — Detect local environment
+const isLocalhost =
+    typeof window !== "undefined" &&
+    (window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1");
 
 // 🧩 Helper — Read Telegram key from storage
 async function getAuthKey() {
+    if (isLocalhost) {
+        // ✅ Localhost: bypass Telegram key
+        console.log("🧩 Localhost detected — skipping Telegram key requirement");
+        return "LOCAL-DEV-MODE";
+    }
+
     const token = localStorage.getItem("RB_AUTH");
     if (!token) {
         console.warn("⚠️ No Telegram authorization key found in localStorage.");
         return null;
     }
 
-    // ✅ Ensure it starts with TG-SECRET-
     const cleanToken = token.replace(/^Bearer\s+/i, "").trim();
-
     if (!cleanToken.startsWith("TG-SECRET-")) {
         console.error("❌ Invalid token format in storage!");
         return null;
@@ -23,16 +30,15 @@ async function getAuthKey() {
     return cleanToken;
 }
 
-// 🧾 Generate resume (PDF) — secure route
+// 🧾 Generate resume (PDF)
 export async function generateResume(formData) {
     const token = await getAuthKey();
-    if (!token) throw new Error("Authorization key missing.");
 
     const res = await fetch(`${BASE_URL}/secure/generate-cv`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            Authorization: token,  // ✅ Don't add "Bearer" prefix
+            ...(token ? { Authorization: token } : {}), // ✅ Only send if exists
         },
         body: JSON.stringify(formData),
     });
@@ -50,10 +56,9 @@ export async function generateResume(formData) {
 // 🔒 Test secure API route
 export async function testSecure() {
     const token = await getAuthKey();
-    if (!token) throw new Error("Authorization key missing.");
 
     const res = await fetch(`${BASE_URL}/secure/ping`, {
-        headers: { Authorization: token },  // ✅ Don't add "Bearer" prefix
+        headers: token ? { Authorization: token } : {},
     });
 
     if (!res.ok) {

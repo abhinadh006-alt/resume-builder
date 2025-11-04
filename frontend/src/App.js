@@ -9,6 +9,10 @@ function App() {
   const [validAccess, setValidAccess] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  const isLocalhost =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+
   // 🌱 Auto-fetch and validate Telegram daily key once
   // 🌱 Auto-fetch and validate Telegram daily key once
   useEffect(() => {
@@ -18,6 +22,15 @@ function App() {
         const chatId = params.get("chatId");
         const urlAuth = params.get("auth"); // 👈 New: Telegram-provided key
         const today = new Date().toISOString().split("T")[0].replace(/-/g, "");
+
+        // ✅ Skip Telegram auth when testing locally
+        if (isLocalhost) {
+          console.log("🧩 Localhost detected — skipping Telegram auth check");
+          setValidAccess(true);
+          setLoading(false);
+          return;
+        }
+
 
         // ✅ 1. If Telegram URL includes auth, trust and store it
         if (urlAuth && chatId) {

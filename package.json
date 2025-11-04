@@ -23,8 +23,8 @@
     "mongoose": "^8.19.0",
     "multer": "^2.0.2",
     "pdfkit": "^0.17.2",
-    "puppeteer": "^24.24.0",
-    "puppeteer-core": "^24.27.0",
+    "puppeteer": "^24.28.0",
+    "puppeteer-core": "^24.28.0",
     "react-toastify": "^11.0.5",
     "uuid": "^13.0.0"
   },

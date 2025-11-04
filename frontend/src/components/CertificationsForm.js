@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import MonthYearPicker from "./MonthYearPicker";
 import { format } from "date-fns";
 import "./CertificationsForm.css";
+import useBulletTextarea from "../hooks/useBulletTextarea"; // ✅ import bullet hook
 
 export default function CertificationsForm({ onSave, onCancel, initialData }) {
     const [cert, setCert] = useState({
@@ -12,8 +13,8 @@ export default function CertificationsForm({ onSave, onCancel, initialData }) {
         description: "",
     });
 
-    // ✅ use bullet hook
-    const handleBulletInput = useBulletTextarea();
+    // ✅ use bullet hook (same as ExperienceForm)
+    const { handleKeyDown, handleFocus } = useBulletTextarea();
 
     useEffect(() => {
         if (initialData) {
@@ -43,6 +44,7 @@ export default function CertificationsForm({ onSave, onCancel, initialData }) {
 
         onSave(formatted);
 
+        // reset form
         setCert({
             name: "",
             organization: "",
@@ -96,14 +98,16 @@ export default function CertificationsForm({ onSave, onCancel, initialData }) {
                     name="description"
                     value={cert.description}
                     onChange={handleChange}
-                    onKeyDown={(e) => handleBulletInput(e, (val) =>
-                        setCert((prev) => ({ ...prev, description: val }))
-                    )}
-                    rows="3"
-                    placeholder="Add notes like validity, specialization, or key topics..."
+                    onFocus={handleFocus}
+                    onKeyDown={handleKeyDown}
+                    rows="5"
+                    placeholder="• Add notes like validity, specialization, or key topics..."
+                    style={{
+                        whiteSpace: "pre-wrap",
+                        fontFamily: "Arial, sans-serif",
+                        lineHeight: "1.6",
+                    }}
                 />
-
-
             </div>
 
             <div className="form-buttons">
