@@ -1,0 +1,124 @@
+/* ===========================
+   🧾 Modern Resume Template
+   Print-Optimized for Puppeteer
+=========================== */
+
+@page {
+    size: A4;
+    margin: 15mm;
+}
+
+* {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+body {
+    font-family: 'Inter', Arial, Helvetica, sans-serif;
+    color: #222;
+    margin: 0;
+    padding: 0;
+    background: #fff;
+}
+
+.page {
+    padding: 20mm;
+    box-sizing: border-box;
+}
+
+.header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    border-bottom: 2px solid #dcdcdc;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+.name-title h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1b2b6f;
+    margin: 0;
+}
+
+.name-title h2 {
+    font-size: 13px;
+    font-weight: 500;
+    color: #666;
+    margin-top: 4px;
+}
+
+.contacts {
+    text-align: right;
+    font-size: 12px;
+    line-height: 1.4;
+    color: #444;
+}
+
+.section {
+    margin-top: 16px;
+}
+
+.section h2 {
+    font-size: 14px;
+    color: #1b2b6f;
+    border-bottom: 1px solid #ddd;
+    margin: 0 0 6px 0;
+    padding-bottom: 4px;
+    text-transform: uppercase;
+}
+
+.resume-item {
+    margin-bottom: 10px;
+    font-size: 12.5px;
+}
+
+.date-range {
+    font-size: 11px;
+    color: #555;
+    margin-top: 2px;
+}
+
+.resume-item p {
+    margin: 4px 0 0 0;
+    line-height: 1.4;
+}
+
+.skills-list,
+.section ul {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+}
+
+.skills-list li,
+.section ul li {
+    display: inline-block;
+    background: #f3f4ff;
+    border: 1px solid #e0e3ff;
+    border-radius: 6px;
+    padding: 3px 8px;
+    margin: 3px 4px 3px 0;
+    font-size: 11.5px;
+}
+
+/* ===== Languages Section ===== */
+.section ul li {
+    margin-bottom: 3px;
+}
+
+/* ===== Print Optimization ===== */
+@media print {
+    body {
+        background: white;
+    }
+
+    .page {
+        box-shadow: none;
+        margin: 0;
+        padding: 15mm;
+    }
+}
