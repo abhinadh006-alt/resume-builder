@@ -37,9 +37,20 @@ export default function CertificationsForm({ onSave, onCancel, initialData }) {
     const handleSubmit = (e) => {
         e.preventDefault();
 
+        // helper to strip stray parentheses/spaces
+        const stripParens = (s) =>
+            (s || "")
+                .toString()
+                .trim()
+                .replace(/^[\s()]+|[\s()]+$/g, "") // remove leading/trailing spaces and parens
+                .replace(/\)+$/, ""); // ensure trailing ) removed
+
         const formatted = {
-            ...cert,
+            name: stripParens(cert.name),
+            organization: stripParens(cert.organization),
             issueDate: cert.issueDate ? format(cert.issueDate, "MMM yyyy") : "",
+            credentialId: stripParens(cert.credentialId),
+            description: (cert.description || "").toString().replace(/\)+$/, "").trim(),
         };
 
         onSave(formatted);
@@ -53,6 +64,8 @@ export default function CertificationsForm({ onSave, onCancel, initialData }) {
             description: "",
         });
     };
+
+
 
     return (
         <form className="experience-form" onSubmit={handleSubmit}>

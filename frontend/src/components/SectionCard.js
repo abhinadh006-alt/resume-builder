@@ -6,7 +6,7 @@ export default function SectionCard({ title, children, onAdd }) {
         <div className="section-card">
             <div className="section-header">
                 <span>{title}</span>
-                <button onClick={onAdd}>+</button>
+                <button onClick={onAdd}></button>
             </div>
             <div className="section-content">{children}</div>
         </div>

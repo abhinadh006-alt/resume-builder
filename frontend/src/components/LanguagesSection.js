@@ -2,54 +2,71 @@ import React from "react";
 import { Plus, Trash2, Globe } from "lucide-react";
 import "./SectionStyles.css";
 
-export default function LanguagesSection({ languages = [], onAdd, onRemove, onEdit }) {
+export default function LanguagesSection({
+    languages = [],
+    onAdd = () => { },
+    onRemove = () => { },
+    onEdit = () => { },
+}) {
     return (
         <div className="section-container">
+            {/* Header */}
             <div className="section-header">
                 <div className="header-left">
-                    <Globe size={18} color="#4f46e5" />
-                    <h4>Languages</h4>
+                    <h4>🌐 Languages</h4>
                 </div>
-                <button className="add-btn" onClick={onAdd}>
-                    <Plus size={16} />add
+
+                <button
+                    className="add-btn"
+                    onClick={onAdd}
+                    aria-label="Add language"
+                    title="Add language"
+                >
+                    <Plus size={16} />
                 </button>
             </div>
 
+            {/* List */}
             <div className="section-list">
                 {languages.length === 0 ? (
                     <p className="placeholder">Add languages you know.</p>
                 ) : (
                     languages.map((lang, index) => (
-                        <div key={index} className="section-item">
+                        <div
+                            key={lang.id ?? index}
+                            className="section-item"
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => onEdit(index)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") onEdit(index);
+                            }}
+                        >
+                            {/* Title + small proficiency (keeps truncation safe) */}
                             <span
-                                onClick={() => onEdit(index)}
-                                style={{
-                                    cursor: "pointer",
-                                    flexGrow: 1,
-                                    color: "#111827",
-                                    fontWeight: 500,
-                                }}
+                                className="item-title"
+                                title={lang.language || "Unnamed Language"}
                             >
                                 {lang.language || "Unnamed Language"}
-                                {lang.proficiency && (
-                                    <span style={{ color: "#6b7280", fontSize: "12px", marginLeft: "6px" }}>
-                                        ({lang.proficiency})
-                                    </span>
-                                )}
                             </span>
-                            <button
-                                type="button"
-                                className="icon-btn remove-btn"
-                                aria-label="Remove education"
-                                onClick={() => onRemove(index)}
 
+                            {/* Delete: stop propagation so it won't trigger the card click */}
+                            <div
+                                className="item-actions"
+                                onClick={(e) => e.stopPropagation()}
                             >
-                                <Trash2 size={16} />
-                            </button>
+                                <button
+                                    type="button"
+                                    className="icon-btn remove-btn"
+                                    onClick={() => onRemove(index)}
+                                    title="Delete"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                            </div>
                         </div>
                     ))
                 )}
-
             </div>
         </div>
     );

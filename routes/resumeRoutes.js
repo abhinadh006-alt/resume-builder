@@ -8,7 +8,8 @@ import fs from "fs";
 import FormData from "form-data";
 
 import Resume from "../models/Resume.js";
-import { generatePDF } from "../utils/generatePDF.js";
+import pdfModule from "../utils/generatePDF.cjs";
+const { generatePDF } = pdfModule;
 import { isValidDailyKey, logKeyUsage } from "../middleware/verifyTgLink.js";
 
 
@@ -106,10 +107,30 @@ router.post("/generate", async (req, res) => {
 
         logKeyUsage(req, authHeader);
 
-        const { name, email, phone, experience, education, skills, certifications, template = "modern", chatId } = req.body;
+        // accept and forward all relevant fields — include website, summary, photo
+        const {
+            name,
+            title,
+            email,
+            phone,
+            location,
+            website,
+            summary,
+            photo,
+            experience = [],
+            education = [],
+            certifications = [],
+            skills = [],
+            languages = [],
+            template = "modern",
+            chatId
+        } = req.body;
+
         if (!name || !email) return res.status(400).json({ message: "Name and Email required." });
 
-        const data = { name, email, phone, experience, education, skills, certifications };
+        // build data object that will be passed to generatePDF
+        const data = { name, title, email, phone, location, website, summary, photo, experience, education, certifications, skills, languages };
+
         const downloadURL = await generatePDF(data, template);
 
         // Send PDF to Telegram

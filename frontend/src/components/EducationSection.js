@@ -4,53 +4,66 @@ import "./SectionStyles.css";
 
 export default function EducationSection({
     education = [],
-    onAdd,
-    onRemove,
-    onEdit, // ⬅️ NEW
+    onAdd = () => { },
+    onRemove = () => { },
+    onEdit = () => { },
 }) {
     return (
         <div className="section-container">
+            {/* Header */}
             <div className="section-header">
                 <div className="header-left">
-                    <GraduationCap size={18} color="#4f46e5" />
-                    <h4>Education</h4>
+                    <h4>🎓 Education</h4>
                 </div>
-                <button className="add-btn" onClick={onAdd}>
+
+                <button
+                    className="add-btn"
+                    onClick={onAdd}
+                    aria-label="Add education"
+                    title="Add education"
+                >
                     <Plus size={16} />
-                    add
                 </button>
             </div>
 
+            {/* List */}
             <div className="section-list">
                 {education.length === 0 ? (
                     <p className="placeholder">Add your education details here.</p>
                 ) : (
                     education.map((edu, index) => (
                         <div
-                            key={index}
+                            key={edu.id ?? index}
                             className="section-item"
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => onEdit(index)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") onEdit(index);
+                            }}
                         >
+                            {/* Title: uses CSS class for truncation */}
                             <span
-                                onClick={() => onEdit(index)}
-                                style={{
-                                    cursor: "pointer",
-                                    flexGrow: 1,
-                                    color: "#111827",
-                                    fontWeight: 500,
-                                }}
+                                className="item-title"
+                                title={edu.degree || "Untitled Degree"}
                             >
                                 {edu.degree || "Untitled Degree"}
-
                             </span>
-                            <button
-                                type="button"
-                                className="icon-btn remove-btn"
-                                aria-label="Remove education"
-                                onClick={() => onRemove(index)}
 
+                            {/* Delete: stop propagation so it won't trigger the card click */}
+                            <div
+                                className="item-actions"
+                                onClick={(e) => e.stopPropagation()}
                             >
-                                <Trash2 size={16} />
-                            </button>
+                                <button
+                                    type="button"
+                                    className="icon-btn remove-btn"
+                                    onClick={() => onRemove(index)}
+                                    title="Delete"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                            </div>
                         </div>
                     ))
                 )}

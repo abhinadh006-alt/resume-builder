@@ -1,6 +1,8 @@
 // controllers/resumeController.js
 import Resume from "../models/Resume.js";
-import { generatePDF } from "../utils/generatePDF.js";
+import pdfModule from "../utils/generatePDF.cjs";
+const { generatePDF } = pdfModule;
+
 
 export const createResume = async (req, res) => {
     try {
@@ -45,7 +47,7 @@ export const getResumePDF = async (req, res) => {
 // ✅ Export for secure route
 export async function generateResume(req, res) {
     try {
-        const { name, email, phone, experience, education, skills, certifications, template = "modern" } = req.body;
+        const { name, title, email, phone, location, website, summary, experience, education, certifications, skills, languages, template = "modern" } = req.body;
 
         console.log("📩 Received resume data:", req.body);
 
@@ -54,9 +56,9 @@ export async function generateResume(req, res) {
         }
 
         // Import and use your existing PDF generator
-        const { generatePDF } = await import("../utils/generatePDF.js");
+        const { generatePDF } = await import("../utils/generatePDF.cjs");
         const downloadURL = await generatePDF(
-            { name, email, phone, experience, education, skills, certifications },
+            { name, title, email, phone, location, website, summary, experience, education, certifications, skills, languages },
             template
         );
 

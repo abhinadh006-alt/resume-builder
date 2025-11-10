@@ -10,7 +10,7 @@ import SkillForm from "./components/SkillForm";
 import LanguagesSection from "./components/LanguagesSection";
 import LanguageForm from "./components/LanguageForm";
 import Modal from "./components/Modal";
-import ResumePreview from "./components/ResumePreview";
+import ResumePreview from "./resumepreview/ResumePreview";
 import { generateResume } from "./api"; // ✅ adjust path if needed
 import { toast } from "react-toastify";
 import "./App.css";
@@ -85,6 +85,8 @@ export default function ResumeBuilder() {
                 return;
             }
 
+
+
             // Construct payload explicitly to ensure backend gets the right structure
             const chatId = localStorage.getItem("RB_CHAT");
             const payload = {
@@ -143,7 +145,7 @@ export default function ResumeBuilder() {
         <div className="builder-layout">
             <aside className="sidebar">
                 {/* ===== PERSONAL DETAILS ===== */}
-                <h3>Personal Details</h3>
+                <h3>👤Personal Details</h3>
                 {["name", "title", "email", "phone", "location", "website"].map((field) => (
                     <input
                         key={field}
@@ -155,7 +157,7 @@ export default function ResumeBuilder() {
                 ))}
 
                 {/* ===== SUMMARY ===== */}
-                <h3>Summary</h3>
+                <h3>📒Summary</h3>
                 <textarea
                     name="summary"
                     rows="5"

@@ -1,3 +1,5 @@
+App.css
+
 /* === Global layout (Resmume-like builder) === */
 body {
   margin: 0;
@@ -235,4 +237,188 @@ textarea:focus {
 
 .toggle-btn.active {
   background: linear-gradient(135deg, #374151, #4b5563);
+}
+
+/* ===== Two independent scrollable panels: sidebar + preview ===== */
+
+/* 1) Make the viewport occupied by the app and prevent page-level scrolling */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  /* REMOVE the outer browser scrollbar */
+  box-sizing: border-box;
+}
+
+/* 2) Layout container - full viewport, horizontal two-column layout */
+.builder-layout {
+  display: flex;
+  height: 100vh;
+  /* fill viewport height */
+  width: 100%;
+  overflow: hidden;
+  /* prevent extra nested scroll */
+}
+
+/* 3) Sidebar (left) - fixed width, its own vertical scroll */
+.sidebar {
+  width: 320px;
+  /* adjust width as needed */
+  min-width: 220px;
+  max-width: 360px;
+  height: 100%;
+  /* full height */
+  overflow-y: auto;
+  /* sidebar scroll only */
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  /* smooth scrolling on mobile */
+}
+
+/* 4) Main preview area (right) - flex to fill remaining space and its own scroll */
+.main-panel,
+.preview-container {
+  flex: 1 1 auto;
+  height: 100%;
+  /* full height */
+  overflow-y: auto;
+  /* preview scroll only */
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  background: #fff;
+  /* or whatever your background is */
+}
+
+/* 5) Ensure inner resume preview doesn't create an extra scroll */
+.resume-preview,
+.page,
+.resume-content {
+  /* Allow content to grow; don't create nested scrollbars */
+  max-height: none;
+  overflow: visible !important;
+}
+
+/* 6) Defensive: remove accidental body-margin-caused scroll */
+#root,
+#root>.builder-layout {
+  height: 100%;
+}
+
+/* Optional: hide any accidental small scrollbar track on the left gutter */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+/* ===========================
+   SAFE OVERRIDES (non-destructive)
+   Paste at the END of App.css
+   =========================== */
+
+/* Restore normal page scrolling (keep this safe) */
+html,
+body {
+  /* Do not force overflow:hidden globally — allow app container to control it */
+  overflow: auto !important;
+  height: 100%;
+}
+
+/* Ensure top-level app container controls viewport scrolling */
+.builder-layout {
+  display: flex !important;
+  width: 100% !important;
+  min-height: 100vh !important;
+  /* Keep panels scrollable; do not clip content globally */
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure the sidebar retains its intended sizing and scroll */
+.sidebar {
+  background-color: #4f46e5 !important;
+  /* preserve purple */
+  color: #fff !important;
+  width: 320px !important;
+  min-width: 220px !important;
+  max-width: 360px !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  position: relative !important;
+}
+
+/* Ensure sidebar inner cards keep their padding and border-radius */
+.sidebar .content-card,
+.sidebar .section-card,
+.preview-toggle {
+  box-sizing: border-box !important;
+  width: calc(100% - 0px) !important;
+}
+
+/* Main panel and preview area should fill remaining space and scroll independently */
+.main-panel,
+.preview-container {
+  flex: 1 1 auto !important;
+  height: 100% !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  background: #f9fafb !important;
+  /* preserve previous look */
+  box-sizing: border-box !important;
+}
+
+/* Keep resume-preview card centered and prevent accidental resizing */
+.resume-preview {
+  width: 800px !important;
+  max-width: calc(100% - 80px) !important;
+  background-color: #fff !important;
+  padding: 40px !important;
+  border-radius: 12px !important;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08) !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+/* Limit global scrollbar styling to sidebar only (safer than global) */
+.sidebar::-webkit-scrollbar {
+  width: 10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+}
+
+/* Keep input focus styling accessible but non-invasive */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12) !important;
+  border-color: #4f46e5 !important;
+}
+
+/* Responsive: if screen small, stack sidebar above preview */
+@media (max-width: 900px) {
+  .builder-layout {
+    flex-direction: column !important;
+  }
+
+  .sidebar {
+    width: 100% !important;
+    max-height: 40vh !important;
+  }
+
+  .main-panel {
+    padding: 20px !important;
+  }
+
+  .resume-preview {
+    width: 100% !important;
+    padding: 24px !important;
+  }
 }

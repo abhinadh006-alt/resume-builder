@@ -1,6 +1,7 @@
 import React from "react";
 import SectionCard from "./SectionCard";
 
+
 export default function FormPanel({ formData, onChange }) {
     const handleInput = (e) => onChange(e.target.name, e.target.value);
 

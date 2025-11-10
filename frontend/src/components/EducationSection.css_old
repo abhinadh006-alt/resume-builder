@@ -35,6 +35,11 @@
     transition: 0.2s;
 }
 
+.add-btn svg {
+    color: #ffffff;
+    fill: #ffffff;
+}
+
 .add-btn:hover {
     transform: scale(1.1);
 }

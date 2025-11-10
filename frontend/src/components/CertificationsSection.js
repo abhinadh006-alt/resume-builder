@@ -1,5 +1,5 @@
 import React from "react";
-import { Award, Trash2 } from "lucide-react";
+import { Plus, Award, Trash2 } from "lucide-react";
 import "./SectionStyles.css";
 
 export default function CertificationsSection({ certifications, onAdd, onEdit, onRemove }) {
@@ -8,11 +8,10 @@ export default function CertificationsSection({ certifications, onAdd, onEdit, o
             {/* === HEADER === */}
             <div className="section-header">
                 <div className="header-left">
-                    <Award size={18} color="#4f46e5" />
-                    <h4>Certifications</h4>
+                    <h4>🏅 Certifications</h4>
                 </div>
                 <button className="add-btn" onClick={onAdd}>
-                    add
+                    <Plus size={16} />
                 </button>
             </div>
 
@@ -26,6 +25,12 @@ export default function CertificationsSection({ certifications, onAdd, onEdit, o
                             key={index}
                             className="section-item"
                             onClick={() => onEdit(index)} // ✅ whole card clickable
+                            style={{
+                                cursor: "pointer",
+                                flexGrow: 1,
+                                color: "#111827",
+                                fontWeight: 500,
+                            }}
                         >
                             <span className="item-title cert-title">
                                 {cert.name || "Untitled Certification"}

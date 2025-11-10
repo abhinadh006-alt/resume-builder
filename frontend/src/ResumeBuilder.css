@@ -1,190 +1,303 @@
-body {
-    font-family: "Poppins", sans-serif;
-    background: #f8faff;
-    margin: 0;
-    color: #333;
+/* =========================
+   Cleaned & Consolidated CSS
+   Notes: 1rem = 16px
+   ========================= */
+
+:root {
+    /* fonts */
+    --ff-base: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --ff-serif: "Georgia", serif;
+    --ff-ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+    /* palette */
+    --page-bg: #f8faff;
+    --panel-bg: #f6f8ff;
+    --card-bg: #ffffff;
+    --muted-bg: #fafafa;
+    --muted-2: #f3f4ff;
+    --border: #e2e6f3;
+    --border-2: #e5e9f0;
+    --primary: #5b68ff;
+    --primary-2: #4b53b6;
+    --accent: #6675f5;
+    --text: #222222;
+    --muted-text: #666666;
+    --muted-3: #777777;
+    --danger: #dc2626;
+
+    /* spacing & radius */
+    --gap: 0.75rem;
+    /* 12px */
+    --pad-lg: 2.5rem;
+    /* 40px */
+    --pad-md: 1rem;
+    /* 16px */
+    --pad-sm: 0.625rem;
+    /* 10px */
+    --radius: 0.625rem;
+    /* 10px */
+    --radius-sm: 0.5rem;
+    /* 8px */
+
+    /* sizes */
+    --sidebar-w: 20rem;
+    /* 320px */
+    --preview-max-h: 80vh;
+    --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
+/* --------------------------------
+   Base / page
+   -------------------------------- */
+html,
+body {
+    height: 100%;
+}
+
+body {
+    font-family: var(--ff-base);
+    background: var(--page-bg);
+    margin: 0;
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* --------------------------------
+   Layout
+   -------------------------------- */
 .resume-layout {
     display: flex;
     min-height: 100vh;
+    gap: var(--gap);
 }
 
-/* Sidebar */
+/* Sidebar (single canonical definition) */
 .sidebar {
-    width: 320px;
-    background: #fff;
-    border-right: 1px solid #e5e9f0;
-    padding: 20px 25px;
+    width: var(--sidebar-w);
+    background: var(--card-bg);
+    border-right: 1px solid var(--border-2);
+    padding: 1.25rem;
+    /* 20px */
     overflow-y: auto;
+    box-sizing: border-box;
 }
 
+/* Main panel */
+.main-panel {
+    flex: 1;
+    padding: var(--pad-lg);
+    background: var(--panel-bg);
+    box-sizing: border-box;
+}
+
+/* Form-and-preview layout */
+.form-and-preview {
+    display: flex;
+    gap: 1.25rem;
+    /* 20px */
+    align-items: flex-start;
+}
+
+/* Responsive stack for small screens */
+@media (max-width: 900px) {
+    .resume-layout {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border-2);
+    }
+
+    .form-and-preview {
+        flex-direction: column;
+    }
+}
+
+/* --------------------------------
+   Sections / typography
+   -------------------------------- */
 .section {
-    margin-bottom: 25px;
+    margin-bottom: 1.5rem;
 }
 
 .section h3 {
-    color: #3a3a75;
-    margin-bottom: 5px;
+    color: var(--primary-2);
+    margin: 0 0 0.3125rem 0;
+    /* 5px bottom */
+    font-size: 1rem;
 }
 
 .section p {
-    font-size: 13px;
-    color: #666;
-    margin-bottom: 10px;
+    font-size: 0.8125rem;
+    /* 13px */
+    color: var(--muted-text);
+    margin: 0 0 0.625rem 0;
 }
 
 label {
     display: block;
-    font-size: 13px;
-    margin: 8px 0 3px;
+    font-size: 0.8125rem;
+    margin: 0.5rem 0 0.1875rem 0;
 }
 
+/* --------------------------------
+   Inputs
+   -------------------------------- */
 input,
 select,
 textarea {
     width: 100%;
-    padding: 8px 10px;
+    padding: 0.5rem 0.625rem;
+    /* 8px 10px */
     border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 14px;
-    background: #fafafa;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    /* 14px */
+    background: var(--muted-bg);
+    box-sizing: border-box;
+    transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
 input:focus,
 textarea:focus,
 select:focus {
-    border-color: #6675f5;
+    border-color: var(--accent);
     background: #fff;
     outline: none;
-    box-shadow: 0 0 3px rgba(102, 117, 245, 0.3);
+    box-shadow: 0 0 6px rgba(102, 117, 245, 0.18);
 }
 
+/* Input with button inline block */
 .input-with-button {
     display: flex;
     align-items: center;
 }
 
 .input-with-button input {
-    border-radius: 8px 0 0 8px;
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    margin: 0;
 }
 
 .input-with-button button {
     border: none;
     background: #e4e7ff;
     color: #555;
-    font-weight: bold;
-    font-size: 18px;
-    border-radius: 0 8px 8px 0;
+    font-weight: 700;
+    font-size: 1.125rem;
+    /* 18px */
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
     cursor: pointer;
-    width: 40px;
-    height: 38px;
+    width: 2.5rem;
+    /* 40px */
+    height: 2.375rem;
+    /* 38px */
 }
 
+/* Secondary button (full width) */
 .secondary-btn {
     background: #f2f3ff;
     border: 1px solid #d1d3f5;
-    color: #333;
+    color: var(--text);
     font-weight: 600;
-    padding: 8px 12px;
-    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-sm);
     cursor: pointer;
     width: 100%;
-    margin-top: 8px;
+    margin-top: 0.5rem;
 }
 
-.content-card {
-    background: #fafafa;
-    border: 1px solid #e2e6f3;
-    border-radius: 10px;
-    padding: 10px;
-    margin-top: 8px;
+/* --------------------------------
+   Cards & small UI
+   -------------------------------- */
+.content-card,
+.section-card {
+    background: var(--muted-bg);
+    border: 1px solid #e3e6f0;
+    border-radius: var(--radius);
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .card-title {
     font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 0.375rem;
+    /* 6px */
 }
 
 .card-body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 0.5rem;
 }
 
 .plus-btn {
     background: #e8ebff;
     border: none;
-    font-size: 18px;
+    font-size: 1.125rem;
     border-radius: 50%;
     cursor: pointer;
-    width: 28px;
-    height: 28px;
+    width: 1.75rem;
+    /* 28px */
+    height: 1.75rem;
 }
 
 .import-btn {
     width: 100%;
-    padding: 8px;
+    padding: 0.5rem;
     border: none;
     background: #e7e9ff;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
     font-weight: 500;
-    margin-bottom: 5px;
+    margin-bottom: 0.3125rem;
 }
 
 .issue-link {
-    font-size: 12px;
-    color: #666;
+    font-size: 0.75rem;
+    /* 12px */
+    color: var(--muted-text);
 }
 
 .issue-link a {
-    color: #5a68e0;
+    color: var(--primary-2);
     text-decoration: none;
 }
 
-/* Main Panel */
-.main-panel {
-    flex: 1;
-    padding: 40px;
-    background: #f6f8ff;
-}
-
-.main-panel h2 {
-    color: #4b53b6;
-}
-
-.main-panel textarea {
-    width: 100%;
-    margin-top: 10px;
-    padding: 12px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    font-size: 15px;
-}
-
+/* --------------------------------
+   Actions & links
+   -------------------------------- */
 .generate-btn {
-    margin-top: 20px;
-    background: #5b68ff;
+    margin-top: 1.25rem;
+    background: var(--primary);
     color: #fff;
-    padding: 12px 16px;
+    padding: 0.75rem 1rem;
     border: none;
-    border-radius: 10px;
+    border-radius: var(--radius);
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: background-color 0.22s ease, transform 0.08s ease;
 }
 
 .generate-btn:hover {
     background: #404bdb;
 }
 
+.generate-btn:active {
+    transform: translateY(1px);
+}
+
 .download-link {
     display: inline-block;
-    margin-top: 15px;
-    color: #4b53b6;
+    margin-top: 0.9375rem;
+    /* 15px */
+    color: var(--primary-2);
     font-weight: 600;
     text-decoration: none;
 }
@@ -193,78 +306,83 @@ select:focus {
     text-decoration: underline;
 }
 
-.section select {
-    width: 100%;
-    padding: 8px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    background: #fafafa;
-}
-
-/* ===== Live Preview Panel ===== */
-.form-and-preview {
-    display: flex;
-    gap: 20px;
-    align-items: flex-start;
-}
-
-.form-section {
-    flex: 1;
-}
-
+/* --------------------------------
+   Preview container
+   -------------------------------- */
 .preview-section {
     flex: 1;
-    background: #fff;
-    border: 1px solid #e2e6f3;
-    border-radius: 12px;
-    padding: 20px 25px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    box-shadow: var(--box-shadow);
     overflow-y: auto;
-    max-height: 80vh;
+    max-height: var(--preview-max-h);
+    box-sizing: border-box;
 }
 
-/* ===== Resume Preview ===== */
 .preview-container {
-    font-family: "Poppins", sans-serif;
-    color: #333;
+    font-family: var(--ff-base);
+    color: var(--text);
 }
 
+/* --------------------------------
+   Resume header & variants (scoped)
+   -------------------------------- */
 .resume-header {
-    border-bottom: 2px solid #e2e6f3;
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
+    margin-bottom: 0.9375rem;
+    padding-bottom: 0.625rem;
+}
+
+/* Default resume header (centered printable version) */
+.resume-preview .resume-header,
+.resume-preview .resume-header h1 {
+    text-align: center;
 }
 
 .resume-name {
-    font-size: 24px;
+    font-size: 1.5rem;
+    /* 24px */
     font-weight: 700;
-    color: #3a3a75;
+    color: var(--primary-2);
 }
 
 .resume-title {
-    font-size: 16px;
+    font-size: 1rem;
     font-weight: 500;
-    color: #777;
+    color: var(--muted-3);
+}
+
+/* Contact info - flexible usage */
+.contact-info {
+    font-size: 0.8125rem;
+    color: #555;
 }
 
 .contact-info span {
     display: inline-block;
-    margin-right: 12px;
-    font-size: 13px;
-    color: #555;
+    margin-right: 0.75rem;
 }
 
+/* --------------------------------
+   Resume sections & lists
+   -------------------------------- */
 .resume-section {
-    margin-top: 15px;
+    margin-top: 0.9375rem;
 }
 
 .resume-section h2 {
-    font-size: 16px;
-    color: #4b53b6;
-    margin-bottom: 6px;
+    font-size: 1rem;
+    color: var(--primary-2);
+    margin-bottom: 0.375rem;
+    border-left: 4px solid var(--accent);
+    padding-left: 0.375rem;
+}
+
+.resume-section p {
+    font-size: 0.875rem;
+    color: #444;
+    line-height: 1.5;
 }
 
 .resume-section ul {
@@ -275,164 +393,192 @@ select:focus {
 
 .resume-section ul li {
     background: #f2f3ff;
-    border-radius: 6px;
-    padding: 5px 10px;
+    border-radius: 0.375rem;
+    padding: 0.3125rem 0.625rem;
     display: inline-block;
-    margin: 3px 4px;
-    font-size: 13px;
+    margin: 0.1875rem 0.25rem;
+    font-size: 0.8125rem;
 }
 
-/* ===== TEMPLATE VARIANTS ===== */
-
-/* === Minimal Template === */
+/* --------------------------------
+   Template variants — consolidated
+   -------------------------------- */
+/* Minimal */
 .preview-minimal {
-    background: #fff;
+    background: var(--card-bg);
     color: #222;
-    font-family: "Poppins", sans-serif;
 }
 
-/* === Classic Template === */
+/* Classic (serif emphasis) */
 .preview-classic {
     background: #fefefe;
     border: 2px solid #e0e3f0;
-    font-family: "Georgia", serif;
-    color: #333;
+    font-family: var(--ff-serif);
+    color: var(--text);
 }
 
 .preview-classic .resume-header {
-    border-bottom: 3px solid #4b53b6;
+    border-bottom: 3px solid var(--primary-2);
     color: #2a2a70;
 }
 
 .preview-classic h1 {
-    font-family: "Georgia", serif;
+    font-family: var(--ff-serif);
     text-transform: uppercase;
 }
 
-/* === Modern Template === */
-.preview-modern {
-    background: #f8f9ff;
-    border-left: 6px solid #5b68ff;
-    border-radius: 8px;
-    font-family: "Inter", sans-serif;
-    color: #222;
-}
-
-.preview-modern .resume-header {
-    background: #5b68ff;
-    color: #fff;
-    border-radius: 6px;
-    padding: 12px 16px;
-}
-
-.preview-modern h2 {
-    color: #5b68ff;
-}
-
-/* ======== MODERN TEMPLATE (Two Column Layout) ======== */
-.preview-modern {
+/* Modern (single consolidated block) */
+.preview-modern,
+.resume-preview.modern {
     background: #ffffff;
     color: #222;
-    font-family: "Inter", sans-serif;
-    border-radius: 10px;
+    font-family: var(--ff-ui);
+    border-radius: 0.625rem;
     overflow: hidden;
-    border: 1px solid #e2e6f3;
+    border: 1px solid var(--border);
 }
 
-/* Header */
-.modern-header {
+/* Modern header & two-column layout (scoped to .preview-modern and .resume-preview.modern) */
+.preview-modern .modern-header,
+.resume-preview.modern .modern-header {
     display: flex;
     justify-content: space-between;
-    background: #5b68ff;
+    background: var(--primary);
     color: white;
-    padding: 20px;
+    padding: 1.25rem;
     flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
-.modern-header-left h1 {
+.preview-modern .modern-header-left h1,
+.resume-preview.modern .modern-header-left h1 {
     margin: 0;
-    font-size: 24px;
+    font-size: 1.5rem;
     font-weight: 700;
 }
 
-.modern-header-left h3 {
-    margin: 4px 0 0;
+.preview-modern .modern-header-left h3 {
+    margin: 0.25rem 0 0 0;
     font-weight: 500;
 }
 
-.modern-header-right p {
-    margin: 2px 0;
-    font-size: 13px;
+.preview-modern .modern-header-right p {
+    margin: 0.125rem 0;
+    font-size: 0.8125rem;
 }
 
-/* Body */
-.modern-body {
+/* Modern body columns */
+.preview-modern .modern-body,
+.resume-preview.modern .modern-body {
     display: flex;
     flex-direction: row;
 }
 
-/* Sidebar */
-.modern-sidebar {
+/* Modern sidebar */
+.preview-modern .modern-sidebar,
+.resume-preview.modern .modern-sidebar {
     width: 30%;
-    background: #f3f4ff;
-    padding: 20px;
+    background: var(--muted-2);
+    padding: 1.25rem;
     border-right: 1px solid #e0e3f0;
+    box-sizing: border-box;
 }
 
-.modern-sidebar section {
-    margin-bottom: 20px;
-}
-
-.modern-sidebar h2 {
-    font-size: 14px;
-    color: #3a3a75;
-    margin-bottom: 6px;
+.preview-modern .modern-sidebar h2,
+.resume-preview.modern .modern-sidebar h2 {
+    font-size: 0.875rem;
+    color: var(--primary-2);
+    margin-bottom: 0.375rem;
     border-bottom: 1px solid #ccc;
 }
 
-.modern-sidebar ul {
+.preview-modern .modern-sidebar ul,
+.resume-preview.modern .modern-sidebar ul {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
-.modern-sidebar li {
+.preview-modern .modern-sidebar li,
+.resume-preview.modern .modern-sidebar li {
     background: #e4e7ff;
-    border-radius: 5px;
-    padding: 4px 8px;
-    margin: 3px 0;
-    font-size: 13px;
+    border-radius: 0.3125rem;
+    padding: 0.25rem 0.5rem;
+    margin: 0.1875rem 0;
+    font-size: 0.8125rem;
 }
 
-/* Main Content */
-.modern-main {
+/* Modern main content */
+.preview-modern .modern-main,
+.resume-preview.modern .modern-main {
     width: 70%;
-    padding: 20px;
+    padding: 1.25rem;
+    box-sizing: border-box;
 }
 
-.modern-main section {
-    margin-bottom: 18px;
-}
-
-.modern-main h2 {
-    color: #5b68ff;
-    font-size: 15px;
+.preview-modern .modern-main h2,
+.resume-preview.modern .modern-main h2 {
+    color: var(--primary);
+    font-size: 0.9375rem;
     border-bottom: 1px solid #ddd;
-    padding-bottom: 3px;
+    padding-bottom: 0.1875rem;
 }
 
-.modern-main p {
-    font-size: 13.5px;
-    margin-top: 6px;
-    line-height: 1.5;
+/* --------------------------------
+   Resume preview wrapper variants
+   -------------------------------- */
+.resume-preview {
+    background: var(--card-bg);
+    border-radius: 0.75rem;
+    box-shadow: var(--box-shadow);
+    padding: 2.5rem;
+    margin-top: 1.25rem;
+    font-family: var(--ff-ui);
 }
 
-/* ====== 🖨 PRINT OPTIMIZATION ====== */
+/* Classic / hybrid modifiers */
+.resume-preview.classic {
+    border: 1px solid #ccc;
+    font-family: var(--ff-serif);
+}
+
+.resume-preview.hybrid {
+    display: flex;
+    gap: 1.25rem;
+}
+
+.resume-preview.hybrid .resume-section {
+    flex: 1;
+}
+
+/* --------------------------------
+   Small buttons
+   -------------------------------- */
+.add-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    height: 1.75rem;
+    width: 1.75rem;
+    cursor: pointer;
+}
+
+.add-btn:hover {
+    background: #4338ca;
+}
+
+/* --------------------------------
+   Print rules & @page
+   -------------------------------- */
 @media print {
     body {
         -webkit-print-color-adjust: exact !important;
         color-adjust: exact !important;
-        font-family: "Inter", sans-serif;
+        font-family: var(--ff-ui);
         margin: 0;
         padding: 0;
     }
@@ -442,7 +588,7 @@ select:focus {
         min-height: 297mm;
         padding: 15mm;
         margin: 0 auto;
-        background: white !important;
+        background: #fff !important;
         box-shadow: none !important;
         border: none !important;
     }
@@ -457,154 +603,25 @@ select:focus {
         page-break-inside: avoid;
     }
 
-    /* Hide sidebar scrollbar on print */
     .modern-sidebar {
         overflow: visible;
+        background: #f7f8ff !important;
     }
 
-    /* Maintain layout scaling for Puppeteer */
+    .modern-sidebar li {
+        background: #e3e6ff !important;
+        color: #222 !important;
+    }
+
     html,
     body {
         zoom: 1;
     }
 
-    /* Remove unnecessary UI-only colors */
-    .modern-sidebar {
-        background: #f7f8ff !important;
-    }
-
-    /* Skill tags cleaner for print */
-    .modern-sidebar li {
-        background: #e3e6ff !important;
-        color: #222 !important;
-    }
+    /* kept for Puppeteer printing where needed */
 }
 
 @page {
     size: A4;
-    /* ✅ Tell Puppeteer to use standard A4 paper */
     margin: 10mm;
-    /* ✅ Exact space around all edges */
-}
-
-/* ===============================
-   Resume Preview Styles
-=================================*/
-
-.resume-preview {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-    padding: 40px;
-    margin-top: 20px;
-    font-family: "Inter", sans-serif;
-    color: #222;
-}
-
-/* Header */
-.resume-header {
-    text-align: center;
-    border-bottom: 2px solid #eaeaea;
-    padding-bottom: 15px;
-    margin-bottom: 20px;
-}
-
-.resume-header h1 {
-    margin: 0;
-    font-size: 26px;
-    font-weight: 700;
-    color: #222;
-}
-
-.resume-header .job-title {
-    font-size: 16px;
-    color: #666;
-}
-
-.contact-info {
-    margin-top: 10px;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    font-size: 13px;
-    color: #555;
-}
-
-/* Sections */
-.resume-section {
-    margin-bottom: 18px;
-}
-
-.resume-section h2 {
-    font-size: 16px;
-    color: #333;
-    margin-bottom: 6px;
-    border-left: 4px solid #6675f5;
-    padding-left: 6px;
-}
-
-.resume-section p {
-    font-size: 14px;
-    color: #444;
-    line-height: 1.5;
-}
-
-/* Template Variants */
-.resume-preview.modern {
-    border-left: 6px solid #5b68ff;
-}
-
-.resume-preview.classic {
-    border: 1px solid #ccc;
-    font-family: "Georgia", serif;
-}
-
-.resume-preview.hybrid {
-    display: flex;
-    gap: 20px;
-}
-
-.resume-preview.hybrid .resume-section {
-    flex: 1;
-}
-
-.left-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    margin-top: 20px;
-}
-
-.sidebar {
-    width: 320px;
-    background: #fff;
-    border-right: 1px solid #e5e9f0;
-    padding: 20px 25px;
-    overflow-y: auto;
-}
-
-.section-card {
-    background: #f8f9ff;
-    border: 1px solid #e3e6f0;
-    border-radius: 12px;
-    padding: 12px 15px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.add-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #4f46e5;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    height: 28px;
-    width: 28px;
-    cursor: pointer;
-}
-
-.add-btn:hover {
-    background: #4338ca;
 }

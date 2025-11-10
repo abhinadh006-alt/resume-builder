@@ -71,7 +71,7 @@ export default function ResumeBuilder() {
                             </div>
                             <div className="card-body">
                                 <p>{sec.empty}</p>
-                                <button className="plus-btn">＋</button>
+                                <button className="plus-btn">add</button>
                             </div>
                         </div>
                     ))}

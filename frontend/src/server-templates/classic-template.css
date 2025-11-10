@@ -1,0 +1,248 @@
+/* src/components/templates/classic-template.css */
+
+/* Font: uses Georgia for classic serif look; fallbacks included */
+.classic-template {
+    background: #fff;
+    color: #111827;
+    font-family: "Georgia", "Times New Roman", serif;
+    max-width: 760px;
+    margin: 24px auto;
+    padding: 36px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    border-radius: 8px;
+    box-sizing: border-box;
+    line-height: 1.45;
+}
+
+/* Top header: left (photo + name) and right (contacts) */
+.classic-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.classic-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* Photo */
+.classic-photo {
+    width: 72px;
+    height: 72px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 2px solid #e6e6e6;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.classic-photo--placeholder {
+    background: #efefef;
+    display: inline-block;
+}
+
+/* Name block */
+.classic-name-block {
+    display: flex;
+    flex-direction: column;
+}
+
+.classic-name {
+    font-size: 22px;
+    margin: 0;
+    color: #2b2b3a;
+    letter-spacing: 0.2px;
+}
+
+.classic-title {
+    font-size: 13px;
+    color: #6b6b82;
+    margin-top: 6px;
+    font-style: italic;
+}
+
+/* Right contact column */
+.classic-right {
+    text-align: right;
+    font-size: 13px;
+    color: #333;
+    min-width: 180px;
+}
+
+.classic-right .contact-item {
+    margin-bottom: 4px;
+    color: #333;
+}
+
+/* thin divider */
+.classic-divider {
+    border: none;
+    border-top: 2px solid #e9e9ef;
+    margin: 18px 0;
+}
+
+/* Section heading */
+.classic-section {
+    margin-bottom: 18px;
+}
+
+.classic-section__title {
+    font-size: 12px;
+    letter-spacing: 0.6px;
+    color: #27406b;
+    margin: 0 0 12px 0;
+    padding-left: 0;
+}
+
+.classic-section__text {
+    color: #333;
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    font-family: Georgia, serif;
+}
+
+/* Item (experience / education entries) */
+.classic-list {
+    display: block;
+}
+
+.classic-item {
+    margin-bottom: 14px;
+}
+
+.classic-item__header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.classic-item__role {
+    max-width: 62%;
+}
+
+.classic-item__role strong {
+    font-size: 15px;
+    color: #111;
+    font-weight: 700;
+}
+
+.classic-item__company {
+    font-style: italic;
+    color: #6b6b82;
+    font-size: 13px;
+}
+
+.classic-item__meta {
+    text-align: right;
+    min-width: 150px;
+    color: #6b6b82;
+    font-size: 13px;
+}
+
+.classic-item__date {
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+/* bullets */
+.classic-bullets {
+    margin: 8px 0 0 18px;
+    padding: 0;
+    list-style-type: disc;
+    color: #333;
+}
+
+.classic-bullets li {
+    margin: 6px 0;
+    font-size: 14px;
+}
+
+/* two-column compact area for skills & languages */
+.classic-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    margin-top: 12px;
+}
+
+.classic-side {
+    background: transparent;
+}
+
+.classic-side__title {
+    font-size: 12px;
+    margin-bottom: 8px;
+    color: #27406b;
+}
+
+.classic-side__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    color: #333;
+    font-size: 14px;
+}
+
+.classic-side__list li {
+    margin-bottom: 6px;
+}
+
+/* placeholder text style for builder mode */
+.placeholder {
+    color: #7a7a8a;
+    font-style: italic;
+}
+
+/* print friendly */
+@media print {
+    .classic-template {
+        box-shadow: none;
+        margin: 0;
+        padding: 18mm;
+        max-width: 100%;
+        border-radius: 0;
+        background: #fff;
+    }
+
+    .classic-top .classic-right {
+        text-align: left;
+    }
+
+    .classic-two-col {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* small screens */
+@media (max-width: 720px) {
+    .classic-template {
+        padding: 20px;
+    }
+
+    .classic-top {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .classic-right {
+        text-align: left;
+        margin-top: 12px;
+    }
+
+    .classic-item__role {
+        max-width: 100%;
+    }
+
+    .classic-item__meta {
+        min-width: auto;
+        text-align: left;
+        margin-top: 6px;
+    }
+
+    .classic-two-col {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,18 +1,37 @@
+/* SectionStyles.css — cleaned & improved */
+
+/* ----- Variables (easy to tweak) ----- */
+:root {
+    --card-bg: #f9f9ff;
+    --card-border: #e0e4ff;
+    --card-shadow: 0 2px 6px rgba(91, 104, 255, 0.08);
+    --accent: #4f46e5;
+    --accent-2: linear-gradient(135deg, #5b68ff, #7c83ff);
+    --muted-text: #a0a3b0;
+    --text: #1f2937;
+    --radius: 12px;
+    --gap-sm: 8px;
+}
+
 /* 🌟 Common Section Container */
 .section-container {
-    background: #f9f9ff;
-    border: 1px solid #e0e4ff;
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(91, 104, 255, 0.08);
-    padding: 14px 16px;
-    margin-bottom: 12px;
-    transition: box-shadow 0.2s ease;
-    width: 270px;
-    /* fixed consistent width */
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    transition: box-shadow 0.2s ease, transform 0.12s ease;
+    box-sizing: border-box;
+    width: 100%;
+    /* Let parent define width for flexibility */
+    max-width: 270px;
+    /* keep the original size as a max, but allow shrink */
 }
 
 .section-container:hover {
     box-shadow: 0 3px 8px rgba(91, 104, 255, 0.12);
+    transform: translateY(-1px);
 }
 
 /* 🌟 Header (icon + title + add button) */
@@ -38,38 +57,61 @@
 
 /* 🌟 Add Button (Centered text + icon) */
 .add-btn {
-    background: linear-gradient(135deg, #5b68ff, #7c83ff);
-    color: #ffffff;
-    border: none;
+    background: #ffffff;
+    /* white background */
+    border: 2px solid #4f46e5;
+    /* blue border */
+    color: #4f46e5;
+    /* blue icon/text color */
     border-radius: 8px;
-    padding: 8px 18px;
-    width: 60px;
-    /* fixed width */
-    text-align: center;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
+    width: 34px;
+    /* fixed square button */
+    height: 34px;
     display: flex;
     align-items: center;
     justify-content: center;
-    /* ✅ Center text and icon */
-    gap: 4px;
-    transition: 0.25s ease;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: none;
+    padding: 0;
 }
 
+/* make the Plus icon blue */
+.add-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke: #4f46e5;
+    /* lucide icons use stroke */
+    fill: none;
+}
+
+/* hover effect – subtle blue fill */
 .add-btn:hover {
-    background: linear-gradient(135deg, #4a57f5, #6a73ff);
-    transform: translateY(-1px);
+    background: #4f46e5;
+    border-color: #4f46e5;
+}
+
+.add-btn:hover svg {
+    stroke: #ffffff;
+    /* turns white on hover */
+}
+
+/* Focus for keyboard users */
+.add-btn:focus,
+.icon-btn:focus {
+    outline: 3px solid rgba(79, 70, 229, 0.18);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08);
 }
 
 /* 🌟 Section Item List */
 .section-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--gap-sm);
 }
 
-/* 🌟 Section Item Card (fixed width + safe text area) */
+/* 🌟 Section Item Card */
 .section-item {
     display: flex;
     justify-content: space-between;
@@ -77,45 +119,61 @@
     padding: 8px 10px;
     border: 1px solid #e2e6f3;
     border-radius: 8px;
-    margin-bottom: 8px;
     background: #fff;
     cursor: pointer;
     position: relative;
-    transition: background 0.2s ease;
+    transition: background 0.18s ease, transform 0.12s ease;
+    min-height: 40px;
+    box-sizing: border-box;
 }
 
 .section-item:hover {
     background: #f7f8ff;
+    transform: translateY(-1px);
 }
 
 .section-item span:hover {
-    color: #4f46e5;
+    color: var(--accent);
     text-decoration: underline;
 }
 
-
-.item-actions button {
-    pointer-events: auto;
-    position: relative;
-    z-index: 2;
-}
-
+/* Title & actions */
 .item-title {
     flex: 1;
+    /* Let it fill the available space */
+    min-width: 0;
+    /* ✅ Allows flex child to shrink */
+    overflow: hidden;
+    /* Hide any overflowing text */
+    white-space: nowrap;
+    /* Keep text on one line */
+    text-overflow: ellipsis;
+    /* Show "..." for overflowed text */
     cursor: pointer;
-    color: #1a1a2e;
+    color: var(--text);
     font-size: 14px;
+    font-weight: 600;
+    margin-right: 8px;
 }
 
 .item-title:hover {
     text-decoration: underline;
-    color: #4f46e5;
+    color: var(--accent);
 }
+
+.item-title {
+    background: transparent;
+    border: none;
+    padding: 0;
+    text-align: left;
+}
+
 
 /* Make edit/delete icons always visible and clickable */
 .item-actions {
     display: flex;
     gap: 6px;
+    align-items: center;
 }
 
 .icon-btn {
@@ -123,64 +181,58 @@
     border: none;
     cursor: pointer;
     padding: 4px;
-    color: #4f46e5;
+    color: var(--accent);
     opacity: 1;
-    /* ensure visible */
-    pointer-events: auto;
-    transition: transform 0.1s ease;
+    transition: transform 0.1s ease, color 0.12s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
 }
 
+/* slight hover emphasis */
 .icon-btn:hover {
-    transform: scale(1.1);
+    transform: scale(1.08);
+    color: #2f46d6;
 }
 
+/* destructive remove */
 .remove-btn {
-    color: #ff5c5c;
+    color: #473398;
 }
 
 .remove-btn:hover {
-    color: #e04343;
+    color: #000000;
 }
 
 /* 🌟 Placeholder Text */
 .placeholder {
     font-size: 13px;
-    color: #a0a3b0;
+    color: var(--muted-text);
     text-align: left;
 }
 
 /* === Certification title style (bold like Education) === */
 .cert-title {
     font-weight: 600;
-    color: #1f2937;
+    color: var(--text);
 }
 
-/* 🔹 Make all section headers visually identical */
+/* Section header SVG icon sizing */
 .section-header svg {
     width: 18px;
     height: 18px;
-    color: #4f46e5;
+    color: var(--accent);
 }
 
-/* 🔹 Ensure all section items have equal height */
-.section-item {
-    min-height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 10px;
-}
+/* Responsive: allow section container to shrink on narrow screens */
+@media (max-width: 640px) {
+    .section-container {
+        max-width: 100%;
+        padding: 10px;
+    }
 
-/* 🔹 Standardize title font size and spacing */
-.item-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: #1f2937;
-    flex: 1;
-}
-
-/* 🔹 Equalize spacing between cards */
-.section-container {
-    margin-bottom: 14px;
-    padding: 12px 14px;
+    .add-btn {
+        padding: 8px 12px;
+    }
 }

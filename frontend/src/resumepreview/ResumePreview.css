@@ -1,0 +1,208 @@
+/* src/ResumePreview.css
+   Consolidated preview CSS.
+   Uses modifier classes: resume-preview--modern | resume-preview--classic | resume-preview--hybrid
+*/
+
+:root {
+    --accent: #4f46e5;
+    --accent-2: #059669;
+    --bg: #fff;
+    --card-radius: 12px;
+    --pad: 2.5rem;
+    --text: #111827;
+    --muted: #6b7280;
+    --divider: #e6eef8;
+}
+
+/* Outer wrapper */
+.resume-preview {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 800px;
+    margin: 20px auto;
+    background: var(--bg);
+    border-radius: var(--card-radius);
+    padding: var(--pad);
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: var(--text);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+    overflow: visible;
+}
+
+/* modifier classes (explicit) */
+.resume-preview--modern {
+    --accent-color: var(--accent);
+}
+
+.resume-preview--classic {
+    --accent-color: #2d3748;
+    font-family: Georgia, "Times New Roman", serif;
+    max-width: 760px;
+    padding: 2.2rem;
+    line-height: 1.55;
+}
+
+.resume-preview--hybrid {
+    --accent-color: var(--accent-2);
+}
+
+/* header */
+.resume-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 2px solid var(--divider);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.resume-header h1 {
+    margin: 0;
+    font-size: 26px;
+    color: var(--text);
+}
+
+.resume-header h2 {
+    margin: 0;
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+/* contact */
+.contact-info {
+    font-size: 13px;
+    color: #666;
+    text-align: right;
+}
+
+/* sections */
+.resume-section {
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--divider);
+}
+
+.resume-section h2 {
+    font-size: 15px;
+    margin: 0 0 8px 0;
+    color: #374151;
+    border-left: 4px solid var(--accent-color);
+    padding-left: 8px;
+}
+
+.resume-section p {
+    margin: 0;
+    color: #444;
+    line-height: 1.5;
+}
+
+/* small utilities */
+.date-range {
+    font-size: 13px;
+    color: #666;
+    margin: 6px 0;
+}
+
+.placeholder-text {
+    color: #a5a8c9;
+    font-style: italic;
+}
+
+/* lists */
+.resume-preview ul {
+    padding-left: 1.25rem;
+    margin: 6px 0;
+}
+
+.resume-preview li {
+    margin: 6px 0;
+}
+
+/* hybrid layout */
+.resume-preview--hybrid {
+    display: grid;
+    gap: 28px;
+    grid-template-columns: 0.95fr 2fr;
+    align-items: start;
+}
+
+.resume-preview--hybrid .resume-header {
+    grid-column: 1 / -1;
+}
+
+.resume-preview--hybrid .left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.resume-preview--hybrid .right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* classic alterations (if you still use inline renderer) */
+.resume-preview--classic .resume-header {
+    text-align: center;
+    border: none;
+    padding-bottom: 12px;
+    margin-bottom: 24px;
+}
+
+.resume-preview--classic h1 {
+    font-size: 28px;
+    color: var(--accent-color);
+    font-weight: 700;
+}
+
+.resume-preview--classic h2 {
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+}
+
+/* final vs builder */
+.resume-preview.builder .placeholder-text {
+    display: inline;
+}
+
+.resume-preview.final .placeholder-text {
+    display: none !important;
+}
+
+/* Print rules — ensure printable A4 size when exported */
+@media print {
+    .resume-preview {
+        max-width: 210mm;
+        min-height: 297mm;
+        padding: 15mm;
+        margin: 0;
+        box-shadow: none !important;
+        border-radius: 0;
+        background: #fff !important;
+    }
+
+    .resume-preview .resume-section,
+    .resume-preview .resume-header {
+        page-break-inside: avoid;
+    }
+
+    .resume-preview--hybrid {
+        grid-template-columns: 1fr 1.8fr;
+        gap: 18px;
+    }
+}
+
+/* small responsive */
+@media (max-width: 900px) {
+    .resume-preview {
+        max-width: 100%;
+        padding: 1.25rem;
+    }
+
+    .resume-preview--hybrid {
+        display: block;
+    }
+}

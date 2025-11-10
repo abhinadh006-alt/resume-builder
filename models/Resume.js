@@ -19,6 +19,14 @@ const EducationSchema = new mongoose.Schema({
     description: String,
 }, { _id: false });
 
+const CertificationSchema = new mongoose.Schema({
+    name: String,
+    organization: String,
+    issueDate: String,   // "MMM yyyy"
+    credentialId: String,
+    description: String,
+}, { _id: false });
+
 const SkillSchema = new mongoose.Schema({
     skill: String,
     proficiency: String, // or level
@@ -29,14 +37,6 @@ const LanguageSchema = new mongoose.Schema({
     language: String,
     proficiency: String, // or level
     level: String,
-}, { _id: false });
-
-const CertificationSchema = new mongoose.Schema({
-    name: String,
-    organization: String,
-    issueDate: String,   // "MMM yyyy"
-    credentialId: String,
-    description: String,
 }, { _id: false });
 
 const ResumeSchema = new mongoose.Schema({
@@ -50,9 +50,10 @@ const ResumeSchema = new mongoose.Schema({
 
     experience: { type: [ExperienceSchema], default: [] },
     education: { type: [EducationSchema], default: [] },
+    certifications: { type: [CertificationSchema], default: [] },
     skills: { type: [SkillSchema], default: [] },
     languages: { type: [LanguageSchema], default: [] },
-    certifications: { type: [CertificationSchema], default: [] },
+
 
     template: { type: String, default: "modern" },
     createdAt: { type: Date, default: Date.now },

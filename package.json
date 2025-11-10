@@ -5,8 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon --exec node -r ./babel-register.js server.js",
+    "start": "node -r ./babel-register.js server.js"
   },
   "keywords": [],
   "author": "",
@@ -23,12 +23,27 @@
     "mongoose": "^8.19.0",
     "multer": "^2.0.2",
     "pdfkit": "^0.17.2",
+    "postcss": "^8.5.6",
     "puppeteer": "^24.28.0",
     "puppeteer-core": "^24.28.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
     "react-toastify": "^11.0.5",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
+    "@babel/preset-react": "^7.28.5",
+    "@babel/register": "^7.28.3",
     "nodemon": "^3.1.10"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abhinadh006-alt/resume-builder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/abhinadh006-alt/resume-builder/issues"
+  },
+  "homepage": "https://github.com/abhinadh006-alt/resume-builder#readme"
 }
