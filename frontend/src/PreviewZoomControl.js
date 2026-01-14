@@ -4,7 +4,7 @@ import "./PreviewZoomControl.css";
 
 export default function PreviewZoomControl({ previewRef }) {
     // defaultScale: 1 (100%) on desktop, 0.5 (50%) on mobile
-    const getDefaultScale = () => (window.innerWidth < 900 ? 0.5 : 1);
+    const getDefaultScale = () => (window.innerWidth < 900 ? 0.4 : 1);
 
     const [defaultScale] = useState(getDefaultScale());
     const [scale, setScale] = useState(defaultScale);
@@ -45,8 +45,8 @@ export default function PreviewZoomControl({ previewRef }) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); // run once
 
-    const increase = () => applyScale(scale + 0.08);
-    const decrease = () => applyScale(scale - 0.08);
+    const increase = () => applyScale(scale + 0.1);
+    const decrease = () => applyScale(scale - 0.1);
     const center = () => applyScale(defaultScale);
 
     return (

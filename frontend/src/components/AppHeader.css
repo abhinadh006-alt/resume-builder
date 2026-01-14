@@ -78,7 +78,7 @@
 
     /* LEFT */
     .header-left {
-        gap: 8px;
+        gap: 4px;
     }
 
     .header-left img {
@@ -106,7 +106,7 @@
         align-items: center;
 
         display: flex;
-        gap: 5px;
+        gap: 0px;
 
         padding: 0;
         /* remove desktop padding */
@@ -116,5 +116,12 @@
         font-size: 12px;
         padding: 6px 8px;
         white-space: nowrap;
+    }
+}
+
+/* MOBILE – hide tagline */
+@media (max-width: 768px) {
+    .brand-text span {
+        display: none;
     }
 }

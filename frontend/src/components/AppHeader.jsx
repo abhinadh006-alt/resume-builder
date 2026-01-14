@@ -30,7 +30,7 @@ export default function AppHeader() {
                         target="_blank"
                         rel="noreferrer"
                     >
-                        💬 WhatsApp Channel
+                        🟢 WhatsApp Channel
                     </a>
                 </nav>
 
