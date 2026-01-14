@@ -1,33 +1,18 @@
 // src/api.js
 
-const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+const BASE_URL =
+    process.env.REACT_APP_API_URL ||
+    "https://resume-builder-jv01.onrender.com/api";
 
-const isLocalhost =
-    typeof window !== "undefined" &&
-    (window.location.hostname === "localhost" ||
-        window.location.hostname === "127.0.0.1");
-
-async function getAuthKey() {
-    if (isLocalhost) {
-        console.log("🧩 Localhost detected — skipping Telegram key");
-        return "LOCAL-DEV";
-    }
-
-    const token = localStorage.getItem("RB_AUTH");
-    return token || null;
-}
-
+/**
+ * Generate resume (PDF)
+ * No auth, no Telegram, no secure routes
+ */
 export async function generateResume(formData) {
-    const token = await getAuthKey();
-
-    // 🔥🔥🔥 THIS IS THE FIX 🔥🔥🔥
-    const url = `${BASE_URL}/resume/secure/generate-cv`;
-
-    const res = await fetch(url, {
+    const res = await fetch(`${BASE_URL}/resume/generate-cv`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            ...(token ? { Authorization: token } : {}),
         },
         body: JSON.stringify(formData),
     });
@@ -40,4 +25,6 @@ export async function generateResume(formData) {
     return await res.json();
 }
 
-export default { generateResume };
+export default {
+    generateResume,
+};

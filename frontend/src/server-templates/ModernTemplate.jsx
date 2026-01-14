@@ -21,13 +21,6 @@ function formatDateRange(start, end) {
     return "";
 }
 
-function normalizePhoto(photo) {
-    if (!photo || typeof photo !== "string") return null;
-    if (photo.startsWith("data:image")) return photo;
-    if (photo.startsWith("http")) return photo;
-    return null;
-}
-
 /* ===============================
    TEMPLATE
 ================================ */
@@ -47,7 +40,6 @@ export default function ModernTemplate({
         ...(formData || {})
     };
 
-    const photo = normalizePhoto(formData.photo);
     const name = pd.name?.trim() || (!isFinalView ? placeholders.name : "");
     const title = pd.title?.trim() || (!isFinalView ? placeholders.title : "");
     const email = pd.email?.trim() || (!isFinalView ? placeholders.email : "");
@@ -85,25 +77,7 @@ export default function ModernTemplate({
                 {/* ================= HEADER ================= */}
                 {(name || title || email || phone || location || website) && (
                     <div className="mt-header">
-                        <div className="mt-photo-wrapper">
-                            {photo ? (
-                                photo.startsWith("data:image") ? (
-                                    <img
-                                        className="mt-photo"
-                                        src={photo}
-                                        alt="Profile"
-                                        style={{ objectFit: "cover" }}
-                                    />
-                                ) : (
-                                    <div
-                                        className="mt-photo-bg"
-                                        style={{ backgroundImage: `url("${photo}")` }}
-                                    />
-                                )
-                            ) : (
-                                <div className="mt-photo-placeholder">PROFILE</div>
-                            )}
-                        </div>
+
 
                         <div className="mt-header-main">
                             <div>

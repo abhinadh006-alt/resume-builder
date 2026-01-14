@@ -147,12 +147,7 @@ export default function HybridTemplate({
                         </div>
                     </div>
 
-                    <div className="hybrid-photo">
-                        {formData.photo
-                            ? <img src={formData.photo} alt="Profile" />
-                            : !isFinalView && <div className="hybrid-photo-placeholder" />
-                        }
-                    </div>
+
                 </div>
             </div>
 
