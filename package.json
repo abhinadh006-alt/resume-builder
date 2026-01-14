@@ -6,7 +6,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --exec node -r ./babel-register.js server.js",
-    "start": "node -r ./babel-register.js server.js"
+    "start": "node -r ignore-styles server.js",
+    "build:templates": "babel frontend/src/server-templates --out-dir server/templates-compiled --extensions \".js,.jsx\" --presets @babel/preset-env,@babel/preset-react && node ./scripts/renameCompiledToCjs.cjs",
+    "build:all": "npm run build:templates"
   },
   "keywords": [],
   "author": "",
@@ -20,11 +22,12 @@
     "express": "^5.1.0",
     "form-data": "^4.0.4",
     "handlebars": "^4.7.8",
+    "ignore-styles": "^5.0.1",
     "mongoose": "^8.19.0",
     "multer": "^2.0.2",
     "pdfkit": "^0.17.2",
     "postcss": "^8.5.6",
-    "puppeteer": "^24.28.0",
+    "puppeteer": "^24.31.0",
     "puppeteer-core": "^24.28.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
@@ -32,10 +35,12 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.28.3",
     "@babel/core": "^7.28.5",
     "@babel/preset-env": "^7.28.5",
     "@babel/preset-react": "^7.28.5",
     "@babel/register": "^7.28.3",
+    "babel-plugin-transform-require-ignore": "^0.1.1",
     "nodemon": "^3.1.10"
   },
   "repository": {

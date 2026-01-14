@@ -1,0 +1,260 @@
+/* Sidebar.css (STEP 3 SAFE)
+   - Sidebar MUST NOT control preview layout
+   - Preview positioning handled ONLY by layout-preview.css
+*/
+
+/* theme variables */
+
+:root {
+    --iconbar-left: 12px;
+    --iconbar-w: 48px;
+    --panel-gap: 12px;
+    --panel-w: 320px;
+    --panel-radius: 10px;
+    --panel-bg: #fff;
+    --panel-shadow: 0 10px 30px rgba(2, 6, 23, 0.08);
+    --purple: #5d4dfc;
+    --muted-border: rgba(12, 18, 50, 0.04);
+
+    --z-iconbar: 900;
+    --z-panel: 800;
+    --z-overlay: 780;
+}
+
+/* icon drawer button (mobile) */
+.drawer-toggle {
+    position: fixed;
+    left: var(--iconbar-left);
+    top: 12px;
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    z-index: calc(var(--z-iconbar) + 10);
+    box-shadow: 0 6px 18px rgba(16, 24, 40, 0.08);
+    border: 0;
+    cursor: pointer;
+}
+
+/* icon bar */
+.icon-bar {
+    position: fixed;
+    left: var(--iconbar-left);
+    top: 110px;
+    width: var(--iconbar-w);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: var(--z-iconbar);
+}
+
+/* icon buttons */
+.icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.96);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(2, 6, 23, 0.06);
+    transition: transform .08s ease, background .12s;
+}
+
+.icon-btn:hover {
+    transform: translateY(-2px);
+}
+
+.icon-btn.active {
+    background: linear-gradient(180deg, var(--purple), #6f56f8);
+    color: #fff;
+}
+
+/* panel shell */
+.panel-shell {
+    position: fixed;
+    left: calc(var(--iconbar-left) + var(--iconbar-w) + var(--panel-gap));
+    top: 80px;
+    width: var(--panel-w);
+    height: calc(100vh - 96px);
+    background: var(--panel-bg);
+    border-radius: var(--panel-radius);
+    box-shadow: var(--panel-shadow);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: var(--z-panel);
+    overflow: hidden;
+}
+
+/* hide when inactive */
+.panel-shell.hidden {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+/* scrollable panel body */
+.panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+/* panel cards */
+.panel-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 12px;
+    border: 1px solid var(--muted-border);
+    box-shadow: 0 8px 22px rgba(12, 18, 50, 0.04);
+}
+
+/* buttons */
+.template-btn {
+    width: 100%;
+    padding: 9px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(12, 18, 50, 0.06);
+    background: #fff;
+    cursor: pointer;
+}
+
+.template-btn.active {
+    background: linear-gradient(180deg, var(--purple), #6f56f8);
+    color: #fff;
+}
+
+.generate-btn {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 0;
+    background: linear-gradient(180deg, #18b26a, #14a85a);
+    color: #fff;
+    font-weight: 700;
+}
+
+/* MOBILE drawer */
+@media (max-width: 900px) {
+    .drawer-toggle {
+        display: flex;
+    }
+
+    .panel-shell {
+        width: 82%;
+        height: 100vh;
+        border-radius: 0;
+        transform: translateX(-140%);
+        z-index: calc(var(--z-panel) + 20);
+
+        top: 75px;
+        bottom: 18px;
+        height: auto;
+        left: 0px;
+
+        width: calc(100% - 12px);
+        max-width: 320px;
+
+        border-radius: 14px;
+        padding: 10px;
+    }
+
+    .panel-shell.open {
+        transform: translateX(0);
+    }
+
+    .sidebar-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(6, 8, 20, 0.35);
+        z-index: var(--z-overlay);
+    }
+}
+
+/* =========================
+   Sidebar – Summary textarea (FINAL FIX)
+   ========================= */
+
+.panel-shell textarea[name="summary"] {
+    height: 120px;
+    /* FORCE 5 lines */
+    min-height: 120px;
+    line-height: 1.5;
+    padding: 10px 12px;
+    resize: vertical;
+    width: 100%;
+    box-sizing: border-box;
+
+    /* defensive overrides */
+    font-size: 14px;
+    appearance: none;
+}
+
+
+/* =========================
+   Sidebar – Template button spacing
+   ========================= */
+
+.template-btn {
+    margin-bottom: 8px;
+    /* professional gap */
+}
+
+.template-btn:last-child {
+    margin-bottom: 0;
+}
+
+/* 🔥 FIX: never block preview when sidebar is closed */
+.sidebar-overlay {
+    display: none !important;
+}
+
+.panel-shell.open~.sidebar-overlay {
+    display: block !important;
+}
+
+/* =========================
+   MOBILE – Enlarge "+" add buttons
+   ========================= */
+
+/* =========================
+   MOBILE – Enlarge "+" add buttons
+   ========================= */
+/* =========================
+   MOBILE – Enlarge "+" add buttons
+   ========================= */
+
+/* MOBILE – Enlarge ONLY section "+" add buttons */
+
+
+/* =========================
+   MOBILE – Enlarge ONLY section "+" add buttons (FINAL)
+   ========================= */
+
+@media (max-width: 900px) {
+
+    /* ONLY buttons inside section headers */
+    .panel-card .section-header button {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* ONLY the "+" text inside those buttons */
+    .panel-card .section-header button span {
+        font-size: 22px;
+        font-weight: 700;
+        line-height: 1;
+    }
+}

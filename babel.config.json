@@ -1,0 +1,25 @@
+{
+    "presets": [
+        [
+            "@babel/preset-env",
+            {
+                "targets": {
+                    "node": "14"
+                },
+                "modules": "commonjs"
+            }
+        ],
+        "@babel/preset-react"
+    ],
+    "plugins": [
+        [
+            "transform-require-ignore",
+            {
+                "extensions": [
+                    ".css",
+                    ".scss"
+                ]
+            }
+        ]
+    ]
+}

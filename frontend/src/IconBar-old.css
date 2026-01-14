@@ -1,0 +1,91 @@
+/* IconBar.css - compact vertical icon bar to match Sidebar theme */
+
+.iconbar {
+    position: fixed;
+    left: 12px;
+    top: 84px;
+    /* below any top chrome */
+    z-index: 2350;
+    /* above drawer toggle and other overlays */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    pointer-events: auto;
+}
+
+.iconbar .icon-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+    border: 0;
+    box-shadow: 0 6px 18px rgba(12, 16, 60, 0.06);
+    cursor: pointer;
+    transition: transform 120ms ease, background 120ms ease, box-shadow 120ms ease;
+}
+
+/* primary accent for active item */
+.iconbar .icon-btn.active {
+    background: linear-gradient(180deg, #5b46e6, #6f56f8);
+    box-shadow: 0 8px 20px rgba(79, 52, 255, 0.12);
+    transform: translateY(-2px);
+}
+
+/* subtle hover */
+.iconbar .icon-btn:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* icon sizing */
+.iconbar svg {
+    width: 20px;
+    height: 20px;
+    display: block;
+    color: inherit;
+}
+
+/* optional labels shown on wide layouts */
+.iconbar .label {
+    display: none;
+    font-size: 12px;
+    color: #111;
+    margin-top: 4px;
+    background: #fff;
+    padding: 6px 8px;
+    border-radius: 6px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+}
+
+/* responsive: on desktop show slightly expanded bar, on mobile hide (we rely on drawer) */
+@media (min-width: 900px) {
+    .iconbar {
+        left: 18px;
+        top: 110px;
+    }
+
+    .iconbar .label {
+        display: none;
+        /* keep minimal - enable if you want */
+    }
+}
+
+/* mobile: show compact but keep tappable */
+@media (max-width: 900px) {
+    .iconbar {
+        left: 12px;
+        top: 70px;
+        gap: 8px;
+    }
+
+    /* hide iconbar if sidebar is open (avoid overlap) */
+    body.sidebar-open .iconbar {
+        opacity: 0;
+        pointer-events: none;
+    }
+}

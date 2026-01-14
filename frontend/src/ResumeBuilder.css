@@ -1,57 +1,29 @@
 /* =========================
-   Cleaned & Consolidated CSS
-   Notes: 1rem = 16px
+   ResumeBuilder.css (cleaned)
+   Purpose: page-level layout, form & preview base styles
    ========================= */
 
 :root {
-    /* fonts */
     --ff-base: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --ff-serif: "Georgia", serif;
-    --ff-ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-
-    /* palette */
     --page-bg: #f8faff;
     --panel-bg: #f6f8ff;
-    --card-bg: #ffffff;
-    --muted-bg: #fafafa;
-    --muted-2: #f3f4ff;
+    --card-bg: #fff;
     --border: #e2e6f3;
-    --border-2: #e5e9f0;
-    --primary: #5b68ff;
-    --primary-2: #4b53b6;
     --accent: #6675f5;
-    --text: #222222;
-    --muted-text: #666666;
-    --muted-3: #777777;
-    --danger: #dc2626;
-
-    /* spacing & radius */
+    --text: #222;
+    --muted-text: #666;
     --gap: 0.75rem;
-    /* 12px */
     --pad-lg: 2.5rem;
-    /* 40px */
-    --pad-md: 1rem;
-    /* 16px */
-    --pad-sm: 0.625rem;
-    /* 10px */
     --radius: 0.625rem;
-    /* 10px */
     --radius-sm: 0.5rem;
-    /* 8px */
-
-    /* sizes */
-    --sidebar-w: 20rem;
-    /* 320px */
     --preview-max-h: 80vh;
     --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    --sidebar-w: 20rem;
 }
 
-/* --------------------------------
-   Base / page
-   -------------------------------- */
 html,
 body {
-    height: 100%;
+    height: 100%
 }
 
 body {
@@ -63,565 +35,244 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* --------------------------------
-   Layout
-   -------------------------------- */
+/* Layout */
 .resume-layout {
     display: flex;
     min-height: 100vh;
     gap: var(--gap);
 }
 
-/* Sidebar (single canonical definition) */
+/* left column sidebar (legacy UI, optional) */
 .sidebar {
     width: var(--sidebar-w);
     background: var(--card-bg);
-    border-right: 1px solid var(--border-2);
+    border-right: 1px solid #e9edf6;
     padding: 1.25rem;
-    /* 20px */
-    overflow-y: auto;
     box-sizing: border-box;
 }
 
-/* Main panel */
-.main-panel {
-    flex: 1;
-    padding: var(--pad-lg);
-    background: var(--panel-bg);
-    box-sizing: border-box;
-}
-
-/* Form-and-preview layout */
-.form-and-preview {
+/* preview-section is the container for .resume-preview */
+.preview-section {
+    width: 100%;
     display: flex;
-    gap: 1.25rem;
-    /* 20px */
+    justify-content: center;
     align-items: flex-start;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
-/* Responsive stack for small screens */
-@media (max-width: 900px) {
+/* small responsive stack */
+@media (max-width:900px) {
     .resume-layout {
-        flex-direction: column;
+        flex-direction: column
     }
 
     .sidebar {
         width: 100%;
         border-right: none;
-        border-bottom: 1px solid var(--border-2);
+        border-bottom: 1px solid #eef1fb
     }
 
-    .form-and-preview {
-        flex-direction: column;
+    .preview-section {
+        padding: 12px
     }
 }
 
-/* --------------------------------
-   Sections / typography
-   -------------------------------- */
+/* Simple element styles (inputs, cards, etc.) */
 .section {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.5rem
 }
 
 .section h3 {
-    color: var(--primary-2);
-    margin: 0 0 0.3125rem 0;
-    /* 5px bottom */
-    font-size: 1rem;
-}
-
-.section p {
-    font-size: 0.8125rem;
-    /* 13px */
-    color: var(--muted-text);
-    margin: 0 0 0.625rem 0;
+    color: var(--accent);
+    margin: 0 0 .3125rem;
+    font-size: 1rem
 }
 
 label {
     display: block;
-    font-size: 0.8125rem;
-    margin: 0.5rem 0 0.1875rem 0;
+    font-size: .8125rem;
+    margin: .5rem 0 .1875rem
 }
 
-/* --------------------------------
-   Inputs
-   -------------------------------- */
 input,
 select,
 textarea {
     width: 100%;
-    padding: 0.5rem 0.625rem;
-    /* 8px 10px */
+    padding: .5rem .625rem;
     border: 1px solid #ccc;
     border-radius: var(--radius-sm);
-    font-size: 0.875rem;
-    /* 14px */
-    background: var(--muted-bg);
+    font-size: .875rem;
+    background: #fafafa;
     box-sizing: border-box;
-    transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    transition: box-shadow .12s ease, border-color .12s;
 }
 
 input:focus,
 textarea:focus,
 select:focus {
     border-color: var(--accent);
-    background: #fff;
     outline: none;
-    box-shadow: 0 0 6px rgba(102, 117, 245, 0.18);
+    box-shadow: 0 0 6px rgba(102, 117, 245, .14)
 }
 
-/* Input with button inline block */
-.input-with-button {
-    display: flex;
-    align-items: center;
-}
-
-.input-with-button input {
-    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
-    margin: 0;
-}
-
-.input-with-button button {
-    border: none;
-    background: #e4e7ff;
-    color: #555;
-    font-weight: 700;
-    font-size: 1.125rem;
-    /* 18px */
-    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-    cursor: pointer;
-    width: 2.5rem;
-    /* 40px */
-    height: 2.375rem;
-    /* 38px */
-}
-
-/* Secondary button (full width) */
-.secondary-btn {
-    background: #f2f3ff;
-    border: 1px solid #d1d3f5;
-    color: var(--text);
-    font-weight: 600;
-    padding: 0.5rem 0.75rem;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    width: 100%;
-    margin-top: 0.5rem;
-}
-
-/* --------------------------------
-   Cards & small UI
-   -------------------------------- */
-.content-card,
-.section-card {
-    background: var(--muted-bg);
-    border: 1px solid #e3e6f0;
+/* small reusable card */
+.content-card {
+    background: #fff;
     border-radius: var(--radius);
-    padding: 0.75rem;
-    margin-top: 0.5rem;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    padding: .75rem;
+    border: 1px solid #eef1fb;
+    box-shadow: var(--box-shadow)
 }
 
-.card-title {
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-    /* 6px */
-}
-
-.card-body {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.plus-btn {
-    background: #e8ebff;
-    border: none;
-    font-size: 1.125rem;
-    border-radius: 50%;
-    cursor: pointer;
-    width: 1.75rem;
-    /* 28px */
-    height: 1.75rem;
-}
-
-.import-btn {
-    width: 100%;
-    padding: 0.5rem;
-    border: none;
-    background: #e7e9ff;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    font-weight: 500;
-    margin-bottom: 0.3125rem;
-}
-
-.issue-link {
-    font-size: 0.75rem;
-    /* 12px */
-    color: var(--muted-text);
-}
-
-.issue-link a {
-    color: var(--primary-2);
-    text-decoration: none;
-}
-
-/* --------------------------------
-   Actions & links
-   -------------------------------- */
-.generate-btn {
-    margin-top: 1.25rem;
-    background: var(--primary);
-    color: #fff;
-    padding: 0.75rem 1rem;
-    border: none;
-    border-radius: var(--radius);
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.22s ease, transform 0.08s ease;
-}
-
-.generate-btn:hover {
-    background: #404bdb;
-}
-
-.generate-btn:active {
-    transform: translateY(1px);
-}
-
-.download-link {
-    display: inline-block;
-    margin-top: 0.9375rem;
-    /* 15px */
-    color: var(--primary-2);
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.download-link:hover {
-    text-decoration: underline;
-}
-
-/* --------------------------------
-   Preview container
-   -------------------------------- */
-.preview-section {
-    flex: 1;
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 0.75rem;
-    padding: 1.25rem;
-    box-shadow: var(--box-shadow);
-    overflow-y: auto;
-    max-height: var(--preview-max-h);
-    box-sizing: border-box;
-}
-
-.preview-container {
-    font-family: var(--ff-base);
-    color: var(--text);
-}
-
-/* --------------------------------
-   Resume header & variants (scoped)
-   -------------------------------- */
-.resume-header {
-    margin-bottom: 0.9375rem;
-    padding-bottom: 0.625rem;
-}
-
-/* Default resume header (centered printable version) */
-.resume-preview .resume-header,
-.resume-preview .resume-header h1 {
-    text-align: center;
-}
-
-.resume-name {
-    font-size: 1.5rem;
-    /* 24px */
-    font-weight: 700;
-    color: var(--primary-2);
-}
-
-.resume-title {
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--muted-3);
-}
-
-/* Contact info - flexible usage */
-.contact-info {
-    font-size: 0.8125rem;
-    color: #555;
-}
-
-.contact-info span {
-    display: inline-block;
-    margin-right: 0.75rem;
-}
-
-/* --------------------------------
-   Resume sections & lists
-   -------------------------------- */
-.resume-section {
-    margin-top: 0.9375rem;
-}
-
-.resume-section h2 {
-    font-size: 1rem;
-    color: var(--primary-2);
-    margin-bottom: 0.375rem;
-    border-left: 4px solid var(--accent);
-    padding-left: 0.375rem;
-}
-
-.resume-section p {
-    font-size: 0.875rem;
-    color: #444;
-    line-height: 1.5;
-}
-
-.resume-section ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.resume-section ul li {
-    background: #f2f3ff;
-    border-radius: 0.375rem;
-    padding: 0.3125rem 0.625rem;
-    display: inline-block;
-    margin: 0.1875rem 0.25rem;
-    font-size: 0.8125rem;
-}
-
-/* --------------------------------
-   Template variants — consolidated
-   -------------------------------- */
-/* Minimal */
-.preview-minimal {
-    background: var(--card-bg);
-    color: #222;
-}
-
-/* Classic (serif emphasis) */
-.preview-classic {
-    background: #fefefe;
-    border: 2px solid #e0e3f0;
-    font-family: var(--ff-serif);
-    color: var(--text);
-}
-
-.preview-classic .resume-header {
-    border-bottom: 3px solid var(--primary-2);
-    color: #2a2a70;
-}
-
-.preview-classic h1 {
-    font-family: var(--ff-serif);
-    text-transform: uppercase;
-}
-
-/* Modern (single consolidated block) */
-.preview-modern,
-.resume-preview.modern {
-    background: #ffffff;
-    color: #222;
-    font-family: var(--ff-ui);
-    border-radius: 0.625rem;
-    overflow: hidden;
-    border: 1px solid var(--border);
-}
-
-/* Modern header & two-column layout (scoped to .preview-modern and .resume-preview.modern) */
-.preview-modern .modern-header,
-.resume-preview.modern .modern-header {
-    display: flex;
-    justify-content: space-between;
-    background: var(--primary);
-    color: white;
-    padding: 1.25rem;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-}
-
-.preview-modern .modern-header-left h1,
-.resume-preview.modern .modern-header-left h1 {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 700;
-}
-
-.preview-modern .modern-header-left h3 {
-    margin: 0.25rem 0 0 0;
-    font-weight: 500;
-}
-
-.preview-modern .modern-header-right p {
-    margin: 0.125rem 0;
-    font-size: 0.8125rem;
-}
-
-/* Modern body columns */
-.preview-modern .modern-body,
-.resume-preview.modern .modern-body {
-    display: flex;
-    flex-direction: row;
-}
-
-/* Modern sidebar */
-.preview-modern .modern-sidebar,
-.resume-preview.modern .modern-sidebar {
-    width: 30%;
-    background: var(--muted-2);
-    padding: 1.25rem;
-    border-right: 1px solid #e0e3f0;
-    box-sizing: border-box;
-}
-
-.preview-modern .modern-sidebar h2,
-.resume-preview.modern .modern-sidebar h2 {
-    font-size: 0.875rem;
-    color: var(--primary-2);
-    margin-bottom: 0.375rem;
-    border-bottom: 1px solid #ccc;
-}
-
-.preview-modern .modern-sidebar ul,
-.resume-preview.modern .modern-sidebar ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.preview-modern .modern-sidebar li,
-.resume-preview.modern .modern-sidebar li {
-    background: #e4e7ff;
-    border-radius: 0.3125rem;
-    padding: 0.25rem 0.5rem;
-    margin: 0.1875rem 0;
-    font-size: 0.8125rem;
-}
-
-/* Modern main content */
-.preview-modern .modern-main,
-.resume-preview.modern .modern-main {
-    width: 70%;
-    padding: 1.25rem;
-    box-sizing: border-box;
-}
-
-.preview-modern .modern-main h2,
-.resume-preview.modern .modern-main h2 {
-    color: var(--primary);
-    font-size: 0.9375rem;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 0.1875rem;
-}
-
-/* --------------------------------
-   Resume preview wrapper variants
-   -------------------------------- */
+/* preview wrapper (outer) — minimal so templates handle visual appearance */
 .resume-preview {
-    background: var(--card-bg);
-    border-radius: 0.75rem;
-    box-shadow: var(--box-shadow);
-    padding: 2.5rem;
-    margin-top: 1.25rem;
-    font-family: var(--ff-ui);
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 1200px;
+    background: transparent;
+    /* leave template to draw card */
+    padding: 0;
+    border-radius: 0;
+    overflow: visible;
 }
 
-/* Classic / hybrid modifiers */
-.resume-preview.classic {
-    border: 1px solid #ccc;
-    font-family: var(--ff-serif);
-}
-
-.resume-preview.hybrid {
-    display: flex;
-    gap: 1.25rem;
-}
-
-.resume-preview.hybrid .resume-section {
-    flex: 1;
-}
-
-/* --------------------------------
-   Small buttons
-   -------------------------------- */
-.add-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: #4f46e5;
-    color: white;
-    border: none;
-    border-radius: 0.5rem;
-    height: 1.75rem;
-    width: 1.75rem;
-    cursor: pointer;
-}
-
-.add-btn:hover {
-    background: #4338ca;
-}
-
-/* --------------------------------
-   Print rules & @page
-   -------------------------------- */
+/* print-friendly fallback */
 @media print {
     body {
-        -webkit-print-color-adjust: exact !important;
-        color-adjust: exact !important;
-        font-family: var(--ff-ui);
         margin: 0;
-        padding: 0;
+        padding: 0
     }
 
-    .preview-container {
-        width: 210mm;
+    .resume-preview {
+        max-width: 210mm;
         min-height: 297mm;
         padding: 15mm;
-        margin: 0 auto;
-        background: #fff !important;
-        box-shadow: none !important;
-        border: none !important;
+        background: #fff
     }
-
-    .resume-header,
-    .modern-header {
-        page-break-inside: avoid;
-    }
-
-    .resume-section,
-    .modern-main section {
-        page-break-inside: avoid;
-    }
-
-    .modern-sidebar {
-        overflow: visible;
-        background: #f7f8ff !important;
-    }
-
-    .modern-sidebar li {
-        background: #e3e6ff !important;
-        color: #222 !important;
-    }
-
-    html,
-    body {
-        zoom: 1;
-    }
-
-    /* kept for Puppeteer printing where needed */
 }
 
-@page {
-    size: A4;
-    margin: 10mm;
+.app-header {
+    position: sticky;
+    top: 0;
+    z-index: 2000;
+    height: 64px;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand img {
+    height: 36px;
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.brand-text span {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* =========================
+   APP HEADER (PROFESSIONAL)
+========================= */
+
+:root {
+    --app-header-h: 64px;
+}
+
+.app-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--app-header-h);
+    background: #ffffff;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+    z-index: 1200;
+}
+
+.header-inner {
+    max-width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+/* Brand */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand img {
+    height: 36px;
+    width: auto;
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.brand-text strong {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.brand-text span {
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* Header actions */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.header-link {
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    color: #334155;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.header-link:hover {
+    background: rgba(15, 23, 42, 0.06);
+    color: #0f172a;
+}
+
+.header-link.whatsapp {
+    color: #15803d;
+}
+
+.header-link.whatsapp:hover {
+    background: rgba(21, 128, 61, 0.12);
+}
+
+body {
+    padding-top: var(--app-header-h);
 }

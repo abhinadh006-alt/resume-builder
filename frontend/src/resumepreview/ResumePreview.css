@@ -1,208 +1,134 @@
-/* src/ResumePreview.css
-   Consolidated preview CSS.
-   Uses modifier classes: resume-preview--modern | resume-preview--classic | resume-preview--hybrid
-*/
+/* =========================================
+   Resume Preview – CLEAN, ISOLATED & PDF-SAFE
+   ========================================= */
 
-:root {
-    --accent: #4f46e5;
-    --accent-2: #059669;
-    --bg: #fff;
-    --card-radius: 12px;
-    --pad: 2.5rem;
-    --text: #111827;
-    --muted: #6b7280;
-    --divider: #e6eef8;
+/* -------------------------------------------------
+   PREVIEW CONTAINER
+   - NO positioning
+   - NO margins
+   - NO layout offsets
+-------------------------------------------------- */
+.resume-preview {
+    display: block;
+    margin: 0;
+    padding: 0;
+
+    /* scaling only (used by zoom control) */
+    transform-origin: top left;
+
+    /* typography isolation */
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    color: #111827;
 }
 
-/* Outer wrapper */
-.resume-preview {
+/* -------------------------------------------------
+   SINGLE A4 PAGE (ON SCREEN)
+   👉 Hybrid must control padding itself
+-------------------------------------------------- */
+.resume-page {
+    width: 210mm;
+    min-height: 297mm;
+
+    background: #ffffff;
+    padding: 0;
+    /* 🔑 REMOVED — hybrid header is full bleed */
     box-sizing: border-box;
-    width: 100%;
-    max-width: 800px;
-    margin: 20px auto;
-    background: var(--bg);
-    border-radius: var(--card-radius);
-    padding: var(--pad);
-    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    color: var(--text);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+
+    /* visual scaling only */
+    transform: scale(var(--preview-scale, 1));
+    transform-origin: top left;
+
+    margin: 0 auto;
+}
+
+/* -------------------------------------------------
+   FLOW RULES — NEVER CLIP CONTENT
+-------------------------------------------------- */
+.resume-preview,
+.resume-page,
+.resume-page * {
     overflow: visible;
 }
 
-/* modifier classes (explicit) */
-.resume-preview--modern {
-    --accent-color: var(--accent);
+/* -------------------------------------------------
+   PREVENT BAD PAGE BREAKS
+-------------------------------------------------- */
+.resume-section,
+.resume-item,
+.experience-item,
+.education-item,
+.certification-item {
+    break-inside: avoid;
+    page-break-inside: avoid;
 }
 
-.resume-preview--classic {
-    --accent-color: #2d3748;
-    font-family: Georgia, "Times New Roman", serif;
-    max-width: 760px;
-    padding: 2.2rem;
-    line-height: 1.55;
-}
-
+/* -------------------------------------------------
+   HYBRID TEMPLATE SAFETY
+-------------------------------------------------- */
 .resume-preview--hybrid {
-    --accent-color: var(--accent-2);
-}
-
-/* header */
-.resume-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    border-bottom: 2px solid var(--divider);
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-}
-
-.resume-header h1 {
     margin: 0;
-    font-size: 26px;
-    color: var(--text);
+    padding: 0;
 }
 
-.resume-header h2 {
-    margin: 0;
-    font-size: 14px;
-    color: var(--muted);
-    font-weight: 500;
-}
-
-/* contact */
-.contact-info {
-    font-size: 13px;
-    color: #666;
-    text-align: right;
-}
-
-/* sections */
-.resume-section {
-    margin-bottom: 20px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--divider);
-}
-
-.resume-section h2 {
-    font-size: 15px;
-    margin: 0 0 8px 0;
-    color: #374151;
-    border-left: 4px solid var(--accent-color);
-    padding-left: 8px;
-}
-
-.resume-section p {
-    margin: 0;
-    color: #444;
-    line-height: 1.5;
-}
-
-/* small utilities */
-.date-range {
-    font-size: 13px;
-    color: #666;
-    margin: 6px 0;
-}
-
-.placeholder-text {
-    color: #a5a8c9;
-    font-style: italic;
-}
-
-/* lists */
-.resume-preview ul {
-    padding-left: 1.25rem;
-    margin: 6px 0;
-}
-
-.resume-preview li {
-    margin: 6px 0;
-}
-
-/* hybrid layout */
-.resume-preview--hybrid {
-    display: grid;
-    gap: 28px;
-    grid-template-columns: 0.95fr 2fr;
-    align-items: start;
-}
-
-.resume-preview--hybrid .resume-header {
-    grid-column: 1 / -1;
-}
-
-.resume-preview--hybrid .left-column {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.resume-preview--hybrid .right-column {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-/* classic alterations (if you still use inline renderer) */
-.resume-preview--classic .resume-header {
-    text-align: center;
-    border: none;
-    padding-bottom: 12px;
-    margin-bottom: 24px;
-}
-
-.resume-preview--classic h1 {
-    font-size: 28px;
-    color: var(--accent-color);
-    font-weight: 700;
-}
-
-.resume-preview--classic h2 {
-    text-transform: uppercase;
-    letter-spacing: 0.7px;
-}
-
-/* final vs builder */
-.resume-preview.builder .placeholder-text {
-    display: inline;
-}
-
-.resume-preview.final .placeholder-text {
-    display: none !important;
-}
-
-/* Print rules — ensure printable A4 size when exported */
+/* -------------------------------------------------
+   PRINT / PDF — HARD RESET
+   (THIS GUARANTEES PERFECT PDF OUTPUT)
+-------------------------------------------------- */
 @media print {
-    .resume-preview {
-        max-width: 210mm;
-        min-height: 297mm;
-        padding: 15mm;
+
+    @page {
         margin: 0;
-        box-shadow: none !important;
-        border-radius: 0;
-        background: #fff !important;
     }
 
-    .resume-preview .resume-section,
-    .resume-preview .resume-header {
-        page-break-inside: avoid;
+    html,
+    body {
+        margin: 0;
+        padding: 0;
     }
 
-    .resume-preview--hybrid {
-        grid-template-columns: 1fr 1.8fr;
-        gap: 18px;
+    /* SINGLE PAGE CONTAINER */
+    .resume-page {
+        width: 210mm;
+        min-height: 297mm;
+
+        margin: 0 auto;
+        padding: 0;
+        /* 🔑 FULL BLEED FOR HYBRID */
+
+        background: #ffffff;
+        box-sizing: border-box;
+
+        box-shadow: none;
+
+        transform: none;
+    }
+
+    /* Absolutely no positioning leaks */
+    .resume-preview,
+    .resume-page {
+        position: static !important;
+        left: auto !important;
+        top: auto !important;
     }
 }
 
-/* small responsive */
-@media (max-width: 900px) {
-    .resume-preview {
-        max-width: 100%;
-        padding: 1.25rem;
-    }
+/* =========================
+   TEMPLATE NORMALIZATION
+   ========================= */
 
-    .resume-preview--hybrid {
-        display: block;
-    }
+/* Modern & Classic keep internal padding */
+.resume-preview--modern,
+.resume-preview--classic {
+    margin: 0;
+    padding: 0;
 }
+
+/* Modern internal safety */
+.resume-preview--modern * {
+    box-sizing: border-box;
+}
+
+/* 🚫 Hybrid intentionally controls its own layout */
+/* No global padding or centering applied */

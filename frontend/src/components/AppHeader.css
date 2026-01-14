@@ -1,0 +1,120 @@
+.app-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    z-index: 5000;
+}
+
+.header-inner {
+    height: 100%;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    padding: 0 24px;
+}
+
+/* LEFT */
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-left img {
+    height: 50px;
+    padding-left: 50px;
+}
+
+.brand-text strong {
+    font-size: 14px;
+    display: block;
+}
+
+.brand-text span {
+    font-size: 11px;
+    color: #6b7280;
+}
+
+/* CENTER */
+.header-center {
+    text-align: center;
+    font-weight: 800;
+    color: #00307d;
+    padding-left: 250px;
+}
+
+/* RIGHT */
+.header-right {
+    display: flex;
+    gap: 16px;
+    padding-right: 50px;
+    padding-left: 250px;
+}
+
+.header-right a {
+    font-size: 13px;
+    color: #00329e;
+    text-decoration: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+}
+
+.header-right a:hover {
+    background: #00d057;
+}
+
+/* MOBILE */
+/* MOBILE */
+@media (max-width: 900px) {
+
+    .header-inner {
+        grid-template-columns: auto 1fr;
+        padding: 0 8px;
+    }
+
+    /* LEFT */
+    .header-left {
+        gap: 8px;
+    }
+
+    .header-left img {
+        height: 42px;
+        padding: 0;
+    }
+
+    .brand-text strong {
+        font-size: 13px;
+    }
+
+    .brand-text span {
+        font-size: 10px;
+    }
+
+    /* ❌ HIDE CENTER TEXT COMPLETELY */
+    .header-center {
+        display: none;
+    }
+
+    /* RIGHT — place inside header properly */
+    .header-right {
+        grid-column: 2;
+        justify-self: end;
+        align-items: center;
+
+        display: flex;
+        gap: 5px;
+
+        padding: 0;
+        /* remove desktop padding */
+    }
+
+    .header-right a {
+        font-size: 12px;
+        padding: 6px 8px;
+        white-space: nowrap;
+    }
+}

@@ -1,94 +1,123 @@
-import React, { useState, useEffect } from "react";
+// src/App.js
+import React, { useState, useEffect, useRef } from "react";
 import ResumeBuilder from "./ResumeBuilder";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { api } from "./api";
+import api from "./api";
+import AppHeader from "./components/AppHeader";
 
 function App() {
   const [testMsg, setTestMsg] = useState("");
   const [validAccess, setValidAccess] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // prevents state update after unmount
+  const mountedRef = useRef(true);
+
   const isLocalhost =
     window.location.hostname === "localhost" ||
     window.location.hostname === "127.0.0.1";
 
-  // 🌱 Auto-fetch and validate Telegram daily key once
-  // 🌱 Auto-fetch and validate Telegram daily key once
   useEffect(() => {
+    mountedRef.current = true;
+
+    // 🔐 FAILSAFE — never allow infinite loading
+    const safetyTimeout = setTimeout(() => {
+      if (mountedRef.current) {
+        console.warn("⏱ Auth check timeout — forcing UI");
+        setValidAccess(false);
+        setLoading(false);
+      }
+    }, 5000);
+
     async function fetchAuthKey() {
       try {
         const params = new URLSearchParams(window.location.search);
         const chatId = params.get("chatId");
-        const urlAuth = params.get("auth"); // 👈 New: Telegram-provided key
+        const urlAuth = params.get("auth");
         const today = new Date().toISOString().split("T")[0].replace(/-/g, "");
 
-        // ✅ Skip Telegram auth when testing locally
+        // 🧩 Local testing bypass
         if (isLocalhost) {
-          console.log("🧩 Localhost detected — skipping Telegram auth check");
+          console.log("🧩 Localhost detected — skipping Telegram auth");
+          if (!mountedRef.current) return;
           setValidAccess(true);
-          setLoading(false);
           return;
         }
 
-
-        // ✅ 1. If Telegram URL includes auth, trust and store it
+        // 1️⃣ Telegram auth from URL
         if (urlAuth && chatId) {
           localStorage.setItem("RB_AUTH", urlAuth);
           localStorage.setItem("RB_CHAT", chatId);
-          console.log("✅ Using auth from Telegram link:", urlAuth);
+          console.log("✅ Using auth from Telegram link");
+          if (!mountedRef.current) return;
           setValidAccess(true);
-          setLoading(false);
           return;
         }
 
-        // ✅ 2. If existing stored key is still valid for today
+        // 2️⃣ Existing valid daily key
         const existingKey = localStorage.getItem("RB_AUTH");
         if (existingKey && existingKey.includes(today)) {
-          console.log("✅ Using existing valid key:", existingKey);
+          console.log("✅ Using cached daily key");
+          if (!mountedRef.current) return;
           setValidAccess(true);
-          setLoading(false);
           return;
         }
 
-        // ✅ 3. If no auth in URL, fetch a new one if chatId available
+        // 3️⃣ Fetch new daily key
         if (chatId) {
-          console.log("🗝 Fetching new key for chatId:", chatId);
+          console.log("🗝 Fetching new daily key");
           const res = await fetch(
-            `https://resume-builder-jv01.onrender.com/api/daily-key?chatId=${encodeURIComponent(chatId)}`
+            `https://resume-builder-jv01.onrender.com/api/daily-key?chatId=${encodeURIComponent(
+              chatId
+            )}`,
+            { cache: "no-store" }
           );
 
-          if (!res.ok) throw new Error("Failed to fetch daily key");
+          if (!res.ok) throw new Error("Daily key request failed");
 
           const data = await res.json();
-          if (data.key) {
+          if (data?.key) {
             localStorage.setItem("RB_AUTH", data.key);
             localStorage.setItem("RB_CHAT", chatId);
-            console.log("✅ Stored new key:", data.key);
+            console.log("✅ New daily key stored");
+            if (!mountedRef.current) return;
             setValidAccess(true);
-          } else {
-            console.error("❌ No key returned from API");
-            setValidAccess(false);
+            return;
           }
-          setLoading(false);
+
+          console.warn("❌ No key returned from API");
+          if (!mountedRef.current) return;
+          setValidAccess(false);
           return;
         }
 
-        // ❌ 4. No auth or chatId → show access denied
-        console.warn("⚠️ No chatId or auth in URL — restricted access");
+        // 4️⃣ No auth → restricted
+        console.warn("⚠️ Missing chatId/auth — restricted");
+        if (!mountedRef.current) return;
         setValidAccess(false);
-        setLoading(false);
       } catch (err) {
-        console.error("❌ Fetch daily key failed:", err);
+        console.error("❌ Auth error:", err);
+        if (!mountedRef.current) return;
         setValidAccess(false);
-        setLoading(false);
+      } finally {
+        // 🔥 THIS IS THE KEY FIX
+        if (mountedRef.current) {
+          setLoading(false);
+          clearTimeout(safetyTimeout);
+        }
       }
     }
 
     fetchAuthKey();
-  }, []);
 
-  // 🔐 Test secure route button
+    return () => {
+      mountedRef.current = false;
+      clearTimeout(safetyTimeout);
+    };
+  }, [isLocalhost]);
+
+  // 🔐 Secure route test
   const testSecure = async () => {
     try {
       const res = await api.testSecure();
@@ -97,34 +126,48 @@ function App() {
       const msg =
         error.response?.status === 401
           ? "❌ Unauthorized — invalid or expired Telegram key."
-          : "❌ " + error.message;
+          : "❌ " + (error.message || String(error));
       setTestMsg(msg);
     }
   };
 
-  if (loading) return <div style={{ textAlign: "center", marginTop: "100px" }}>⏳ Loading secure session...</div>;
-
+  // ⏳ LOADING
+  if (loading) {
+    return (
+      <>
+        <AppHeader />
+        <div style={{ textAlign: "center", marginTop: "120px" }}>
+          ⏳ Loading secure session...
+        </div>
+      </>
+    );
+  }
+  // 🚫 ACCESS DENIED (debug-friendly)
   if (!validAccess) {
     return (
-      <div
-        style={{
-          textAlign: "center",
-          marginTop: "100px",
-          color: "#333",
-          fontFamily: "Arial, sans-serif",
-        }}
-      >
-        <h2>⚠️ Access Expired or Invalid</h2>
-        <p>Please access this page using your personal Telegram bot link.</p>
-        <p style={{ fontSize: "0.9em", color: "#888" }}>
-          (Open your Telegram bot → tap <b>Generate Resume</b>)
-        </p>
+      <div>
+        <div style={{ textAlign: "center", marginTop: 20 }}>
+          <button onClick={testSecure}>🔐 Test Secure Access</button>
+          <p>{testMsg}</p>
+        </div>
+
+        <div style={{ border: "2px dashed red", margin: 20, padding: 20 }}>
+          <h3>Debug: ResumeBuilder below</h3>
+          <ResumeBuilder />
+          <div style={{ marginTop: 10, color: "#666" }}>
+            If builder does not appear, check DevTools → Console.
+          </div>
+        </div>
+
+        <ToastContainer position="top-right" autoClose={3000} />
       </div>
     );
   }
 
+  // ✅ AUTHORIZED VIEW
   return (
     <div>
+      <AppHeader />
       <ResumeBuilder />
       <ToastContainer position="top-right" autoClose={3000} />
       <div style={{ textAlign: "center", marginTop: "20px" }}>

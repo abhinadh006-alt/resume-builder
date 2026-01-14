@@ -17,3 +17,24 @@ public/resumes/*.pdf
 
 # cloudflare worker (deprecated)
 resume-builder-worker/
+
+# dependencies
+frontend/node_modules/
+
+# builds
+build/
+
+# env
+.env.*
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# temp / backup
+tmp/
+*.bak
+*_old.*
+out-test.pdf
+test-resume.pdf

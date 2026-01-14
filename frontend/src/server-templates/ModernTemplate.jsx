@@ -1,175 +1,294 @@
-// src/server-templates/ModernTemplate.jsx
 import React from "react";
-import "./modern-template.css";
 
-export default function ModernTemplate({ formData = {}, isFinalView = false, placeholders = {} }) {
-    // small helper that uses placeholders passed from ResumePreview
-    const showText = (value, placeholder) => {
-        const has = value !== undefined && value !== null && String(value).trim() !== "";
-        if (isFinalView) return has ? value : null;
-        return has ? value : placeholder;
+/* ===============================
+   Helpers
+================================ */
+
+function textToBullets(text, fallback = []) {
+    if (typeof text === "string" && text.trim()) {
+        return text
+            .split("\n")
+            .map(l => l.replace(/^•\s*/, "").trim())
+            .filter(Boolean);
+    }
+    return Array.isArray(fallback) ? fallback : [];
+}
+
+function formatDateRange(start, end) {
+    if (!start && !end) return "";
+    if (start && end) return `${start} — ${end}`;
+    if (start) return `${start} — Present`;
+    return "";
+}
+
+function normalizePhoto(photo) {
+    if (!photo || typeof photo !== "string") return null;
+    if (photo.startsWith("data:image")) return photo;
+    if (photo.startsWith("http")) return photo;
+    return null;
+}
+
+/* ===============================
+   TEMPLATE
+================================ */
+
+export default function ModernTemplate({
+    formData = {},
+    placeholders,
+    isFinalView = false
+}) {
+
+    /* ======================================================
+       PERSONAL DETAILS — HARD FIX (DO NOT CHANGE)
+       ====================================================== */
+
+    const pd = {
+        ...(formData.personalDetails || {}),
+        ...(formData || {})
     };
 
-    const fmtDate = (it = {}) => {
-        const start = (it.start || it.startDate || "").toString().trim();
-        const end = (it.end || it.endDate || "").toString().trim();
-        if (start || end) return `${start || "Start"} — ${end || "Present"}`;
-        return "";
-    };
+    const photo = normalizePhoto(formData.photo);
+    const name = pd.name?.trim() || (!isFinalView ? placeholders.name : "");
+    const title = pd.title?.trim() || (!isFinalView ? placeholders.title : "");
+    const email = pd.email?.trim() || (!isFinalView ? placeholders.email : "");
+    const phone = pd.phone?.trim() || (!isFinalView ? placeholders.phone : "");
+    const location = pd.location?.trim() || (!isFinalView ? placeholders.location : "");
+    const website = pd.website?.trim() || (!isFinalView ? placeholders.website : "");
+    const summary = pd.summary?.trim() || (!isFinalView ? placeholders.summary : "");
 
-    const ph = placeholders; // shorthand
+    const experiences = Array.isArray(formData.experience) && formData.experience.length
+        ? formData.experience
+        : (!isFinalView ? [placeholders.experience] : []);
+
+    const educations = Array.isArray(formData.education) && formData.education.length
+        ? formData.education
+        : (!isFinalView ? [placeholders.education] : []);
+
+    const certifications = Array.isArray(formData.certifications) && formData.certifications.length
+        ? formData.certifications
+        : (!isFinalView ? [placeholders.certifications] : []);
+
+    const skills = Array.isArray(formData.skills) && formData.skills.length
+        ? formData.skills
+        : (!isFinalView ? placeholders.skills : []);
+
+    const languages = Array.isArray(formData.languages) && formData.languages.length
+        ? formData.languages
+        : (!isFinalView ? placeholders.languages : []);
 
     return (
-        <article className="mt-root">
-            <div className="mt-card">
-                <header className="mt-header">
-                    <div className="mt-header-left">
-                        {formData.photoUrl ? (
-                            <img src={formData.photoUrl} alt={formData.name || ph.name || "Photo"} className="mt-avatar" />
-                        ) : (
-                            <div className="mt-avatar mt-avatar--placeholder" aria-hidden="true" />
-                        )}
+        <div className="mt-root">
 
-                        <div className="mt-name-block">
-                            <h1 className="mt-name">{showText(formData.name, ph.name)}</h1>
-                            <div className="mt-title">{showText(formData.title, ph.title)}</div>
+            {/* ✅ NEW INNER MARGIN WRAPPER */}
+            <div className="mt-content-inner">
+
+                {/* ================= HEADER ================= */}
+                {(name || title || email || phone || location || website) && (
+                    <div className="mt-header">
+                        <div className="mt-photo-wrapper">
+                            {photo ? (
+                                photo.startsWith("data:image") ? (
+                                    <img
+                                        className="mt-photo"
+                                        src={photo}
+                                        alt="Profile"
+                                        style={{ objectFit: "cover" }}
+                                    />
+                                ) : (
+                                    <div
+                                        className="mt-photo-bg"
+                                        style={{ backgroundImage: `url("${photo}")` }}
+                                    />
+                                )
+                            ) : (
+                                <div className="mt-photo-placeholder">PROFILE</div>
+                            )}
                         </div>
-                    </div>
 
-                    <div className="mt-contact">
-                        {(formData.email || formData.phone || !isFinalView) && (
-                            <div className="mt-contact-line">
-                                <span className="mt-contact-item">{showText(formData.email, ph.email)}</span>
-                                <span className="mt-divider">|</span>
-                                <span className="mt-contact-item">{showText(formData.phone, ph.phone)}</span>
+                        <div className="mt-header-main">
+                            <div>
+                                {name && <h1 className="mt-name">{name}</h1>}
+                                {title && <div className="mt-title">{title}</div>}
                             </div>
-                        )}
-                        <div className="mt-contact-line">
-                            <span className="mt-contact-item">{showText(formData.website, ph.website)}</span>
-                            <span className="mt-divider">|</span>
-                            <span className="mt-contact-item">{showText(formData.location, ph.location)}</span>
+
+                            <div className="mt-contact">
+                                {email && <div>{email}</div>}
+                                {phone && <div>{phone}</div>}
+                                {location && <div>{location}</div>}
+                                {website && <div>{website}</div>}
+                            </div>
                         </div>
                     </div>
-                </header>
+                )}
 
-                {(formData.summary || !isFinalView) && (
-                    <section className="mt-section mt-summary">
-                        <h2 className="mt-section-title">Summary</h2>
-                        <div className="mt-section-body">
-                            <p>{showText(formData.summary, ph.summary)}</p>
-                        </div>
+                {/* ================= SUMMARY ================= */}
+                {summary && (
+                    <section className="mt-section">
+                        <div className="mt-section-title">SUMMARY</div>
+                        <p className="mt-text">{summary}</p>
                     </section>
                 )}
 
-                {(formData.experience?.length > 0 || !isFinalView) && (
+                {/* ================= EXPERIENCE ================= */}
+                {experiences.length > 0 && (
                     <section className="mt-section">
-                        <h2 className="mt-section-title">Experience</h2>
+                        <div className="mt-section-title">EXPERIENCE</div>
 
-                        <div className="mt-section-body">
-                            {Array.isArray(formData.experience) && formData.experience.length > 0 ? (
-                                formData.experience.map((exp, idx) => (
-                                    <div key={idx} className="mt-entry">
-                                        <div className="mt-entry-head">
-                                            <div className="mt-entry-left">
-                                                <div className="mt-entry-job">{exp.title || ph.experience.jobTitle}</div>
-                                                <div className="mt-entry-company">
-                                                    {exp.company || ph.experience.company} {exp.location ? `| ${exp.location}` : ""}
+                        {experiences.map((exp, i) => {
+                            if (!exp) return null;
+
+                            const bullets = textToBullets(
+                                exp.description,
+                                placeholders.experience?.bullets
+                            );
+
+                            return (
+                                <div className="mt-item" key={i}>
+                                    <div className="mt-item-header">
+                                        <div>
+                                            <div className="mt-role">
+                                                {exp.title || placeholders.experience.jobTitle}
+                                            </div>
+                                            <div className="mt-company">
+                                                {(exp.company || placeholders.experience.company)},{" "}
+                                                {(exp.location || placeholders.experience.location)}
+                                            </div>
+                                        </div>
+                                        <div className="mt-date">
+                                            {formatDateRange(exp.startDate, exp.endDate) ||
+                                                placeholders.experience.dateRange}
+                                        </div>
+                                    </div>
+
+                                    {bullets.length > 0 && (
+                                        <ul className="mt-bullets">
+                                            {bullets.map((b, idx) => (
+                                                <li key={idx}>{b}</li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </section>
+                )}
+
+                {/* ================= EDUCATION ================= */}
+                {educations.length > 0 && (
+                    <section className="mt-section">
+                        <div className="mt-section-title">EDUCATION</div>
+
+                        {educations.map((edu, i) => {
+                            if (!edu) return null;
+
+                            const bullets = textToBullets(
+                                edu.description,
+                                placeholders.education?.bullets
+                            );
+
+                            return (
+                                <div className="mt-item" key={i}>
+                                    <div className="mt-item-header">
+                                        <div>
+                                            <div className="mt-role">
+                                                {edu.degree || placeholders.education.degree}
+                                            </div>
+                                            <div className="mt-company">
+                                                {(edu.school || placeholders.education.school)},{" "}
+                                                {(edu.location || placeholders.education.location)}
+                                            </div>
+                                        </div>
+                                        <div className="mt-date">
+                                            {formatDateRange(edu.startDate, edu.endDate) ||
+                                                placeholders.education.dateRange}
+                                        </div>
+                                    </div>
+
+                                    {bullets.length > 0 && (
+                                        <ul className="mt-bullets">
+                                            {bullets.map((b, idx) => (
+                                                <li key={idx}>{b}</li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </section>
+                )}
+
+                {/* ================= CERTIFICATIONS ================= */}
+                {certifications.length > 0 && (
+                    <section className="mt-section">
+                        <div className="mt-section-title">CERTIFICATIONS</div>
+
+                        {certifications.map((c, i) => {
+                            if (!c) return null;
+
+                            const bullets = textToBullets(
+                                c.description,
+                                placeholders.certifications?.bullets
+                            );
+
+                            return (
+                                <div className="mt-item" key={i}>
+                                    <div className="mt-item-header">
+                                        <div>
+                                            <div className="mt-role">
+                                                {c.name || placeholders.certifications.name}
+                                            </div>
+                                            <div className="mt-company">
+                                                {c.organization || placeholders.certifications.organization}
+                                            </div>
+                                            {(c.credentialId || placeholders.certifications.credentialId) && (
+                                                <div className="mt-text">
+                                                    Credential ID: {c.credentialId || placeholders.certifications.credentialId}
                                                 </div>
-                                            </div>
-                                            <div className="mt-entry-date">{fmtDate(exp) || ph.experience.dateRange}</div>
-                                        </div>
-
-                                        <ul className="mt-bullets">
-                                            {exp.description && String(exp.description).trim() ? (
-                                                String(exp.description).split("\n").map((line, i) => <li key={i}>{line}</li>)
-                                            ) : (
-                                                !isFinalView ? (
-                                                    ph.experience.sampleBullets.map((b, i) => <li key={i}>{b}</li>)
-                                                ) : null
                                             )}
-                                        </ul>
-                                    </div>
-                                ))
-                            ) : (
-                                !isFinalView && (
-                                    <div className="mt-entry">
-                                        <div className="mt-entry-head">
-                                            <div className="mt-entry-left">
-                                                <div className="mt-entry-job">{ph.experience.jobTitle} | {ph.experience.company}</div>
-                                            </div>
-                                            <div className="mt-entry-date">{ph.experience.dateRange}</div>
                                         </div>
+                                        <div className="mt-date">
+                                            {c.issueDate || placeholders.certifications.issueDate}
+                                        </div>
+                                    </div>
+
+                                    {bullets.length > 0 && (
                                         <ul className="mt-bullets">
-                                            {ph.experience.sampleBullets.map((b, i) => <li key={i}>{b}</li>)}
+                                            {bullets.map((b, idx) => (
+                                                <li key={idx}>{b}</li>
+                                            ))}
                                         </ul>
-                                    </div>
-                                )
-                            )}
-                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
                     </section>
                 )}
 
-                {(formData.education?.length > 0 || !isFinalView) && (
+                {/* ================= SKILLS ================= */}
+                {skills.length > 0 && (
                     <section className="mt-section">
-                        <h2 className="mt-section-title">Education</h2>
-                        <div className="mt-section-body">
-                            {Array.isArray(formData.education) && formData.education.length > 0 ? (
-                                formData.education.map((edu, i) => (
-                                    <div className="mt-entry" key={i}>
-                                        <div className="mt-entry-head">
-                                            <div className="mt-entry-left">
-                                                <div className="mt-entry-job">{edu.degree || ph.education.degree}</div>
-                                                <div className="mt-entry-company">{edu.school || ph.education.school}{edu.location ? ` — ${edu.location}` : ""}</div>
-                                            </div>
-                                            <div className="mt-entry-date">{fmtDate(edu) || ph.education.dateRange}</div>
-                                        </div>
-                                        {edu.description ? <p className="mt-edu-desc">{edu.description}</p> : (!isFinalView && <p className="mt-edu-desc">{ph.education.description}</p>)}
-                                    </div>
-                                ))
-                            ) : (
-                                !isFinalView && (
-                                    <div className="mt-entry">
-                                        <div className="mt-entry-head">
-                                            <div className="mt-entry-left">
-                                                <div className="mt-entry-job">{ph.education.degree}</div>
-                                                <div className="mt-entry-company">{ph.education.school} — {ph.education.location}</div>
-                                            </div>
-                                            <div className="mt-entry-date">{ph.education.dateRange}</div>
-                                        </div>
-                                        <p className="mt-edu-desc">{ph.education.description}</p>
-                                    </div>
-                                )
-                            )}
-                        </div>
+                        <div className="mt-section-title">SKILLS</div>
+                        {skills.map((s, i) => (
+                            <div key={i} className="mt-skill">
+                                • {typeof s === "string" ? s : `${s.skill} - ${s.level}`}
+                            </div>
+                        ))}
                     </section>
                 )}
 
-                {((formData.skills?.length > 0) || (formData.certifications?.length > 0) || (formData.languages?.length > 0) || !isFinalView) && (
-                    <section className="mt-section mt-bottom">
-                        {(formData.skills?.length > 0 || !isFinalView) && (
-                            <>
-                                <h3 className="mt-mini-title">Skills</h3>
-                                <div className="mt-tag-line">
-                                    {Array.isArray(formData.skills) && formData.skills.length > 0 ? formData.skills.map((s, i) => (
-                                        <span key={i} className="mt-tag">{typeof s === "string" ? s : (s.skill || s.name)}</span>
-                                    )) : (!isFinalView ? (ph.skills.map((t, i) => <span key={i} className="mt-tag">{t}</span>)) : null)}
-                                </div>
-                            </>
-                        )}
-
-                        {(formData.languages?.length > 0 || !isFinalView) && (
-                            <>
-                                <h3 className="mt-mini-title">Languages</h3>
-                                <div className="mt-tag-line">
-                                    {Array.isArray(formData.languages) && formData.languages.length > 0 ? formData.languages.map((l, i) => (
-                                        <span key={i} className="mt-tag">{(l.language || l) + (l.proficiency ? ` — ${l.proficiency}` : "")}</span>
-                                    )) : (!isFinalView ? (ph.languages.map((t, i) => <span key={i} className="mt-tag">{t}</span>)) : null)}
-                                </div>
-                            </>
-                        )}
+                {/* ================= LANGUAGES ================= */}
+                {languages.length > 0 && (
+                    <section className="mt-section">
+                        <div className="mt-section-title">LANGUAGES</div>
+                        {languages.map((l, i) => (
+                            <div key={i}>
+                                • {typeof l === "string" ? l : `${l.language} - ${l.proficiency}`}
+                            </div>
+                        ))}
                     </section>
                 )}
+
             </div>
-        </article>
+        </div>
     );
 }

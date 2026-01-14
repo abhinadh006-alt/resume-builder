@@ -1,0 +1,47 @@
+/* src/PreviewZoomControl.css */
+.preview-zoom-control {
+    position: fixed;
+    right: 22px;
+    bottom: 18px;
+    display: flex;
+    gap: 10px;
+    z-index: 3500;
+    align-items: center;
+}
+
+.zoom-btn {
+    min-width: 28px;
+    height: 28px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    background: #1976d2;
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 2px 5px rgba(25, 118, 210, 0.14);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+}
+
+.zoom-btn.center {
+    background: #fff;
+    color: #1976d2;
+    border: 1px solid rgba(25, 118, 210, 0.12);
+    min-width: 50px;
+}
+
+.zoom-btn.minus,
+.zoom-btn.plus {
+    width: 20px;
+}
+
+@media (max-width: 900px) {
+
+    /* move slightly left on mobile so it doesn't overlap mui/fab buttons */
+    .preview-zoom-control {
+        right: 15px;
+        bottom: 15px;
+    }
+}

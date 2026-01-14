@@ -1,19 +1,24 @@
-import React, { useState } from "react";
-import ExperienceSection from "./components/ExperienceSection";
+// src/ResumeBuilder.js
+import React, { useState, useRef, useEffect, useCallback } from "react";
+//import ExperienceSection from "./components/ExperienceSection";
 import ExperienceForm from "./components/ExperienceForm";
-import EducationSection from "./components/EducationSection";
+//import EducationSection from "./components/EducationSection";
 import EducationForm from "./components/EducationForm";
-import CertificationsSection from "./components/CertificationsSection";
+//import CertificationsSection from "./components/CertificationsSection";
 import CertificationsForm from "./components/CertificationsForm";
-import SkillsSection from "./components/SkillsSection";
+//import SkillsSection from "./components/SkillsSection";
 import SkillForm from "./components/SkillForm";
-import LanguagesSection from "./components/LanguagesSection";
+//import LanguagesSection from "./components/LanguagesSection";
 import LanguageForm from "./components/LanguageForm";
 import Modal from "./components/Modal";
 import ResumePreview from "./resumepreview/ResumePreview";
-import { generateResume } from "./api"; // ✅ adjust path if needed
+import { generateResume } from "./api";
 import { toast } from "react-toastify";
 import "./App.css";
+import Sidebar from "./Sidebar";
+import "./Sidebar.css";
+import PreviewZoomControl from "./PreviewZoomControl";
+import "./layout-preview.css";   // MUST be imported
 
 export default function ResumeBuilder() {
     const [formData, setFormData] = useState({
@@ -29,65 +34,144 @@ export default function ResumeBuilder() {
         certifications: [],
         skills: [],
         languages: [],
+        photo: undefined,
     });
 
-    // ===== MODAL STATES =====
-    const [showExperienceModal, setShowExperienceModal] = useState(false);
+    // single modal controller (only one open at a time)
+    // possible values: null | "experience" | "education" | "cert" | "skill" | "language"
+    const [openModal, setOpenModal] = useState(null);
+
+    // editing indexes + initial data (kept as before)
     const [editingExperienceIndex, setEditingExperienceIndex] = useState(null);
     const [experienceInitialData, setExperienceInitialData] = useState(null);
 
-    const [showEducationModal, setShowEducationModal] = useState(false);
     const [editingEducationIndex, setEditingEducationIndex] = useState(null);
     const [educationInitialData, setEducationInitialData] = useState(null);
 
-    const [showCertModal, setShowCertModal] = useState(false);
     const [editingCertIndex, setEditingCertIndex] = useState(null);
     const [certInitialData, setCertInitialData] = useState(null);
 
-    const [showSkillModal, setShowSkillModal] = useState(false);
     const [editingSkillIndex, setEditingSkillIndex] = useState(null);
     const [skillInitialData, setSkillInitialData] = useState(null);
 
-    const [showLanguageModal, setShowLanguageModal] = useState(false);
     const [editingLanguageIndex, setEditingLanguageIndex] = useState(null);
     const [languageInitialData, setLanguageInitialData] = useState(null);
 
-    // ===== TEMPLATE + PREVIEW =====
+    const previewRef = useRef(null);
+
+    // template + preview
     const [template, setTemplate] = useState("modern");
     const [isFinalView, setIsFinalView] = useState(false);
 
+    const [loading, setLoading] = useState(false);
+
+    // sidebar state
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [activeSection, setActiveSection] = useState("personal");
+
+    // mobile iconbar state - which panel to show inside the sidebar when icon clicked
+    const [activePanel, setActivePanel] = useState("personal");
+
+    // helper to open sidebar + set panel
+    const openPanel = (name) => {
+        setActivePanel(name);
+        setSidebarOpen(true); // open the drawer on mobile
+    };
+
+    // ===== helpers =====
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        setFormData((s) => ({ ...s, [name]: value }));
     };
 
     const toggleFinalView = () => {
-        setShowExperienceModal(false);
-        setShowEducationModal(false);
-        setShowCertModal(false);
-        setShowSkillModal(false);
-        setShowLanguageModal(false);
-        setIsFinalView(!isFinalView);
+        // close any open modal before switching view
+        setOpenModal(null);
+        setIsFinalView((v) => !v);
     };
 
-    const [loading, setLoading] = useState(false);
+    const handleSetPhoto = (base64) => {
+        setFormData((prev) => ({ ...prev, photo: base64 }));
+    };
 
-    // ✅ Handle resume generation
-    // ✅ Handle resume generation
+    const handleImportResume = (parsed) => {
+        const allowed = [
+            "name",
+            "title",
+            "email",
+            "phone",
+            "location",
+            "website",
+            "summary",
+            "experience",
+            "education",
+            "certifications",
+            "skills",
+            "languages",
+            "photo",
+        ];
+        const sanitized = {};
+        allowed.forEach((k) => {
+            if (parsed[k] !== undefined) sanitized[k] = parsed[k];
+        });
+        setFormData((prev) => ({ ...prev, ...sanitized }));
+        toast.success("Imported resume JSON successfully");
+    };
+
+    // ===== helpers for mobile panels: file -> base64, import JSON file
+    const fileToBase64 = (file) =>
+        new Promise((resolve, reject) => {
+            const fr = new FileReader();
+            fr.onload = () => resolve(fr.result);
+            fr.onerror = reject;
+            fr.readAsDataURL(file);
+        });
+
+    const handlePhotoUploadFile = async (file) => {
+        try {
+            const b64 = await fileToBase64(file);
+            handleSetPhoto(b64);
+            toast.success("Photo uploaded");
+        } catch (err) {
+            toast.error("Failed to read photo file");
+        }
+    };
+
+    const handleImportJsonFile = async (file) => {
+        try {
+            const text = await file.text();
+            const parsed = JSON.parse(text);
+            handleImportResume(parsed);
+        } catch (err) {
+            toast.error("Invalid JSON file");
+        }
+    };
+
+    // ✅ Normalize photo before sending to backend (CRITICAL for PDF)
+    // ✅ BASE64-ONLY photo guard (DO NOT ALLOW URLS)
+    const normalizePhoto = (photo) => {
+        if (!photo) return null;
+
+        if (typeof photo === "string" && photo.startsWith("data:image")) {
+            return photo; // ✅ ONLY base64 allowed
+        }
+
+        console.warn("⚠️ Non-base64 photo dropped");
+        return null;
+    };
+
+
+    // ===== handleSubmit (generate resume) =====
     const handleSubmit = async () => {
         try {
             setLoading(true);
 
-            // Ensure required fields
             if (!formData.name?.trim() || !formData.email?.trim()) {
                 toast.error("❌ Please enter your name and email before generating.");
                 setLoading(false);
                 return;
             }
 
-
-
-            // Construct payload explicitly to ensure backend gets the right structure
             const chatId = localStorage.getItem("RB_CHAT");
             const payload = {
                 name: formData.name.trim(),
@@ -102,187 +186,397 @@ export default function ResumeBuilder() {
                 certifications: formData.certifications,
                 skills: formData.skills,
                 languages: formData.languages,
+                photo: normalizePhoto(formData.photo),
                 template,
-                chatId: chatId || undefined  // ✅ Include chatId
+                chatId: chatId || undefined,
             };
 
-            // Call secure backend generator
-            const result = await generateResume(payload);
+            // call generator (secure:true calls /api/secure/generate-cv)
+            const result = await generateResume(payload, { secure: true });
 
-            if (result?.file) {
-                toast.success("✅ Resume generated successfully!");
-                window.open(`https://resume-builder-jv01.onrender.com${result.file}`, "_blank");
-            } else {
-                toast.error("⚠️ Unexpected server response");
+
+            // if server returned PDF bytes (blob)
+            if (result?.fileBlob) {
+                const url = URL.createObjectURL(result.fileBlob);
+                window.open(url, "_blank");
+                toast.success("✅ Resume generated (download opened).");
+                return;
             }
+
+            // if server returned JSON with a downloadURL or file path
+            if (result?.downloadURL || result?.file) {
+                const filePath = result.downloadURL || result.file;
+                const base = (process.env.REACT_APP_API_URL || "http://localhost:5000").replace(/\/api\/?$/, "");
+                const openUrl = filePath.startsWith("http") ? filePath : `${base}${filePath}`;
+                window.open(openUrl, "_blank");
+                toast.success("✅ Resume generated successfully!");
+                return;
+            }
+
+            // fallback: show text (for debugging)
+            if (result?.text) {
+                console.log("generate returned text:", result.text);
+                toast.info("Server returned text response (see console).");
+                return;
+            }
+
+            toast.warn("⚠️ Unexpected server response. Check console.");
+            console.log("generate result:", result);
         } catch (err) {
-            console.error("❌ Resume generation failed:", err.message);
+            console.error("❌ Resume generation failed:", err);
             toast.error("❌ Failed to generate resume. Please try again.");
         } finally {
             setLoading(false);
         }
     };
 
-
-    // ===== Edit Handlers =====
+    // ===== edit handlers =====
     const handleEditItem = (type, index) => {
         const selected = formData[type][index];
         const setters = {
-            experience: [setEditingExperienceIndex, setExperienceInitialData, setShowExperienceModal],
-            education: [setEditingEducationIndex, setEducationInitialData, setShowEducationModal],
-            certifications: [setEditingCertIndex, setCertInitialData, setShowCertModal],
-            skills: [setEditingSkillIndex, setSkillInitialData, setShowSkillModal],
-            languages: [setEditingLanguageIndex, setLanguageInitialData, setShowLanguageModal],
+            experience: [setEditingExperienceIndex, setExperienceInitialData, () => setOpenModal("experience")],
+            education: [setEditingEducationIndex, setEducationInitialData, () => setOpenModal("education")],
+            certifications: [setEditingCertIndex, setCertInitialData, () => setOpenModal("cert")],
+            skills: [setEditingSkillIndex, setSkillInitialData, () => setOpenModal("skill")],
+            languages: [setEditingLanguageIndex, setLanguageInitialData, () => setOpenModal("language")],
         };
 
-        const [setIndex, setInitialData, setShow] = setters[type];
+        const [setIndex, setInitialData, open] = setters[type];
         setIndex(index);
         setInitialData(selected);
-        setShow(true);
+        open();
+    };
+
+    // Small helper to remove item
+    const removeItem = (type, index) => {
+        const updated = [...formData[type]].filter((_, i) => i !== index);
+        setFormData({ ...formData, [type]: updated });
+    };
+
+    // Mobile panel sub-contents: minimal but functional
+    const PersonalPanel = (
+        <div className="card">
+            <h3>Personal Details</h3>
+            <label>Name</label>
+            <input name="name" value={formData.name} onChange={handleChange} />
+            <label>Title</label>
+            <input name="title" value={formData.title} onChange={handleChange} />
+            <label>Email</label>
+            <input name="email" value={formData.email} onChange={handleChange} />
+            <label>Phone</label>
+            <input name="phone" value={formData.phone} onChange={handleChange} />
+            <label>Location</label>
+            <input name="location" value={formData.location} onChange={handleChange} />
+            <label>Website</label>
+            <input name="website" value={formData.website} onChange={handleChange} />
+        </div>
+    );
+
+    const SectionsPanel = (
+        <div className="card">
+            <h3>Sections</h3>
+
+            <div style={{ marginBottom: 10 }}>
+                <strong>Experience</strong>
+                <div style={{ marginTop: 8 }}>
+                    <button
+                        onClick={() => {
+                            setEditingExperienceIndex(null);
+                            setExperienceInitialData(null);
+                            setOpenModal("experience");
+                            setActivePanel(null);
+                        }}
+                        className="template-btn"
+                    >
+                        + Add Experience
+                    </button>
+                </div>
+                <ul className="short-list">
+                    {(formData.experience || []).map((e, i) => (
+                        <li key={i}>
+                            <div style={{ fontSize: 13 }}>{e.title || "Untitled"}</div>
+                            <div>
+                                <button onClick={() => handleEditItem("experience", i)}>Edit</button>
+                                <button onClick={() => removeItem("experience", i)}>Remove</button>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+
+            <div style={{ marginBottom: 10 }}>
+                <strong>Education</strong>
+                <div style={{ marginTop: 8 }}>
+                    <button
+                        onClick={() => {
+                            setEditingEducationIndex(null);
+                            setEducationInitialData(null);
+                            setOpenModal("education");
+                            setActivePanel(null);
+                        }}
+                        className="template-btn"
+                    >
+                        + Add Education
+                    </button>
+                </div>
+                <ul className="short-list">
+                    {(formData.education || []).map((e, i) => (
+                        <li key={i}>
+                            <div style={{ fontSize: 13 }}>{e.school || "Untitled"}</div>
+                            <div>
+                                <button onClick={() => handleEditItem("education", i)}>Edit</button>
+                                <button onClick={() => removeItem("education", i)}>Remove</button>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+
+            <div style={{ marginBottom: 10 }}>
+                <strong>Certifications</strong>
+                <div style={{ marginTop: 8 }}>
+                    <button
+                        onClick={() => {
+                            setEditingCertIndex(null);
+                            setCertInitialData(null);
+                            setOpenModal("cert");
+                            setActivePanel(null);
+                        }}
+                        className="template-btn"
+                    >
+                        + Add Certification
+                    </button>
+                </div>
+                <ul className="short-list">
+                    {(formData.certifications || []).map((c, i) => (
+                        <li key={i}>
+                            <div style={{ fontSize: 13 }}>{c.name || "Untitled"}</div>
+                            <div>
+                                <button onClick={() => handleEditItem("certifications", i)}>Edit</button>
+                                <button onClick={() => removeItem("certifications", i)}>Remove</button>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+
+            <div style={{ marginBottom: 10 }}>
+                <strong>Skills</strong>
+                <div style={{ marginTop: 8 }}>
+                    <button
+                        onClick={() => {
+                            setEditingSkillIndex(null);
+                            setSkillInitialData(null);
+                            setOpenModal("skill");
+                            setActivePanel(null);
+                        }}
+                        className="template-btn"
+                    >
+                        + Add Skill
+                    </button>
+                </div>
+            </div>
+
+            <div style={{ marginBottom: 10 }}>
+                <strong>Languages</strong>
+                <div style={{ marginTop: 8 }}>
+                    <button
+                        onClick={() => {
+                            setEditingLanguageIndex(null);
+                            setLanguageInitialData(null);
+                            setOpenModal("language");
+                            setActivePanel(null);
+                        }}
+                        className="template-btn"
+                    >
+                        + Add Language
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+
+    const PhotoPanel = (
+        <div className="card">
+            <h3>Photo & Import</h3>
+            <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+                <label className="btn-upload" style={{ cursor: "pointer" }}>
+                    Upload Photo
+                    <input
+                        type="file"
+                        accept="image/*"
+                        style={{ display: "none" }}
+                        onChange={(e) => {
+                            const f = e.target.files && e.target.files[0];
+                            if (f) handlePhotoUploadFile(f);
+                        }}
+                    />
+                </label>
+
+                <label className="btn-upload" style={{ cursor: "pointer" }}>
+                    Import JSON
+                    <input
+                        type="file"
+                        accept="application/json"
+                        style={{ display: "none" }}
+                        onChange={(e) => {
+                            const f = e.target.files && e.target.files[0];
+                            if (f) handleImportJsonFile(f);
+                        }}
+                    />
+                </label>
+            </div>
+
+            <div>
+                <small className="muted">Uploaded photo will appear in preview & PDF.</small>
+            </div>
+        </div>
+    );
+
+    const TemplatesPanel = (
+        <div className="card">
+            <h3>Select Resume Style</h3>
+            <button
+                className={`template-btn ${template === "modern" ? "active" : ""}`}
+                onClick={() => {
+                    setTemplate("modern");
+                    toast.info("Template set: Modern");
+                }}
+            >
+                Modern (Experienced)
+            </button>
+            <button
+                className={`template-btn ${template === "classic" ? "active" : ""}`}
+                onClick={() => {
+                    setTemplate("classic");
+                    toast.info("Template set: Classic");
+                }}
+            >
+                Classic (Serif)
+            </button>
+            <button
+                className={`template-btn ${template === "hybrid" ? "active" : ""}`}
+                onClick={() => {
+                    setTemplate("hybrid");
+                    toast.info("Template set: Hybrid");
+                }}
+            >
+                Hybrid (Two column)
+            </button>
+        </div>
+    );
+
+    const GeneratePanel = (
+        <div className="card">
+            <h3>Preview & Generate</h3>
+            <div style={{ marginBottom: 10 }}>
+                <button
+                    className="preview-toggle toggle-btn"
+                    onClick={() => {
+                        toggleFinalView();
+                        setActivePanel(null);
+                    }}
+                >
+                    {isFinalView ? "Switch to Edit View" : "Preview Mode"}
+                </button>
+            </div>
+
+            <div>
+                <button
+                    className="generate-btn"
+                    onClick={() => {
+                        // close mobile panel and start generation
+                        setActivePanel(null);
+                        handleSubmit();
+                    }}
+                    disabled={loading}
+                >
+                    {loading ? "Generating..." : "Generate Resume"}
+                </button>
+            </div>
+        </div>
+    );
+
+    // ========== Preview fit-to-container logic ==========
+
+
+    // ========== edit helpers that open modals ==========
+    const openExperience = () => {
+        setEditingExperienceIndex(null);
+        setExperienceInitialData(null);
+        setOpenModal("experience");
+    };
+    const openEducation = () => {
+        setEditingEducationIndex(null);
+        setEducationInitialData(null);
+        setOpenModal("education");
+    };
+    const openCert = () => {
+        setEditingCertIndex(null);
+        setCertInitialData(null);
+        setOpenModal("cert");
+    };
+    const openSkill = () => {
+        setEditingSkillIndex(null);
+        setSkillInitialData(null);
+        setOpenModal("skill");
+    };
+    const openLanguage = () => {
+        setEditingLanguageIndex(null);
+        setLanguageInitialData(null);
+        setOpenModal("language");
     };
 
     return (
         <div className="builder-layout">
-            <aside className="sidebar">
-                {/* ===== PERSONAL DETAILS ===== */}
-                <h3>👤Personal Details</h3>
-                {["name", "title", "email", "phone", "location", "website"].map((field) => (
-                    <input
-                        key={field}
-                        name={field}
-                        placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-                        value={formData[field]}
-                        onChange={handleChange}
-                    />
-                ))}
 
-                {/* ===== SUMMARY ===== */}
-                <h3>📒Summary</h3>
-                <textarea
-                    name="summary"
-                    rows="5"
-                    placeholder="Write your professional summary..."
-                    value={formData.summary}
-                    onChange={handleChange}
-                ></textarea>
+            {/* ===== APP HEADER (Branding only, NOT part of preview/PDF) ===== */}
 
-                {/* ===== EXPERIENCE ===== */}
-                <ExperienceSection
-                    experience={formData.experience}
-                    onAdd={() => {
-                        setEditingExperienceIndex(null);
-                        setExperienceInitialData(null);
-                        setShowExperienceModal(true);
-                    }}
-                    onEdit={(index) => handleEditItem("experience", index)}
-                    onRemove={(index) => {
-                        const updated = formData.experience.filter((_, i) => i !== index);
-                        setFormData({ ...formData, experience: updated });
-                    }}
-                />
-
-                {/* ===== EDUCATION ===== */}
-                <EducationSection
-                    education={formData.education}
-                    onAdd={() => {
-                        setEditingEducationIndex(null);
-                        setEducationInitialData(null);
-                        setShowEducationModal(true);
-                    }}
-                    onEdit={(index) => handleEditItem("education", index)}
-                    onRemove={(index) => {
-                        const updated = formData.education.filter((_, i) => i !== index);
-                        setFormData({ ...formData, education: updated });
-                    }}
-                />
-
-                {/* ===== CERTIFICATIONS ===== */}
-                <CertificationsSection
-                    certifications={formData.certifications}
-                    onAdd={() => {
-                        setEditingCertIndex(null);
-                        setCertInitialData(null);
-                        setShowCertModal(true);
-                    }}
-                    onEdit={(index) => handleEditItem("certifications", index)}
-                    onRemove={(index) => {
-                        const updated = formData.certifications.filter((_, i) => i !== index);
-                        setFormData({ ...formData, certifications: updated });
-                    }}
-                />
-
-                {/* ===== SKILLS ===== */}
-                <SkillsSection
-                    skills={formData.skills}
-                    onAdd={() => {
-                        setEditingSkillIndex(null);
-                        setSkillInitialData(null);
-                        setShowSkillModal(true);
-                    }}
-                    onEdit={(index) => handleEditItem("skills", index)}
-                    onRemove={(index) => {
-                        const updated = formData.skills.filter((_, i) => i !== index);
-                        setFormData({ ...formData, skills: updated });
-                    }}
-                />
-
-                {/* ===== LANGUAGES ===== */}
-                <LanguagesSection
-                    languages={formData.languages}
-                    onAdd={() => {
-                        setEditingLanguageIndex(null);
-                        setLanguageInitialData(null);
-                        setShowLanguageModal(true);
-                    }}
-                    onEdit={(index) => handleEditItem("languages", index)}
-                    onRemove={(index) => {
-                        const updated = formData.languages.filter((_, i) => i !== index);
-                        setFormData({ ...formData, languages: updated });
-                    }}
-                />
-
-                {/* ===== TEMPLATE SELECTION ===== */}
-                <h3>Select Resume Style</h3>
-                {["modern", "classic", "hybrid"].map((style) => (
-                    <button
-                        key={style}
-                        type="button"
-                        className={`template-btn ${template === style ? "active" : ""}`}
-                        onClick={() => setTemplate(style)}
-                    >
-                        {style === "modern"
-                            ? "💼 Modern (Experienced)"
-                            : style === "classic"
-                                ? "📘 Classic (Fresher)"
-                                : "🧩 Hybrid (Two Column)"}
-                    </button>
-                ))}
-
-                {/* ===== PREVIEW TOGGLE ===== */}
-                <div className="preview-toggle">
-                    <h3>Preview Mode</h3>
-                    <button
-                        type="button"
-                        className={`toggle-btn ${isFinalView ? "active" : ""}`}
-                        onClick={toggleFinalView}
-                    >
-                        {isFinalView ? "Switch to Edit View" : "Preview Final Resume"}
-                    </button>
-                </div>
-
-                {/* ===== GENERATE BUTTON ===== */}
-                <button onClick={handleSubmit} className="generate-btn" disabled={loading}>
-                    {loading ? "⏳ Generating..." : "✅ Generate Resume"}
-                </button>
-
-            </aside>
+            {/* Desktop sidebar (keeps existing Sidebar component) */}
+            <Sidebar
+                formData={formData}
+                setFormData={setFormData}
+                handleChange={handleChange}
+                openExperienceModal={openExperience}
+                openEducationModal={openEducation}
+                openCertModal={openCert}
+                openSkillModal={openSkill}
+                openLanguageModal={openLanguage}
+                onEditItem={(type, index) => handleEditItem(type, index)}
+                onRemoveItem={(type, index) => {
+                    const updated = [...formData[type]].filter((_, i) => i !== index);
+                    setFormData({ ...formData, [type]: updated });
+                }}
+                template={template}
+                setTemplate={setTemplate}
+                isFinalView={isFinalView}
+                toggleFinalView={toggleFinalView}
+                handleSubmit={handleSubmit}
+                handleSetPhoto={handleSetPhoto}
+                handleImportResume={handleImportResume}
+                isOpen={sidebarOpen}
+                onOpen={() => setSidebarOpen(true)}
+                onClose={() => setSidebarOpen(false)}
+                activePanel={activePanel}
+                setActivePanel={setActivePanel}
+            />
 
             <main className="main-panel">
-                <ResumePreview formData={formData} template={template} isFinalView={isFinalView} />
+                <div className="preview-wrapper">
+                    <div className="preview-scale">
+                        <ResumePreview
+                            ref={previewRef}
+                            formData={formData}
+                            template={template}
+                            isFinalView={isFinalView}
+                        />
+                    </div>
+                </div>
+
             </main>
 
-            {/* ===== MODALS ===== */}
-            <Modal isOpen={showExperienceModal} onClose={() => setShowExperienceModal(false)} title="Experience">
+            {/* MODALS */}
+            <Modal isOpen={openModal === "experience"} onClose={() => setOpenModal(null)} title="Experience">
                 <ExperienceForm
                     initialData={experienceInitialData}
                     onSave={(newExp) => {
@@ -290,12 +584,12 @@ export default function ResumeBuilder() {
                         if (editingExperienceIndex !== null) updated[editingExperienceIndex] = newExp;
                         else updated.push(newExp);
                         setFormData({ ...formData, experience: updated });
-                        setShowExperienceModal(false);
+                        setOpenModal(null);
                     }}
                 />
             </Modal>
 
-            <Modal isOpen={showEducationModal} onClose={() => setShowEducationModal(false)} title="Education">
+            <Modal isOpen={openModal === "education"} onClose={() => setOpenModal(null)} title="Education">
                 <EducationForm
                     initialData={educationInitialData}
                     onSave={(newEdu) => {
@@ -303,12 +597,12 @@ export default function ResumeBuilder() {
                         if (editingEducationIndex !== null) updated[editingEducationIndex] = newEdu;
                         else updated.push(newEdu);
                         setFormData({ ...formData, education: updated });
-                        setShowEducationModal(false);
+                        setOpenModal(null);
                     }}
                 />
             </Modal>
 
-            <Modal isOpen={showCertModal} onClose={() => setShowCertModal(false)} title="Certifications">
+            <Modal isOpen={openModal === "cert"} onClose={() => setOpenModal(null)} title="Certifications">
                 <CertificationsForm
                     initialData={certInitialData}
                     onSave={(newCert) => {
@@ -316,12 +610,12 @@ export default function ResumeBuilder() {
                         if (editingCertIndex !== null) updated[editingCertIndex] = newCert;
                         else updated.push(newCert);
                         setFormData({ ...formData, certifications: updated });
-                        setShowCertModal(false);
+                        setOpenModal(null);
                     }}
                 />
             </Modal>
 
-            <Modal isOpen={showSkillModal} onClose={() => setShowSkillModal(false)} title="Skills">
+            <Modal isOpen={openModal === "skill"} onClose={() => setOpenModal(null)} title="Skills">
                 <SkillForm
                     initialData={skillInitialData}
                     onSave={(newSkill) => {
@@ -329,12 +623,12 @@ export default function ResumeBuilder() {
                         if (editingSkillIndex !== null) updated[editingSkillIndex] = newSkill;
                         else updated.push(newSkill);
                         setFormData({ ...formData, skills: updated });
-                        setShowSkillModal(false);
+                        setOpenModal(null);
                     }}
                 />
             </Modal>
 
-            <Modal isOpen={showLanguageModal} onClose={() => setShowLanguageModal(false)} title="Languages">
+            <Modal isOpen={openModal === "language"} onClose={() => setOpenModal(null)} title="Languages">
                 <LanguageForm
                     initialData={languageInitialData}
                     onSave={(newLang) => {
@@ -342,10 +636,12 @@ export default function ResumeBuilder() {
                         if (editingLanguageIndex !== null) updated[editingLanguageIndex] = newLang;
                         else updated.push(newLang);
                         setFormData({ ...formData, languages: updated });
-                        setShowLanguageModal(false);
+                        setOpenModal(null);
                     }}
                 />
             </Modal>
+
+            <PreviewZoomControl previewRef={previewRef} />
         </div>
     );
 }

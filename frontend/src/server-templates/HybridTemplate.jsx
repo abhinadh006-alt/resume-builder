@@ -1,175 +1,245 @@
-// src/components/templates/HybridTemplate.jsx
 import React from "react";
-import "./hybrid-template.css";
+import "../resumepreview/hybrid-template.css";
 
-export default function HybridTemplate({ formData = {}, isFinalView = false, placeholders = {} }) {
-    const ph = placeholders;
+export default function HybridTemplate({
+    formData = {},
+    placeholders = {},
+    isFinalView = false,
+}) {
+    const ph = placeholders || {};
 
-    const show = (val, placeholder = "") => {
-        const has = val !== undefined && val !== null && String(val).trim() !== "";
-        return isFinalView ? (has ? val : null) : (has ? val : placeholder);
+    /* ===============================
+       PLACEHOLDERS
+    =============================== */
+
+    const safePH = {
+        name: ph.name || "Your Full Name",
+        title: ph.title || "Your Professional Title",
+        email: ph.email || "email@example.com",
+        phone: ph.phone || "+91 98765 43210",
+        website: ph.website || "yourwebsite.com",
+        location: ph.location || "City, Country",
+        summary: ph.summary || "Brief professional summary goes here.",
+
+        experience: {
+            title: "Job Title",
+            company: "Company Name",
+            location: "City, Country",
+            startDate: "Jan 2020",
+            endDate: "Dec 2023",
+            description:
+                "• Implemented and monitored safety systems.\n• Conducted audits and trained staff.\n• Performed risk assessments and led investigations.",
+            ...(ph.experience || {})
+        },
+
+        education: {
+            degree: "Degree Name",
+            school: "Institution Name",
+            location: "City, Country",
+            startDate: "Jan 2016",
+            endDate: "Dec 2019",
+            description: "• Key coursework and academic achievements.\n• Graduation project and specialization.",
+            ...(ph.education || {})
+        },
+
+        certifications: {
+            name: "Certification Name",
+            organization: "Issuing Organization",
+            credentialId: "Credential ID / URL",
+            issueDate: "Jun 2021",
+            description: "• Credential verified and industry recognized.\n• Relevant to occupational safety standards.",
+            ...(ph.certifications || {})
+        },
+
+        skills: Array.isArray(ph.skills) && ph.skills.length
+            ? ph.skills
+            : [
+                { skill: "Risk Assessment", level: "Advanced" },
+                { skill: "Fire Safety", level: "Expert" }
+            ],
+
+        languages: Array.isArray(ph.languages) && ph.languages.length
+            ? ph.languages
+            : [
+                { language: "English", proficiency: "Fluent" },
+                { language: "Hindi", proficiency: "Native" }
+            ]
     };
 
-    const formatDates = (item = {}) => {
-        const start = item.startDate || item.start || "";
-        const end = item.endDate || item.end || "";
-        if (start || end) return `${start}${start && end ? " — " : ""}${end}`;
-        return !isFinalView ? ph.experience?.dateRange || "e.g., August 2018 — March 2022" : null;
+    /* ===============================
+       DATA SOURCES
+    =============================== */
+
+    const summary =
+        formData.summary || (!isFinalView ? safePH.summary : null);
+
+    const experience =
+        Array.isArray(formData.experience) && formData.experience.length
+            ? formData.experience
+            : (!isFinalView ? [{}] : []);
+
+    const education =
+        Array.isArray(formData.education) && formData.education.length
+            ? formData.education
+            : (!isFinalView ? [{}] : []);
+
+    const certifications =
+        Array.isArray(formData.certifications) && formData.certifications.length
+            ? formData.certifications
+            : (!isFinalView ? [{}] : []);
+
+    const skills =
+        Array.isArray(formData.skills) && formData.skills.length
+            ? formData.skills
+            : (!isFinalView ? safePH.skills : []);
+
+    const languages =
+        Array.isArray(formData.languages) && formData.languages.length
+            ? formData.languages
+            : (!isFinalView ? safePH.languages : []);
+
+    /* ===============================
+       HELPERS
+    =============================== */
+
+    const renderBullets = (text) =>
+        String(text || "")
+            .split("\n")
+            .map(l => l.replace(/^•\s*/, "").trim())
+            .filter(Boolean)
+            .map((l, i) => <li key={i}>{l}</li>);
+
+    const renderSkill = (s) => {
+        if (!s) return null;
+        if (typeof s === "string") return s;
+        const name = s.skill || s.name || "";
+        const level = s.level || s.proficiency || "";
+        return level ? `${name} - ${level}` : name;
     };
 
-    const renderBullets = (text = "") => {
-        const parts = String(text).split(/\n|•/).map(p => p.trim()).filter(Boolean);
-        if (!parts.length) return null;
-        return <ul className="ct-bullets">{parts.map((p, i) => <li key={i}>{p}</li>)}</ul>;
+    const renderLanguage = (l) => {
+        if (!l) return null;
+        if (typeof l === "string") return l;
+        const name = l.language || l.name || "";
+        const prof = l.proficiency || "";
+        return prof ? `${name} - ${prof}` : name;
     };
 
-    const skills = formData.skills || [];
-    const languages = formData.languages || [];
+    /* ===============================
+       RENDER
+    =============================== */
 
     return (
-        <div className="ct-wrapper">
-            <aside className="ct-sidebar" role="complementary">
-                <div className="ct-photo-wrap">
-                    {formData.photo ? (
-                        <img className="ct-photo" src={formData.photo} alt={formData.name || ph.name} />
-                    ) : (
-                        <div className="ct-photo ct-photo--placeholder" aria-hidden />
-                    )}
-                </div>
+        <div className="hybrid-template">
 
-                <div className="ct-name">{show(formData.name, ph.name)}</div>
-                <div className="ct-title">{show(formData.title, ph.title)}</div>
+            {/* HEADER */}
+            <div className="hybrid-header">
+                <div className="hybrid-header-inner">
+                    <div className="hybrid-header-left">
+                        <h1 className="hybrid-name">{formData.name || safePH.name}</h1>
+                        <div className="hybrid-title">{formData.title || safePH.title}</div>
 
-                <hr className="ct-sep" />
+                        <div className="hybrid-contacts">
+                            <span>✉ {formData.email || safePH.email}</span>
+                            <span>☎ {formData.phone || safePH.phone}</span>
+                            <span>🔗 {formData.website || safePH.website}</span>
+                            <span>📍 {formData.location || safePH.location}</span>
+                        </div>
+                    </div>
 
-                <div className="ct-block">
-                    <h4 className="ct-block__title">Details</h4>
-                    <div className="ct-contact">
-                        {show(formData.location, ph.location) && <div className="ct-contact__row">{show(formData.location, ph.location)}</div>}
-                        {show(formData.phone, ph.phone) && <div className="ct-contact__row">{show(formData.phone, ph.phone)}</div>}
-                        {show(formData.email, ph.email) && <div className="ct-contact__row">{show(formData.email, ph.email)}</div>}
-                        {show(formData.website, ph.website) && <div className="ct-contact__row">{show(formData.website, ph.website)}</div>}
+                    <div className="hybrid-photo">
+                        {formData.photo
+                            ? <img src={formData.photo} alt="Profile" />
+                            : !isFinalView && <div className="hybrid-photo-placeholder" />
+                        }
                     </div>
                 </div>
+            </div>
 
-                <div className="ct-block">
-                    <h4 className="ct-block__title">Skills</h4>
-                    <div className="ct-skill-list">
-                        {skills.length > 0 ? skills.map((s, i) => {
-                            const label = s.skill || s.name || `Skill ${i + 1}`;
-                            const pct = (s.proficiency && parseInt(s.proficiency, 10)) || (s.level && parseInt(s.level, 10)) || 65;
+            {/* CONTENT */}
+            <div className="hybrid-content">
+                <div className="hybrid-content-inner">
+
+                    {summary && (
+                        <section>
+                            <h2>Summary</h2>
+                            <p>{summary}</p>
+                        </section>
+                    )}
+
+                    <section>
+                        <h2>Experience</h2>
+                        {experience.map((e, i) => {
+                            const exp = { ...safePH.experience, ...e };
                             return (
-                                <div className="ct-skill" key={i}>
-                                    <div className="ct-skill__label">{label}</div>
-                                    <div className="ct-skill__bar">
-                                        <div className="ct-skill__fill" style={{ width: `${Math.min(100, Math.max(6, pct))}%` }} />
+                                <div key={i} className="hybrid-item">
+                                    <strong>{exp.title} | {exp.company}</strong>
+                                    <div className="hybrid-meta">
+                                        {exp.location} • {exp.startDate} – {exp.endDate}
                                     </div>
+                                    <ul>{renderBullets(exp.description)}</ul>
                                 </div>
                             );
-                        }) : (
-                            !isFinalView && ph.skills.map((t, i) => (
-                                <div className="ct-skill" key={i}>
-                                    <div className="ct-skill__label placeholder">{t}</div>
-                                    <div className="ct-skill__bar">
-                                        <div className="ct-skill__fill" style={{ width: `${50 + i * 10}%` }} />
+                        })}
+                    </section>
+
+                    <section>
+                        <h2>Education</h2>
+                        {education.map((e, i) => {
+                            const edu = { ...safePH.education, ...e };
+                            return (
+                                <div key={i} className="hybrid-item">
+                                    <strong>{edu.degree} | {edu.school}</strong>
+                                    <div className="hybrid-meta">
+                                        {edu.location} • {edu.startDate} – {edu.endDate}
                                     </div>
+                                    <ul>{renderBullets(edu.description)}</ul>
                                 </div>
-                            ))
-                        )}
-                    </div>
+                            );
+                        })}
+                    </section>
+
+                    <section>
+                        <h2>Certifications</h2>
+                        {certifications.map((c, i) => {
+                            const cert = { ...safePH.certifications, ...c };
+                            return (
+                                <div key={i} className="hybrid-item">
+                                    <strong>{cert.name}</strong>
+                                    <div className="hybrid-meta">
+                                        {cert.organization} • {cert.issueDate}
+                                    </div>
+                                    <div className="hybrid-meta">
+                                        Credential ID: {cert.credentialId}
+                                    </div>
+                                    <ul>{renderBullets(cert.description)}</ul>
+                                </div>
+                            );
+                        })}
+                    </section>
+
+                    <section>
+                        <h2>Skills</h2>
+                        <p className="hybrid-inline">
+                            {skills.map((s, i) => {
+                                const v = renderSkill(s);
+                                return v ? <span key={i}>{v}</span> : null;
+                            })}
+                        </p>
+                    </section>
+
+                    <section>
+                        <h2>Languages</h2>
+                        <p className="hybrid-inline">
+                            {languages.map((l, i) => {
+                                const v = renderLanguage(l);
+                                return v ? <span key={i}>{v}</span> : null;
+                            })}
+                        </p>
+                    </section>
+
                 </div>
-
-                <div className="ct-block">
-                    <h4 className="ct-block__title">Languages</h4>
-                    <ul className="ct-lang-list">
-                        {languages.length > 0 ? languages.map((l, i) => (
-                            <li key={i}>{l.language || l.name}{l.proficiency ? ` — ${l.proficiency}` : ""}</li>
-                        )) : (!isFinalView && ph.languages.map((t, i) => <li key={i} className="placeholder">{t}</li>))}
-                    </ul>
-                </div>
-            </aside>
-
-            <main className="ct-main" role="main">
-                {(formData.summary || !isFinalView) && (
-                    <section className="ct-section">
-                        <h3 className="ct-section__title">Summary</h3>
-                        <p className="ct-section__text">{show(formData.summary, ph.summary)}</p>
-                    </section>
-                )}
-
-                {(formData.experience?.length > 0 || !isFinalView) && (
-                    <section className="ct-section">
-                        <h3 className="ct-section__title">Experience</h3>
-                        <div className="ct-list">
-                            {(formData.experience && formData.experience.length > 0) ? formData.experience.map((e, idx) => (
-                                <article key={idx} className="ct-item">
-                                    <div className="ct-item__head">
-                                        <div className="ct-item__role">
-                                            <strong>{show(e.title, ph.experience.jobTitle)}</strong>
-                                            <div className="ct-item__company">{show(e.company, ph.experience.company)}</div>
-                                        </div>
-                                        <div className="ct-item__meta">
-                                            <div className="ct-item__loc">{show(e.location, ph.experience.location)}</div>
-                                            <div className="ct-item__date">{formatDates(e)}</div>
-                                        </div>
-                                    </div>
-                                    {e.description ? renderBullets(e.description) : (!isFinalView && <p className="ct-section__text">{ph.experience.sampleBullets[0]}</p>)}
-                                </article>
-                            )) : (!isFinalView && (
-                                <article className="ct-item">
-                                    <div className="ct-item__head">
-                                        <div className="ct-item__role">
-                                            <strong>{ph.experience.jobTitle}</strong>
-                                            <div className="ct-item__company">{ph.experience.company}</div>
-                                        </div>
-                                        <div className="ct-item__meta">
-                                            <div className="ct-item__loc">{ph.experience.location}</div>
-                                            <div className="ct-item__date">{ph.experience.dateRange}</div>
-                                        </div>
-                                    </div>
-                                    <p className="ct-section__text">{ph.experience.sampleBullets[0]}</p>
-                                </article>
-                            ))}
-                        </div>
-                    </section>
-                )}
-
-                {(formData.education?.length > 0 || !isFinalView) && (
-                    <section className="ct-section">
-                        <h3 className="ct-section__title">Education</h3>
-                        <div className="ct-list">
-                            {(formData.education && formData.education.length > 0) ? formData.education.map((ed, i) => (
-                                <article key={i} className="ct-item">
-                                    <div className="ct-item__head">
-                                        <div className="ct-item__role">
-                                            <strong>{show(ed.degree, ph.education.degree)}</strong>
-                                            <div className="ct-item__company">{show(ed.school, ph.education.school)}</div>
-                                        </div>
-                                        <div className="ct-item__meta">
-                                            <div className="ct-item__loc">{show(ed.location, ph.education.location)}</div>
-                                            <div className="ct-item__date">{formatDates(ed)}</div>
-                                        </div>
-                                    </div>
-                                    {ed.description && <p className="ct-section__text">{ed.description}</p>}
-                                </article>
-                            )) : (!isFinalView && (
-                                <article className="ct-item">
-                                    <div className="ct-item__head">
-                                        <div className="ct-item__role">
-                                            <strong>{ph.education.degree}</strong>
-                                            <div className="ct-item__company">{ph.education.school}</div>
-                                        </div>
-                                        <div className="ct-item__meta">
-                                            <div className="ct-item__loc">{ph.education.location}</div>
-                                            <div className="ct-item__date">{ph.education.dateRange}</div>
-                                        </div>
-                                    </div>
-                                </article>
-                            ))}
-                        </div>
-                    </section>
-                )}
-            </main>
+            </div>
         </div>
     );
 }

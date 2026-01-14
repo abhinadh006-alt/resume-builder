@@ -1,424 +1,254 @@
-App.css
+/* ======================================================
+   App.css — FINAL (Layout-safe, Sidebar-safe, Preview-safe)
+   ====================================================== */
 
-/* === Global layout (Resmume-like builder) === */
+/* ---------- Global reset ---------- */
+html,
 body {
+  height: 100%;
+  overflow: hidden;
+  /* 🔥 kills the outer scrollbar */
   margin: 0;
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background-color: #f6f8ff;
+  padding: 0;
+  background: #f6f8ff;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   color: #111827;
 }
 
-/* Wrapper layout: sidebar + preview */
+/* Root container */
+#root {
+  height: 100%;
+}
+
+/* ======================================================
+   🔑 BUILDER ROOT (ANCHOR ONLY — NO FLEX)
+   ====================================================== */
 .builder-layout {
+  position: relative;
+  /* anchor for absolute preview */
   display: flex;
-  height: 100vh;
+  width: 100%;
+  height: calc(100vh - var(--app-header-h, 72px));
+  min-height: 100vh;
   overflow: hidden;
   background: #f6f8ff;
+
+  /* 🚫 critical: NEVER flex */
+  display: block !important;
 }
 
-/* === Sidebar === */
+/* ======================================================
+   Sidebar base styles (layout handled in Sidebar.css)
+   ====================================================== */
 .sidebar {
-  width: 320px;
   background-color: #4f46e5;
-  /* purple nav */
-  color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 16px;
-  gap: 16px;
-  overflow-y: auto;
+  color: #ffffff;
 }
 
+/* Sidebar headings */
 .sidebar h3 {
   font-size: 18px;
   margin-top: 0;
-  color: white;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   padding-bottom: 8px;
 }
 
+/* Sidebar inputs */
 .sidebar input,
 .sidebar textarea,
 .sidebar select {
   width: 100%;
   padding: 8px 10px;
   margin-bottom: 10px;
-  border: none;
   border-radius: 6px;
-  outline: none;
   font-size: 14px;
+  box-sizing: border-box;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #111827;
 }
 
-.sidebar input::placeholder {
-  color: #888;
+.sidebar input::placeholder,
+.sidebar textarea::placeholder {
+  color: #9ca3af;
 }
 
-/* Section headings */
-.section-title {
-  margin-top: 20px;
-  font-weight: 600;
-  font-size: 14px;
-  color: #fff;
-}
-
+/* Summary textarea */
 .sidebar textarea[name="summary"] {
-  height: 120px;
-  /* shows ~5 lines */
+  min-height: 120px;
+  max-height: 180px;
   resize: vertical;
-  overflow-y: auto;
-  /* scrollable */
-  border: 1px solid #d4d7e5;
-  border-radius: 8px;
-  padding: 8px 10px;
-  font-size: 14px;
-  width: 100%;
-  line-height: 1.4;
 }
 
-/* Template selector buttons inside sidebar */
+/* ======================================================
+   Buttons
+   ====================================================== */
 .template-btn {
   background: #eef2ff;
   color: #111827;
   border: none;
   border-radius: 6px;
-  margin-bottom: 6px;
-  width: 100%;
   padding: 8px;
-  text-align: left;
+  width: 100%;
   cursor: pointer;
-  transition: 0.3s;
 }
 
 .template-btn.active {
   background: #4338ca;
-  color: #fff;
+  color: #ffffff;
 }
 
-.template-btn:hover {
-  background: #6366f1;
-  color: white;
-}
-
-/* Generate button */
 .generate-btn {
   background: #22c55e;
-  color: white;
+  color: #ffffff;
   border: none;
   border-radius: 6px;
   padding: 10px;
   width: 100%;
   cursor: pointer;
-  font-weight: 500;
-  margin-top: 10px;
+  font-weight: 600;
 }
 
 .generate-btn:hover {
   background: #16a34a;
 }
 
-/* === Main area === */
-.main-panel {
-  flex: 1;
-  background-color: #f9fafb;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  overflow-y: auto;
-  padding: 40px;
-}
-
-.resume-preview {
-  width: 800px;
-  min-height: 1100px;
-  background-color: white;
-  padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
-}
-
-/* === FIX INPUT TEXT VISIBILITY === */
-input,
-textarea,
-select {
-  color: #111827;
-  /* Dark text color */
-  background-color: #ffffff;
-  /* White background */
-  border: 1px solid #d1d5db;
-  /* Light gray border */
-  border-radius: 6px;
-  padding: 8px;
-  font-size: 14px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: #9ca3af;
-  /* Light gray placeholder text */
-}
-
-input:focus,
-textarea:focus {
-  outline: 2px solid #4f46e5;
-  /* Blue outline on focus */
-  border-color: #4f46e5;
-  background-color: #f9fafb;
-  /* Light gray input background */
-  color: #111827;
-}
-
-/* 🎯 Only targets the Summary box textarea */
-.sidebar textarea[name="summary"] {
-  height: 120px;
-  /* Shows about 5 visible rows */
-  min-height: 120px;
-  /* Prevents it from collapsing */
-  max-height: 180px;
-  /* Optional: limit stretch */
-  overflow-y: auto;
-  /* Scroll for long text */
-  resize: vertical;
-  /* Allows user to resize if needed */
-  border: 1px solid #d4d7e5;
-  border-radius: 8px;
-  padding: 10px;
-  font-size: 14px;
-  line-height: 1.4;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* === Preview Toggle Section (match other cards) === */
-.preview-toggle {
-  background: #f9f9ff;
-  border: 1px solid #e0e4ff;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(91, 104, 255, 0.08);
-  padding: 14px 16px;
-  margin-top: 15px;
-  text-align: center;
-  width: 270px;
-  /* ✅ same fixed width as other sidebar cards */
-  transition: box-shadow 0.2s ease;
-}
-
-.preview-toggle:hover {
-  box-shadow: 0 3px 8px rgba(91, 104, 255, 0.12);
-}
-
-.preview-toggle h3 {
-  font-size: 15px;
-  font-weight: 600;
-  margin-bottom: 12px;
-  color: #283b70;
-}
-
-/* === Toggle button inside card === */
+/* Toggle button */
 .toggle-btn {
   background: linear-gradient(135deg, #5b68ff, #7c83ff);
-  color: white;
+  color: #ffffff;
   border: none;
   border-radius: 8px;
   padding: 8px 16px;
-  font-size: 14px;
+  width: 100%;
   font-weight: 600;
   cursor: pointer;
-  width: 100%;
-  transition: all 0.25s ease;
-}
-
-.toggle-btn:hover {
-  background: linear-gradient(135deg, #4a57f5, #6a73ff);
-  transform: translateY(-1px);
 }
 
 .toggle-btn.active {
   background: linear-gradient(135deg, #374151, #4b5563);
 }
 
-/* ===== Two independent scrollable panels: sidebar + preview ===== */
-
-/* 1) Make the viewport occupied by the app and prevent page-level scrolling */
-html,
-body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  /* REMOVE the outer browser scrollbar */
-  box-sizing: border-box;
-}
-
-/* 2) Layout container - full viewport, horizontal two-column layout */
-.builder-layout {
-  display: flex;
-  height: 100vh;
-  /* fill viewport height */
-  width: 100%;
-  overflow: hidden;
-  /* prevent extra nested scroll */
-}
-
-/* 3) Sidebar (left) - fixed width, its own vertical scroll */
-.sidebar {
-  width: 320px;
-  /* adjust width as needed */
-  min-width: 220px;
-  max-width: 360px;
-  height: 100%;
-  /* full height */
-  overflow-y: auto;
-  /* sidebar scroll only */
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  /* smooth scrolling on mobile */
-}
-
-/* 4) Main preview area (right) - flex to fill remaining space and its own scroll */
-.main-panel,
-.preview-container {
-  flex: 1 1 auto;
-  height: 100%;
-  /* full height */
-  overflow-y: auto;
-  /* preview scroll only */
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  background: #fff;
-  /* or whatever your background is */
-}
-
-/* 5) Ensure inner resume preview doesn't create an extra scroll */
-.resume-preview,
-.page,
-.resume-content {
-  /* Allow content to grow; don't create nested scrollbars */
-  max-height: none;
-  overflow: visible !important;
-}
-
-/* 6) Defensive: remove accidental body-margin-caused scroll */
-#root,
-#root>.builder-layout {
-  height: 100%;
-}
-
-/* Optional: hide any accidental small scrollbar track on the left gutter */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-/* ===========================
-   SAFE OVERRIDES (non-destructive)
-   Paste at the END of App.css
-   =========================== */
-
-/* Restore normal page scrolling (keep this safe) */
-html,
-body {
-  /* Do not force overflow:hidden globally — allow app container to control it */
-  overflow: auto !important;
-  height: 100%;
-}
-
-/* Ensure top-level app container controls viewport scrolling */
-.builder-layout {
-  display: flex !important;
-  width: 100% !important;
-  min-height: 100vh !important;
-  /* Keep panels scrollable; do not clip content globally */
-  overflow: hidden !important;
-  box-sizing: border-box !important;
-}
-
-/* Ensure the sidebar retains its intended sizing and scroll */
-.sidebar {
-  background-color: #4f46e5 !important;
-  /* preserve purple */
-  color: #fff !important;
-  width: 320px !important;
-  min-width: 220px !important;
-  max-width: 360px !important;
-  height: 100% !important;
-  box-sizing: border-box !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  position: relative !important;
-}
-
-/* Ensure sidebar inner cards keep their padding and border-radius */
-.sidebar .content-card,
-.sidebar .section-card,
-.preview-toggle {
-  box-sizing: border-box !important;
-  width: calc(100% - 0px) !important;
-}
-
-/* Main panel and preview area should fill remaining space and scroll independently */
-.main-panel,
-.preview-container {
-  flex: 1 1 auto !important;
-  height: 100% !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  -webkit-overflow-scrolling: touch !important;
-  background: #f9fafb !important;
-  /* preserve previous look */
-  box-sizing: border-box !important;
-}
-
-/* Keep resume-preview card centered and prevent accidental resizing */
-.resume-preview {
-  width: 800px !important;
-  max-width: calc(100% - 80px) !important;
-  background-color: #fff !important;
-  padding: 40px !important;
-  border-radius: 12px !important;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08) !important;
-  box-sizing: border-box !important;
-  overflow: visible !important;
-}
-
-/* Limit global scrollbar styling to sidebar only (safer than global) */
+/* ======================================================
+   Scrollbar safety (sidebar only)
+   ====================================================== */
 .sidebar::-webkit-scrollbar {
   width: 10px;
 }
 
 .sidebar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.18);
   border-radius: 8px;
 }
 
-/* Keep input focus styling accessible but non-invasive */
-input:focus,
-textarea:focus,
-select:focus {
-  outline: none !important;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12) !important;
-  border-color: #4f46e5 !important;
+/* ======================================================
+   Zoom control safety
+   ====================================================== */
+.preview-zoom-control {
+  z-index: 3000;
 }
 
-/* Responsive: if screen small, stack sidebar above preview */
-@media (max-width: 900px) {
-  .builder-layout {
-    flex-direction: column !important;
+/* ======================================================
+   PRINT — UI stripped, preview only
+   ====================================================== */
+@page {
+  size: A4;
+  margin: 0;
+}
+
+@media print {
+  body {
+    background: #ffffff;
   }
 
-  .sidebar {
-    width: 100% !important;
-    max-height: 40vh !important;
+  .sidebar,
+  .icon-bar,
+  .panel-shell,
+  .preview-zoom-control {
+    display: none !important;
   }
 
-  .main-panel {
-    padding: 20px !important;
-  }
-
+  .resume-page,
   .resume-preview {
-    width: 100% !important;
-    padding: 24px !important;
+    width: 210mm !important;
+    min-height: 297mm !important;
+    padding: 15mm !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    background: #ffffff !important;
   }
+}
+
+/* =========================
+   APP HEADER (BRANDING)
+========================= */
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  height: var(--app-header-h);
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  z-index: 5000;
+
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 20px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand img {
+  height: 36px;
+}
+
+.brand-text strong {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.brand-text span {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+
+:root {
+  --app-header-h: 0px;
+}
+
+/* push the entire app below header */
+body {
+  padding-top: var(--app-header-h);
+}
+
+.main-panel {
+  flex: 1;
+  overflow: hidden;
+  /* 🔥 critical */
+}
+
+.app-header {
+  margin-bottom: 6px;
+  /* small professional gap */
+}
+
+.resume-preview {
+  width: calc(210mm * var(--preview-scale, 1));
+  transform: none;
+}
+
+.app-header {
+  height: 64px;
+  padding: 0 16px;
+  margin: 0;
 }
