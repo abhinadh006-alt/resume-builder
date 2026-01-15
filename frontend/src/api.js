@@ -13,9 +13,17 @@ export async function generateResume(payload) {
 
     if (!res.ok) {
         const text = await res.text();
-        throw new Error(text || "Failed to generate resume");
+        throw new Error(text || "Resume generation failed");
     }
 
-    const blob = await res.blob();
-    return { fileBlob: blob };
+    const contentType = res.headers.get("content-type");
+
+    // PDF response
+    if (contentType && contentType.includes("application/pdf")) {
+        const blob = await res.blob();
+        return { fileBlob: blob };
+    }
+
+    // JSON response
+    return await res.json();
 }

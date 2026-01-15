@@ -7,6 +7,7 @@ import axios from "axios";
 import fs from "fs";
 
 import Resume from "../models/Resume.js";
+import { generateResume } from "../controllers/resumeController.js";
 
 const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
@@ -64,6 +65,37 @@ async function produceAndSavePdf(formData, template = "modern") {
    🔥 MAIN ROUTE — EXACT MATCH WITH FRONTEND
    POST /api/resume/secure/generate-cv
 ====================================================== */
+/* ======================================================
+   ✅ PUBLIC GENERATE ROUTE (NO AUTH, NO TELEGRAM)
+   POST /api/resume/generate
+   — EXACT MATCH WITH FRONTEND
+====================================================== */
+router.post("/generate", async (req, res) => {
+    try {
+        const { template = "modern", ...formData } = req.body;
+
+        if (!formData.name || !formData.email) {
+            return res.status(400).json({
+                message: "Name and email are required",
+            });
+        }
+
+        const { publicUrl } = await produceAndSavePdf(formData, template);
+
+        return res.json({
+            success: true,
+            downloadURL: publicUrl,
+        });
+    } catch (err) {
+        console.error("❌ generate error:", err);
+        return res.status(500).json({
+            message: "Resume generation failed",
+            error: err.message,
+        });
+    }
+});
+
+
 router.post("/secure/generate-cv", async (req, res) => {
     try {
         /**

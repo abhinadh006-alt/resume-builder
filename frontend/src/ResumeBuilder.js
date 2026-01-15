@@ -172,7 +172,6 @@ export default function ResumeBuilder() {
                 return;
             }
 
-            const chatId = localStorage.getItem("RB_CHAT");
             const payload = {
                 name: formData.name.trim(),
                 email: formData.email.trim(),
