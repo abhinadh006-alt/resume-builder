@@ -3,20 +3,25 @@ const API_BASE =
     "https://resume-builder-jv01.onrender.com";
 
 export async function generateResume(payload) {
-    const res = await fetch(`${API_BASE}/api/resume/generate`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-    });
+    const res = await fetch(
+        `${API_BASE}/api/resume/secure/generate-cv`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                // 🔓 no Authorization needed now
+            },
+            body: JSON.stringify(payload),
+        }
+    );
 
+    const contentType = res.headers.get("content-type");
+
+    // Handle server errors safely
     if (!res.ok) {
         const text = await res.text();
         throw new Error(text || "Resume generation failed");
     }
-
-    const contentType = res.headers.get("content-type");
 
     // PDF response
     if (contentType && contentType.includes("application/pdf")) {

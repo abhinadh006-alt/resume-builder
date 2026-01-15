@@ -70,7 +70,7 @@ async function produceAndSavePdf(formData, template = "modern") {
    POST /api/resume/generate
    — EXACT MATCH WITH FRONTEND
 ====================================================== */
-router.post("/generate", async (req, res) => {
+router.post("/secure/generate", async (req, res) => {
     try {
         const { template = "modern", ...formData } = req.body;
 
