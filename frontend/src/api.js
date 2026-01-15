@@ -1,30 +1,21 @@
-// src/api.js
-
-const BASE_URL =
+const API_BASE =
     process.env.REACT_APP_API_URL ||
-    "https://resume-builder-jv01.onrender.com/api";
+    "https://resume-builder-jv01.onrender.com";
 
-/**
- * Generate resume (PDF)
- * No auth, no Telegram, no secure routes
- */
-export async function generateResume(formData) {
-    const res = await fetch(`${BASE_URL}/resume/generate-cv`, {
+export async function generateResume(payload) {
+    const res = await fetch(`${API_BASE}/api/resume/generate`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
     });
 
     if (!res.ok) {
         const text = await res.text();
-        throw new Error(`Server error (${res.status}): ${text}`);
+        throw new Error(text || "Failed to generate resume");
     }
 
-    return await res.json();
+    const blob = await res.blob();
+    return { fileBlob: blob };
 }
-
-export default {
-    generateResume,
-};
