@@ -186,13 +186,12 @@ export default function ResumeBuilder() {
                 certifications: formData.certifications,
                 skills: formData.skills,
                 languages: formData.languages,
-                photo: normalizePhoto(formData.photo),
                 template,
-                chatId: chatId || undefined,
             };
 
             // call generator (secure:true calls /api/secure/generate-cv)
-            const result = await generateResume(payload, { secure: true });
+            const result = await generateResume(payload);
+
 
 
             // if server returned PDF bytes (blob)
