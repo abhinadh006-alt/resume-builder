@@ -70,7 +70,10 @@ async function produceAndSavePdf(formData, template = "modern") {
    POST /api/resume/generate
    — EXACT MATCH WITH FRONTEND
 ====================================================== */
-router.post("/secure/generate", async (req, res) => {
+
+
+// routes/resumeRoutes.js
+router.post("/generate", async (req, res) => {
     try {
         const { template = "modern", ...formData } = req.body;
 
@@ -95,57 +98,6 @@ router.post("/secure/generate", async (req, res) => {
     }
 });
 
-
-router.post("/secure/generate-cv", async (req, res) => {
-    try {
-        /**
-         * ⚠️ IMPORTANT:
-         * - DO NOT validate Telegram key here
-         * - Security is handled in server.js (/api/secure middleware)
-         * - This avoids CORS + OPTIONS + 401 bugs
-         */
-
-        const { template = "modern", chatId, ...formData } = req.body;
-
-        if (!formData.name || !formData.email) {
-            return res.status(400).json({
-                message: "Name and email are required",
-            });
-        }
-
-        // Normalize photo URL
-        if (formData.photo && !formData.photo.startsWith("http")) {
-            formData.photo = `${process.env.BASE_URL || "http://localhost:5000"
-                }${formData.photo}`;
-        }
-
-        const { publicUrl } = await produceAndSavePdf(formData, template);
-
-        // Optional Telegram delivery
-        if (chatId && publicUrl) {
-            try {
-                await axios.post(`${TELEGRAM_API}/sendDocument`, {
-                    chat_id: chatId,
-                    document: publicUrl,
-                    caption: `✅ Your ${template} resume is ready`,
-                });
-            } catch (tgErr) {
-                console.warn("Telegram delivery failed:", tgErr.message);
-            }
-        }
-
-        return res.json({
-            success: true,
-            downloadURL: publicUrl,
-        });
-    } catch (err) {
-        console.error("❌ generate-cv error:", err);
-        return res.status(500).json({
-            message: "Resume generation failed",
-            error: err.message,
-        });
-    }
-});
 
 /* ======================================================
    HEALTH / TEST
