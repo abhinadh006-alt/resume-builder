@@ -3,9 +3,9 @@ import "./TemplateSelector.css";
 
 export default function TemplateSelector({ selectedTemplate, onSelect }) {
     const templates = [
-        { id: "modern", label: "💼 Modern (Experienced)" },
-        { id: "classic", label: "📘 Classic (Fresher)" },
-        { id: "hybrid", label: "🧩 Hybrid (Two Column)" },
+        { id: "modern", label: "💼 Modern" },
+        { id: "classic", label: "📘 Classic" },
+        { id: "hybrid", label: "🧩 Hybrid" },
     ];
 
     return (

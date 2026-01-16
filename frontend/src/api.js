@@ -1,29 +1,35 @@
-// ✅ HARD LOCK — NO FALLBACK
-const API_BASE = "https://resume-builder-jv01.onrender.com";
+// src/api.js
+
+const API_BASE =
+    process.env.REACT_APP_API_URL ||
+    "https://resume-builder-jv01.onrender.com";
 
 export async function generateResume(payload) {
-    const res = await fetch(
-        `${API_BASE}/api/resume/generate`,
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-        }
-    );
+    const res = await fetch(`${API_BASE}/api/resume/generate`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+    });
 
     const contentType = res.headers.get("content-type") || "";
 
+    // Handle server-side errors safely
     if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text);
+        if (contentType.includes("application/json")) {
+            const err = await res.json();
+            throw new Error(err.message || "Server error");
+        } else {
+            const text = await res.text();
+            throw new Error(text);
+        }
     }
 
+    // Expect JSON only
     if (contentType.includes("application/json")) {
         return await res.json();
     }
 
-    // fallback (debug)
-    return { text: await res.text() };
+    throw new Error("Invalid server response");
 }

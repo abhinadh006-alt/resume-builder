@@ -83,12 +83,16 @@ router.post("/generate", async (req, res) => {
             });
         }
 
-        const { publicUrl } = await produceAndSavePdf(formData, template);
-
         return res.json({
             success: true,
-            downloadURL: publicUrl,
+            message: "Resume data received successfully",
+            data: {
+                template,
+                name: formData.name,
+                email: formData.email,
+            },
         });
+
     } catch (err) {
         console.error("❌ generate error:", err);
         return res.status(500).json({
