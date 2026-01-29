@@ -36,8 +36,8 @@ export default function PreviewZoomControl({ previewRef }) {
         fitToViewport();
     }, [previewRef]);
 
-    const zoomIn = () => setScale(s => clamp(s + 0.1));
-    const zoomOut = () => setScale(s => clamp(s - 0.1));
+    const zoomIn = () => setScale(s => clamp(s + 0.125));
+    const zoomOut = () => setScale(s => clamp(s - 0.125));
     const reset = () => setScale(1);
 
     return (

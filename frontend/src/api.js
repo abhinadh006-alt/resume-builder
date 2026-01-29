@@ -17,14 +17,10 @@ export async function generateResume(payload) {
 
     // Handle server-side errors safely
     if (!res.ok) {
-        if (contentType.includes("application/json")) {
-            const err = await res.json();
-            throw new Error(err.message || "Server error");
-        } else {
-            const text = await res.text();
-            throw new Error(text);
-        }
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || "Resume generation failed");
     }
+
 
     // Expect JSON only
     if (contentType.includes("application/json")) {

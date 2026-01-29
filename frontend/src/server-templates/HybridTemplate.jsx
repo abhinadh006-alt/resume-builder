@@ -71,7 +71,10 @@ export default function HybridTemplate({
     =============================== */
 
     const summary =
-        formData.summary || (!isFinalView ? safePH.summary : null);
+        formData.summary
+            ? formData.summary
+            : (!isFinalView ? safePH.summary : null);
+
 
     const experience =
         Array.isArray(formData.experience) && formData.experience.length
@@ -133,23 +136,55 @@ export default function HybridTemplate({
         <div className="hybrid-template">
 
             {/* HEADER */}
+            {/* HEADER */}
             <div className="hybrid-header">
                 <div className="hybrid-header-inner">
-                    <div className="hybrid-header-left">
-                        <h1 className="hybrid-name">{formData.name || safePH.name}</h1>
-                        <div className="hybrid-title">{formData.title || safePH.title}</div>
 
-                        <div className="hybrid-contacts">
-                            <span>✉ {formData.email || safePH.email}</span>
-                            <span>☎ {formData.phone || safePH.phone}</span>
-                            <span>🔗 {formData.website || safePH.website}</span>
-                            <span>📍 {formData.location || safePH.location}</span>
+                    {/* PHOTO */}
+                    {formData.photo ? (
+                        <img
+                            src={formData.photo}
+                            alt="Profile"
+                            className="hybrid-photo"
+                        />
+                    ) : (
+                        !isFinalView && (
+                            <div className="hybrid-photo hybrid-photo--placeholder">
+                                PHOTO
+                            </div>
+                        )
+                    )}
+
+                    {/* NAME */}
+                    <h1 className="hybrid-name">
+                        {formData.name || (!isFinalView && safePH.name)}
+                    </h1>
+
+                    {/* TITLE */}
+                    {(formData.title || (!isFinalView && safePH.title)) && (
+                        <div className="hybrid-title">
+                            {formData.title || safePH.title}
                         </div>
-                    </div>
+                    )}
 
+                    {/* CONTACTS */}
+                    <div className="hybrid-contacts">
+                        {formData.email && <span>✉ {formData.email}</span>}
+                        {!isFinalView && !formData.email && <span>✉ {safePH.email}</span>}
+
+                        {formData.phone && <span>☎ {formData.phone}</span>}
+                        {!isFinalView && !formData.phone && <span>☎ {safePH.phone}</span>}
+
+                        {formData.website && <span>🔗 {formData.website}</span>}
+                        {!isFinalView && !formData.website && <span>🔗 {safePH.website}</span>}
+
+                        {formData.location && <span>📍 {formData.location}</span>}
+                        {!isFinalView && !formData.location && <span>📍 {safePH.location}</span>}
+                    </div>
 
                 </div>
             </div>
+
 
             {/* CONTENT */}
             <div className="hybrid-content">
@@ -162,76 +197,110 @@ export default function HybridTemplate({
                         </section>
                     )}
 
-                    <section>
-                        <h2>Experience</h2>
-                        {experience.map((e, i) => {
-                            const exp = { ...safePH.experience, ...e };
-                            return (
-                                <div key={i} className="hybrid-item">
-                                    <strong>{exp.title} | {exp.company}</strong>
-                                    <div className="hybrid-meta">
-                                        {exp.location} • {exp.startDate} – {exp.endDate}
-                                    </div>
-                                    <ul>{renderBullets(exp.description)}</ul>
-                                </div>
-                            );
-                        })}
-                    </section>
+                    {(experience.length > 0 || !isFinalView) && (
+                        <section>
+                            <h2>Experience</h2>
+                            {experience.map((e, i) => {
+                                if (isFinalView && !e.title && !e.company) return null;
 
-                    <section>
-                        <h2>Education</h2>
-                        {education.map((e, i) => {
-                            const edu = { ...safePH.education, ...e };
-                            return (
-                                <div key={i} className="hybrid-item">
-                                    <strong>{edu.degree} | {edu.school}</strong>
-                                    <div className="hybrid-meta">
-                                        {edu.location} • {edu.startDate} – {edu.endDate}
-                                    </div>
-                                    <ul>{renderBullets(edu.description)}</ul>
-                                </div>
-                            );
-                        })}
-                    </section>
+                                const exp = isFinalView
+                                    ? e
+                                    : { ...safePH.experience, ...e };
 
-                    <section>
-                        <h2>Certifications</h2>
-                        {certifications.map((c, i) => {
-                            const cert = { ...safePH.certifications, ...c };
-                            return (
-                                <div key={i} className="hybrid-item">
-                                    <strong>{cert.name}</strong>
-                                    <div className="hybrid-meta">
-                                        {cert.organization} • {cert.issueDate}
+                                return (
+                                    <div key={i} className="hybrid-item">
+                                        <strong>{exp.title} | {exp.company}</strong>
+                                        <div className="hybrid-meta">
+                                            {exp.location} • {exp.startDate} – {exp.endDate}
+                                        </div>
+                                        <ul>{renderBullets(exp.description)}</ul>
                                     </div>
-                                    <div className="hybrid-meta">
-                                        Credential ID: {cert.credentialId}
-                                    </div>
-                                    <ul>{renderBullets(cert.description)}</ul>
-                                </div>
-                            );
-                        })}
-                    </section>
-
-                    <section>
-                        <h2>Skills</h2>
-                        <p className="hybrid-inline">
-                            {skills.map((s, i) => {
-                                const v = renderSkill(s);
-                                return v ? <span key={i}>{v}</span> : null;
+                                );
                             })}
-                        </p>
-                    </section>
+                        </section>
+                    )}
 
-                    <section>
-                        <h2>Languages</h2>
-                        <p className="hybrid-inline">
-                            {languages.map((l, i) => {
-                                const v = renderLanguage(l);
-                                return v ? <span key={i}>{v}</span> : null;
+
+                    {(education.length > 0 || !isFinalView) && (
+                        <section>
+                            <h2>Education</h2>
+                            {education.map((e, i) => {
+                                if (isFinalView && !e.degree && !e.school) return null;
+
+                                const edu = isFinalView
+                                    ? e
+                                    : { ...safePH.education, ...e };
+
+                                return (
+                                    <div key={i} className="hybrid-item">
+                                        <strong>{edu.degree} | {edu.school}</strong>
+                                        <div className="hybrid-meta">
+                                            <div></div>{edu.location} • {edu.startDate} – {edu.endDate}<div />
+                                        </div>
+                                        <ul>{renderBullets(edu.description)}</ul>
+                                    </div>
+                                );
                             })}
-                        </p>
-                    </section>
+                        </section>
+                    )}
+
+
+                    {(certifications.length > 0 || !isFinalView) && (
+                        <section>
+                            <h2>Certifications</h2>
+                            {certifications.map((c, i) => {
+                                if (isFinalView && !c.name && !c.organization) return null;
+
+                                const cert = isFinalView
+                                    ? c
+                                    : { ...safePH.certifications, ...c };
+
+                                return (
+                                    <div key={i} className="hybrid-item">
+                                        <strong>{cert.name}</strong>
+                                        <div className="hybrid-meta">
+                                            {cert.organization} • {cert.issueDate}
+                                        </div>
+                                        {cert.credentialId && (
+                                            <div className="hybrid-meta">
+                                                Credential ID: {cert.credentialId}
+                                            </div>
+                                        )}
+                                        <ul>{renderBullets(cert.description)}</ul>
+                                    </div>
+                                );
+                            })}
+                        </section>
+                    )}
+
+
+                    {(skills.length > 0 || !isFinalView) && (
+                        <section>
+                            <h2>Skills</h2>
+                            <p className="hybrid-inline">
+                                {skills.map((s, i) => {
+                                    if (isFinalView && !s) return null;
+                                    const v = renderSkill(s);
+                                    return v ? <span key={i}>{v}</span> : null;
+                                })}
+                            </p>
+                        </section>
+                    )}
+
+
+                    {(languages.length > 0 || !isFinalView) && (
+                        <section>
+                            <h2>Languages</h2>
+                            <p className="hybrid-inline">
+                                {languages.map((l, i) => {
+                                    if (isFinalView && !l) return null;
+                                    const v = renderLanguage(l);
+                                    return v ? <span key={i}>{v}</span> : null;
+                                })}
+                            </p>
+                        </section>
+                    )}
+
 
                 </div>
             </div>

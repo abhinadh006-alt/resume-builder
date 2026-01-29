@@ -2,29 +2,46 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ✅ Single source of truth */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap");
+
+html,
+body,
+.resume-preview,
+.mt-root,
+.classic-template,
+.hybrid-template {
+  font-family: "Inter", sans-serif !important;
+}
 
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
   background-color: #f5f5f5;
 }
 
 input {
   display: block;
   width: 100%;
-  margin-bottom: 10px;
-  padding: 8px;
+  margin-bottom: 13.5pt;
+  padding: 13.5pt;
 }
 
 button {
   background-color: #007bff;
   color: white;
   border: none;
-  padding: 8px 12px;
+  padding: 6pt 9pt;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 3pt;
 }
 
 button:hover {
   background-color: #0056b3;
+}
+
+@media print {
+  html {
+    font-size: 12pt;
+    /* SINGLE SOURCE OF TRUTH */
+  }
 }

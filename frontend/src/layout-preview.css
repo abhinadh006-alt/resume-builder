@@ -3,10 +3,10 @@
 =============================== */
 
 :root {
-    --iconbar-w: 56px;
-    --sidebar-w: 320px;
-    --gap: 16px;
-    --header-h: 64px;
+    --iconbar-w: 42pt;
+    --sidebar-w: 240pt;
+    --gap: 12pt;
+    --header-h: 48pt;
 }
 
 /* ROOT */
@@ -38,14 +38,25 @@
     display: block;
     width: 100%;
     height: calc(100vh - var(--header-h));
-
-    /* CRITICAL */
     overflow-x: auto;
     overflow-y: auto;
-
-    padding: 16px;
+    padding: 12pt;
     box-sizing: border-box;
+    position: relative;
 }
+
+/* SCALE CONTAINER */
+.preview-scale {
+    display: block;
+    justify-content: center;
+    align-items: flex-start;
+
+    /* ✅ allow zoom */
+    overflow: visible;
+    transform: scale(var(--preview-scale, 1));
+    transform-origin: top left;
+}
+
 
 /* PREVIEW ITSELF */
 .resume-preview {
@@ -57,7 +68,7 @@
 /* ===============================
    MOBILE
 =============================== */
-@media (max-width: 900px) {
+@media (max-width: 675pt) {
 
     /* Sidebar overlays → reserve ONLY icon bar */
     .builder-layout {
@@ -66,9 +77,10 @@
     }
 
     .preview-wrapper {
-        padding: 12px;
+        padding: 9pt;
         overflow-x: auto;
         overflow-y: auto;
+        position: relative;
     }
 }
 
@@ -77,35 +89,47 @@
 =============================== */
 .preview-zoom-controls {
     position: fixed;
-    right: 16px;
-    bottom: 16px;
+    right: 12pt;
+    bottom: 12pt;
     z-index: 4000;
 }
 
-/* A4 PAGE — MUST NEVER BE SCALED DIRECTLY */
-.resume-preview,
-.resume-page {
+.resume-preview {
     width: 210mm;
-    min-width: 210mm;
-    max-width: 210mm;
+    transform-origin: top center;
+}
 
-    min-height: 297mm;
-    background: white;
 
+/* ===============================
+   PRINT OVERRIDES — CRITICAL
+   (DO NOT REMOVE)
+=============================== */
+@media print {
+
+    .builder-layout,
+    .main-panel,
+    .preview-wrapper,
+    .preview-scale {
+        display: block !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
 
 }
 
-/* ENABLE horizontal scrolling */
-.preview-wrapper {
-    display: flex;
-    justify-content: flex-start;
-    /* NOT center */
-    align-items: flex-start;
-    overflow-x: auto;
-    overflow-y: auto;
-}
+/* =========================
+   MOBILE
+========================= */
+@media (max-width: 675pt) {
+    .main-panel {
+        left: calc(var(--iconbar-w) + 9pt);
+    }
 
-/* THIS is what creates horizontal overflow */
-.preview-scale {
-    min-width: calc(210mm * var(--preview-scale, 1));
+    .preview-wrapper {
+        padding-left: 0;
+    }
 }

@@ -1,134 +1,95 @@
-/* =========================================
-   Resume Preview – CLEAN, ISOLATED & PDF-SAFE
-   ========================================= */
+/* ===============================
+   SINGLE SOURCE OF TRUTH (A4)
+=============================== */
 
-/* -------------------------------------------------
-   PREVIEW CONTAINER
-   - NO positioning
-   - NO margins
-   - NO layout offsets
--------------------------------------------------- */
+.resume-root,
 .resume-preview {
-    display: block;
-    margin: 0;
-    padding: 0;
-
-    /* scaling only (used by zoom control) */
-    transform-origin: top left;
-
-    /* typography isolation */
-    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-    color: #111827;
-}
-
-/* -------------------------------------------------
-   SINGLE A4 PAGE (ON SCREEN)
-   👉 Hybrid must control padding itself
--------------------------------------------------- */
-.resume-page {
-    width: 210mm;
-    min-height: 297mm;
-
-    background: #ffffff;
-    padding: 0;
-    /* 🔑 REMOVED — hybrid header is full bleed */
-    box-sizing: border-box;
-
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
-
-    /* visual scaling only */
-    transform: scale(var(--preview-scale, 1));
-    transform-origin: top left;
-
+    width: 595pt;
+    /* A4 @ 96dpi */
+    min-height: 842pt;
     margin: 0 auto;
-}
-
-/* -------------------------------------------------
-   FLOW RULES — NEVER CLIP CONTENT
--------------------------------------------------- */
-.resume-preview,
-.resume-page,
-.resume-page * {
+    background: white;
     overflow: visible;
+    box-sizing: border-box;
 }
 
-/* -------------------------------------------------
-   PREVENT BAD PAGE BREAKS
--------------------------------------------------- */
-.resume-section,
-.resume-item,
-.experience-item,
-.education-item,
-.certification-item {
-    break-inside: avoid;
-    page-break-inside: avoid;
-}
 
-/* -------------------------------------------------
-   HYBRID TEMPLATE SAFETY
--------------------------------------------------- */
-.resume-preview--hybrid {
-    margin: 0;
-    padding: 0;
-}
-
-/* -------------------------------------------------
-   PRINT / PDF — HARD RESET
-   (THIS GUARANTEES PERFECT PDF OUTPUT)
--------------------------------------------------- */
+/* PRINT — EXACT SAME GEOMETRY */
 @media print {
 
-    @page {
-        margin: 0;
+    .resume-root,
+    .resume-preview {
+        width: 595pt !important;
+        min-height: auto !important;
+        margin: 0 auto !important;
     }
+}
+
+/* Prevent gray rectangles */
+@media print {
 
     html,
     body {
-        margin: 0;
-        padding: 0;
+        background: white !important;
     }
 
-    /* SINGLE PAGE CONTAINER */
-    .resume-page {
-        width: 210mm;
-        min-height: 297mm;
-
-        margin: 0 auto;
-        padding: 0;
-        /* 🔑 FULL BLEED FOR HYBRID */
-
-        background: #ffffff;
-        box-sizing: border-box;
-
-        box-shadow: none;
-
-        transform: none;
-    }
-
-    /* Absolutely no positioning leaks */
+    .resume-root,
     .resume-preview,
-    .resume-page {
-        position: static !important;
-        left: auto !important;
-        top: auto !important;
+    .resume-preview * {
+        background: transparent !important;
     }
 }
 
-/* =========================
-   TEMPLATE NORMALIZATION
-   ========================= */
+/* ===============================
+   FONT METRIC NORMALIZATION
+=============================== */
+@media print {
+    html {
+        font-size: 11.5pt;
+        /* Chromium calibrated */
+    }
 
-/* Modern & Classic keep internal padding */
-.resume-preview--modern,
-.resume-preview--classic {
-    margin: 0;
-    padding: 0;
+    body {
+        font-size: 1rem;
+        line-height: 1.45;
+    }
 }
 
-/* Modern internal safety */
-.resume-preview--modern * {
+/* ===============================
+   HYBRID — CONTINUOUS FLOW FIX
+=============================== */
+@media print {
+
+    .resume-preview--hybrid,
+    .resume-preview--hybrid .hybrid-template,
+    .resume-preview--hybrid .hybrid-content {
+        height: auto !important;
+        min-height: auto !important;
+        overflow: visible !important;
+        break-inside: auto !important;
+        page-break-inside: auto !important;
+    }
+}
+
+@media print {
+    .preview-scale {
+        transform: none !important;
+    }
+}
+
+/* ===============================
+   INNER PAGE PADDING (18mm)
+   SINGLE SOURCE OF TRUTH
+=============================== */
+
+.resume-preview--modern .mt-root,
+.resume-preview--classic .classic-template,
+.resume-preview--hybrid .hybrid-template {
+    padding: 51pt;
+    /* 18mm */
     box-sizing: border-box;
-}
 
-/* 🚫 Hybrid intentionally controls its own layout */
-/* No global padding or centering applied */
+    /* 🔥 CRITICAL */
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+}

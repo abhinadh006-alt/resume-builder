@@ -7,12 +7,10 @@ html,
 body {
   height: 100%;
   overflow: hidden;
-  /* 🔥 kills the outer scrollbar */
+  /* 🔥 kills the outer scrollbar (screen only) */
   margin: 0;
   padding: 0;
   background: #f6f8ff;
-  font-family: "Inter", -apple-system, BlinkMacSystemFont,
-    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   color: #111827;
 }
 
@@ -152,11 +150,6 @@ body {
 /* ======================================================
    PRINT — UI stripped, preview only
    ====================================================== */
-@page {
-  size: A4;
-  margin: 0;
-}
-
 @media print {
   body {
     background: #ffffff;
@@ -167,17 +160,6 @@ body {
   .panel-shell,
   .preview-zoom-control {
     display: none !important;
-  }
-
-  .resume-page,
-  .resume-preview {
-    width: 210mm !important;
-    min-height: 297mm !important;
-    padding: 15mm !important;
-    margin: 0 !important;
-    box-shadow: none !important;
-    transform: none !important;
-    background: #ffffff !important;
   }
 }
 
@@ -221,7 +203,6 @@ body {
   color: #6b7280;
 }
 
-
 :root {
   --app-header-h: 0px;
 }
@@ -234,21 +215,101 @@ body {
 .main-panel {
   flex: 1;
   overflow: hidden;
-  /* 🔥 critical */
+  /* 🔥 screen only */
 }
 
 .app-header {
   margin-bottom: 6px;
-  /* small professional gap */
-}
-
-.resume-preview {
-  width: calc(210mm * var(--preview-scale, 1));
-  transform: none;
 }
 
 .app-header {
   height: 64px;
   padding: 0 16px;
   margin: 0;
+}
+
+@media print {
+  .resume-preview {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}
+
+/* hide the app chrome when in print-mode */
+body.print-mode .app-header,
+body.print-mode .sidebar,
+body.print-mode .iconbar,
+body.print-mode .some-other-shell-class {
+  display: none !important;
+}
+
+/* make preview area full width on print route */
+body.print-mode .main-panel,
+body.print-mode .preview-wrapper {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* ======================================================
+   ✅ PRINT PAGINATION FIX (ADDED — ONLY CHANGE)
+   ====================================================== */
+@media print {
+
+  html,
+  body {
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  #root,
+  .builder-layout,
+  .main-panel {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+  }
+
+  header,
+  .app-header,
+  .sidebar,
+  .preview-zoom,
+  .toast-container {
+    display: none !important;
+  }
+
+  body {
+    margin: 0;
+  }
+}
+
+/* ======================================================
+   HYBRID — NO OUTER PAGE MARGINS (PRINT ONLY)
+   ====================================================== */
+@media print {
+
+  body.hybrid-print .resume-preview,
+  body.hybrid-print .resume-preview--hybrid {
+    padding: 0 !important;
+    margin: 0 !important;
+    background: white;
+  }
+
+}
+
+@media print {
+
+  body,
+  .builder-layout,
+  .main-panel,
+  .preview-wrapper {
+    background: white !important;
+  }
+}
+
+@media screen {
+  .builder-layout {
+    overflow: visible !important;
+  }
 }

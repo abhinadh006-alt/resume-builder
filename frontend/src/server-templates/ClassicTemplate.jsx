@@ -173,6 +173,9 @@ export default function ClassicTemplate({
 
     /* ---------- PHOTO / CONTACT FLAGS ---------- */
 
+    const hasPhoto = Boolean(formData.photo);
+    const collapsePhotoColumn = isFinalView && !hasPhoto;
+
     const contactItems = [
         { value: formData.email, ph: safePH.email },
         { value: formData.phone, ph: safePH.phone },
@@ -191,8 +194,35 @@ export default function ClassicTemplate({
 
                 {/* HEADER */}
                 <div className="classic-top">
-                    <div className="classic-header-grid classic-header--no-photo">
-
+                    <div
+                        className={`classic-header-grid ${collapsePhotoColumn ? "classic-header--no-photo" : ""
+                            }`}
+                    >
+                        <div className="classic-photo-cell">
+                            {formData.photo ? (
+                                formData.photo.startsWith("data:image") ? (
+                                    <img
+                                        className="classic-photo"
+                                        src={formData.photo}
+                                        alt={formData.name || safePH.name}
+                                        style={{ objectFit: "cover" }}
+                                    />
+                                ) : formData.photo.startsWith("http") ? (
+                                    <div
+                                        className="classic-photo"
+                                        style={{
+                                            backgroundImage: `url("${formData.photo}")`,
+                                            backgroundSize: "cover",
+                                            backgroundPosition: "center"
+                                        }}
+                                    />
+                                ) : null
+                            ) : (
+                                !isFinalView && (
+                                    <div className="classic-photo classic-photo--placeholder">PHOTO</div>
+                                )
+                            )}
+                        </div>
 
                         <div className="classic-name-block">
                             <h1 className="classic-name">

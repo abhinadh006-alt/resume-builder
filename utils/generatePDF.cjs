@@ -142,7 +142,7 @@ async function renderPdfBuffer({
 }
 
 .hybrid-template .hybrid-item {
-    margin-bottom: 12px;
+    margin-bottom: 18px;
 }
 `
             : "";
@@ -151,7 +151,7 @@ async function renderPdfBuffer({
        🔥 TEMPLATE-SPECIFIC PAGE MARGIN FIX
     ===================================================== */
 
-    const pageMargin = template === "hybrid" ? "0mm" : "12mm";
+    const pageMargin = template === "hybrid" ? "0mm" : "18mm";
 
     /* ---------- HTML ---------- */
 
@@ -172,9 +172,10 @@ ${hybridPrintFix}
 ================================================= */
 
 @page {
-  size: A4;
-  margin: ${pageMargin};
+    size: A4;
+    margin: 18mm 18mm 18mm 18mm; /* top right bottom left */
 }
+
 
 html, body {
   margin: 0;

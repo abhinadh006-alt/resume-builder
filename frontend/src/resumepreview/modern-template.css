@@ -4,9 +4,9 @@
 
 /* ---------- ROOT (CRITICAL) ---------- */
 .mt-root {
-    font-family: Inter, Arial, sans-serif;
-    font-size: 14px;
-    /* 🔒 base size */
+
+    font-size: 10.5pt;
+    /* ≈ 14px screen, exact in print */
     line-height: 1.45;
     color: #111;
 }
@@ -24,69 +24,72 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 18px;
+    margin-bottom: 13.5pt;
+    gap: 12pt;
     /* ⬆ more breathing room */
 }
 
 .mt-header-left {
     display: flex;
-    gap: 16px;
+    gap: 12pt;
     align-items: flex-start;
 }
 
 .mt-photo {
-    width: 72px;
-    height: 72px;
+    width: 60pt;
+    height: 60pt;
     object-fit: cover;
-    border-radius: 6px;
+    display: block;
+    border-radius: 4.5pt;
 }
 
 /* ---------- NAME + TITLE ---------- */
 .mt-name {
-    font-size: 22px;
-    font-weight: 700;
+    font-size: 19.5pt;
+    font-weight: 800;
     margin: 0;
 }
 
 .mt-title {
-    font-size: 14px;
+    font-size: 10.5pt;
     font-style: italic;
-    margin-top: 4px;
-    color: #333;
+    margin-top: 3pt;
+    color: #333333;
 }
 
 /* ---------- CONTACT ---------- */
 .mt-contact {
-    font-size: 12.5px;
+    font-size: 9.5pt;
     text-align: right;
     line-height: 1.45;
     color: #222;
 }
 
 .mt-contact div {
-    margin-bottom: 2px;
+    margin-bottom: 1.5pt;
 }
 
 /* ==================================================
    SECTIONS
 ================================================== */
 .mt-section {
-    margin-top: 16px;
+    margin-top: 12pt;
 }
 
 .mt-section-title {
-    font-size: 15px;
-    font-weight: 700;
+    font-size: 11.25pt;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.4px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.25);
-    padding-bottom: 4px;
-    margin-bottom: 10px;
+    letter-spacing: 0.3pt;
+    border-bottom: 0.75pt solid rgba(0, 0, 0, 0.25);
+    padding-bottom: 3pt;
+    margin-bottom: 7.5pt;
+    color: #340167;
 }
 
 /* ---------- BODY TEXT ---------- */
 .mt-text {
-    font-size: 14px;
+    font-size: 10.5pt;
     line-height: 1.5;
     margin: 0;
 }
@@ -95,31 +98,31 @@
    EXPERIENCE / EDUCATION / CERTIFICATIONS
 ================================================== */
 .mt-item {
-    margin-bottom: 12px;
+    margin-bottom: 9pt;
 }
 
 .mt-item-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 12px;
+    gap: 9pt;
 }
 
 .mt-role {
     font-weight: 600;
-    font-size: 14px;
+    font-size: 10.5pt;
     color: #111;
 }
 
 .mt-company {
-    font-size: 13px;
+    font-size: 9.75pt;
     font-style: italic;
-    margin-top: 2px;
+    margin-top: 1.5px;
     color: #444;
 }
 
 .mt-date {
-    font-size: 12.5px;
+    font-size: 9.4pt;
     color: #555;
     white-space: nowrap;
 }
@@ -128,13 +131,13 @@
    BULLETS
 ================================================== */
 .mt-bullets {
-    margin: 8px 0 0 18px;
+    margin: 6pt 0 0 13.5pt;
     padding: 0;
 }
 
 .mt-bullets li {
-    font-size: 13.5px;
-    margin-bottom: 5px;
+    font-size: 10.2pt;
+    margin-bottom: 3.75px;
     line-height: 1.45;
 }
 
@@ -142,45 +145,40 @@
    SKILLS / LANGUAGES
 ================================================== */
 .mt-skill {
-    font-size: 13.5px;
-    margin-bottom: 4px;
+    font-size: 10.2pt;
+    margin-bottom: 3pt;
 }
 
 /* ==================================================
    PRINT SAFETY
 ================================================== */
-.mt-section,
-.mt-item {
-    break-inside: avoid;
-    page-break-inside: avoid;
-}
 
 .mt-section {
-    margin-top: 18px;
+    margin-top: 13.5pt;
 }
 
 .mt-section-title {
-    margin-bottom: 12px;
+    margin-bottom: 9pt;
 }
 
 .mt-bullets li {
-    margin-bottom: 6px;
+    margin-bottom: 4.5pt;
 }
 
 .mt-header {
-    margin-bottom: 22px;
+    margin-bottom: 16.5pt;
 }
 
 .mt-bullets {
-    margin: 6px 0 0 20px;
+    margin: 4.5pt 0 0 15pt;
     padding: 0;
     list-style: disc;
 }
 
 .mt-bullets li {
-    font-size: 13.5px;
+    font-size: 10.2pt;
     line-height: 1.45;
-    margin-bottom: 4px;
+    margin-bottom: 3pt;
     color: #111;
     /* TEXT color */
 }
@@ -188,61 +186,7 @@
 .mt-bullets li::marker {
     color: #000;
     /* BULLET color */
-    font-size: 14px;
-}
-
-.mt-section-title {
-    font-size: 15px;
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    color: #1a255e;
-    /* modern blue */
-    border-bottom: 1px solid #d0d4f5;
-    padding-bottom: 4px;
-    margin-bottom: 8px;
-}
-
-.mt-name {
-    font-size: 26px;
-    font-weight: 800;
-    margin: 0;
-}
-
-.mt-title {
-    font-size: 14px;
-    color: #1c1616;
-    margin-top: 2px;
-}
-
-.mt-role {
-    font-weight: 700;
-    font-size: 14px;
-}
-
-.mt-company {
-    font-size: 13px;
-    color: #555;
-}
-
-.mt-date {
-    font-size: 12px;
-    color: #131111;
-}
-
-.mt-bullets {
-    margin-top: 6px;
-    padding-left: 18px;
-}
-
-.mt-bullets li {
-    margin-bottom: 4px;
-}
-
-.mt-header {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-    margin-bottom: 18px;
+    font-size: 10.5pt;
 }
 
 .mt-header-main {
@@ -251,33 +195,37 @@
     width: 100%;
 }
 
-/* ===============================
-   PROFILE PHOTO (FIXED SIZE)
-=============================== */
-
 .mt-photo-wrapper {
-    width: 80px;
-    height: 80px;
-    border-radius: 6px;
+    width: 60pt;
+    height: 60pt;
+    border-radius: 4.5pt;
     overflow: hidden;
     flex-shrink: 0;
-    background: #f2f4f8;
+    background: #f2f2f2;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .mt-photo-placeholder {
+    font-size: 8.25pt;
+    color: #999;
+    letter-spacing: 0.75pt;
+    font-weight: 600;
+}
+
+/* ===============================
+   PROFILE PHOTO (FIXED SIZE)
+=============================== */
+
+.mt-photo-placeholder {
     width: 100%;
     height: 100%;
-    font-size: 11px;
-    font-weight: 600;
-    color: #666;
     display: flex;
     align-items: center;
     justify-content: center;
     background: #e9ecf1;
-    border: 1px dashed #bbb;
+    border: 0.75pt dashed #bbb;
 }
 
 .mt-photo-bg {
@@ -289,7 +237,55 @@
     background-repeat: no-repeat;
 }
 
-.mt-content-inner {
-    padding: 18mm 18mm 20mm;
-    box-sizing: border-box;
+/* ❌ DO NOT force height (causes blank pages) */
+
+
+
+/* ✔ Prevent orphan sections */
+
+/* ✔ Optional professional border (safe for print) */
+
+
+/* Prevent title orphan */
+
+.mt-section-title {
+    break-after: avoid;
+    page-break-after: avoid;
+}
+
+.mt-item-header {
+    break-after: avoid;
+    page-break-after: avoid;
+}
+
+.mt-item {
+    break-inside: auto;
+}
+
+.mt-bullets {
+    break-inside: auto;
+}
+
+.mt-text,
+.mt-bullets li {
+    line-height: 1.55;
+    orphans: 2;
+    widows: 2;
+}
+
+.mt-bullets li {
+    padding-bottom: 0.75pt;
+    /* tiny buffer to avoid canvas cut */
+}
+
+
+/* ===============================
+   MODERN TEMPLATE PAGE MARGIN
+================================ */
+
+
+@media print {
+    .resume-preview--modern .mt-root {
+        background: transparent !important;
+    }
 }

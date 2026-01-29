@@ -2,7 +2,7 @@
 import React from "react";
 import "./ResumePreview.css";
 
-/* TEMPLATE CSS — MUST BE GLOBAL */
+/* TEMPLATE CSS — MUST BE GLOBAL (PRINT + SCREEN) */
 import "../resumepreview/modern-template.css";
 import "../resumepreview/classic-template.css";
 import "../resumepreview/hybrid-template.css";
@@ -89,25 +89,23 @@ export default function ResumePreview({
 
     return (
         /* ===============================
-           SINGLE A4 PAGE (SOURCE OF TRUTH)
+           PRINT-SAFE ROOT (DO NOT REMOVE)
            =============================== */
+        <div className="resume-print-root">
 
-        <div className="resume-page">
             <div
+                id="resume-preview"
                 className={`resume-preview resume-preview--${template} ${template === "hybrid" ? "resume-preview--hybrid" : ""
                     } ${isFinalView ? "final" : "builder"}`}
             >
-
                 <TemplateComponent
                     formData={formData}
-                    /* 🔑 CRITICAL RULE:
-                       - Builder → placeholders allowed
-                       - Final Preview / PDF → NO placeholders
-                    */
                     placeholders={isFinalView ? {} : PLACEHOLDERS}
                     isFinalView={isFinalView}
                 />
             </div>
+
         </div>
     );
+
 }

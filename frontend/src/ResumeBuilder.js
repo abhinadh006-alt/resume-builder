@@ -1,5 +1,5 @@
 // src/ResumeBuilder.js
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef } from "react";
 //import ExperienceSection from "./components/ExperienceSection";
 import ExperienceForm from "./components/ExperienceForm";
 //import EducationSection from "./components/EducationSection";
@@ -12,7 +12,6 @@ import SkillForm from "./components/SkillForm";
 import LanguageForm from "./components/LanguageForm";
 import Modal from "./components/Modal";
 import ResumePreview from "./resumepreview/ResumePreview";
-import { generateResume } from "./api";
 import { toast } from "react-toastify";
 import "./App.css";
 import Sidebar from "./Sidebar";
@@ -160,71 +159,98 @@ export default function ResumeBuilder() {
         return null;
     };
 
+    // ===== BUILD PRINT-READY HTML (FOR PUPPETEER) =====
 
     // ===== handleSubmit (generate resume) =====
+
+
     const handleSubmit = async () => {
         try {
-            setLoading(true);
-
-            if (!formData.name?.trim() || !formData.email?.trim()) {
-                toast.error("❌ Please enter your name and email before generating.");
-                setLoading(false);
+            if (!formData.name || !formData.email) {
+                toast.error("Name & email required");
                 return;
             }
 
-            const payload = {
-                name: formData.name.trim(),
-                email: formData.email.trim(),
-                title: formData.title,
-                phone: formData.phone,
-                location: formData.location,
-                website: formData.website,
-                summary: formData.summary,
-                experience: formData.experience,
-                education: formData.education,
-                certifications: formData.certifications,
-                skills: formData.skills,
-                languages: formData.languages,
-                template,
+            setLoading(true);
+            setIsFinalView(true);
+
+            const normalizedFormData = {
+                ...formData,
+                photo: normalizePhoto(formData.photo),
             };
 
-            // call generator (secure:true calls /api/secure/generate-cv)
-            const result = await generateResume(payload);
+            localStorage.setItem(
+                "resume-print-data",
+                JSON.stringify({
+                    formData: normalizedFormData,
+                    template,
+                })
+            );
 
+            await new Promise((r) => setTimeout(r, 50));
 
+            const printUrl = `${window.location.origin}/print/resume`;
 
-            // if server returned PDF bytes (blob)
-            if (result?.fileBlob) {
-                const url = URL.createObjectURL(result.fileBlob);
-                window.open(url, "_blank");
-                toast.success("✅ Resume generated (download opened).");
-                return;
-            }
+            // ✅ STEP 3 — enqueue job
+            const res = await fetch(
+                `${process.env.REACT_APP_API_URL || "http://localhost:5000"}/api/generate-pdf`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        url: printUrl,
+                        printData: {
+                            formData: normalizedFormData,
+                            template,
+                        },
+                    }),
+                }
+            );
 
-            // if server returned JSON with a downloadURL or file path
-            if (result?.downloadURL || result?.file) {
-                const filePath = result.downloadURL || result.file;
-                const base = (process.env.REACT_APP_API_URL || "http://localhost:5000").replace(/\/api\/?$/, "");
-                const openUrl = filePath.startsWith("http") ? filePath : `${base}${filePath}`;
-                window.open(openUrl, "_blank");
-                toast.success("✅ Resume generated successfully!");
-                return;
-            }
+            if (!res.ok) throw new Error("Failed to queue PDF job");
 
-            // fallback: show text (for debugging)
-            if (result?.text) {
-                console.log("generate returned text:", result.text);
-                toast.info("Server returned text response (see console).");
-                return;
-            }
+            const { jobId } = await res.json();
 
-            toast.warn("⚠️ Unexpected server response. Check console.");
-            console.log("generate result:", result);
+            // ✅ STEP 7 — poll status
+            const poll = setInterval(async () => {
+                try {
+                    const statusRes = await fetch(
+                        `${process.env.REACT_APP_API_URL || "http://localhost:5000"}/api/pdf-status/${jobId}`
+                    );
+                    const data = await statusRes.json();
+
+                    if (data.status === "completed") {
+                        clearInterval(poll);
+
+                        window.open(
+                            `${process.env.REACT_APP_API_URL || "http://localhost:5000"}/api/pdf-download/${jobId}`,
+                            "_blank",
+                            "noopener,noreferrer"
+                        );
+
+                        toast.success("Resume generated successfully");
+                        setLoading(false);
+                        setIsFinalView(false);
+                    }
+
+                    if (data.status === "failed") {
+                        clearInterval(poll);
+                        toast.error("PDF generation failed");
+                        setLoading(false);
+                        setIsFinalView(false);
+                    }
+                } catch (err) {
+                    clearInterval(poll);
+                    toast.error("Error checking PDF status");
+                    setLoading(false);
+                    setIsFinalView(false);
+                }
+            }, 1500);
         } catch (err) {
-            console.error("❌ Resume generation failed:", err);
-            toast.error("❌ Failed to generate resume. Please try again.");
-        } finally {
+            console.error(err);
+            toast.error("PDF generation failed");
             setLoading(false);
+            setIsFinalView(false);
         }
     };
 

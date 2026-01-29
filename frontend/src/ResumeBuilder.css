@@ -146,8 +146,6 @@ select:focus {
 
     .resume-preview {
         max-width: 210mm;
-        min-height: 297mm;
-        padding: 15mm;
         background: #fff
     }
 }
