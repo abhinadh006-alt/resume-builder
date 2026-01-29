@@ -1,0 +1,35 @@
+@media print {
+
+    /* Paper definition (ONLY place allowed) */
+    @page {
+        size: A4;
+        margin: 0;
+    }
+
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        background: white;
+    }
+
+    /* CLEANUP ONLY — NO SIZING */
+    .resume-preview,
+    .resume-print-root {
+        box-shadow: none !important;
+        background: white;
+        overflow: visible;
+    }
+
+    /* Manual page break utility (optional) */
+    .page-break {
+        page-break-before: always;
+        break-before: page;
+    }
+
+    /* Allow this ONLY on atomic rows */
+    .avoid-break {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+}
