@@ -21,19 +21,31 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, ".env") });
 
 console.log("🧩 MONGO_URI:", process.env.MONGO_URI ? "✅" : "❌");
+console.log("🧵 SUPABASE_DB_URL:", process.env.SUPABASE_DB_URL ? "✅" : "❌");
 console.log("🌐 FRONTEND_URL:", process.env.FRONTEND_URL || "(none)");
 
 const app = express();
 
 /* ======================================================
-   SUPABASE / POSTGRES QUEUE CONNECTION
+   OPTIONAL POSTGRES (SUPABASE) CONNECTION
 ====================================================== */
+let pgPool = null;
 const { Pool } = pkg;
 
-const pgPool = new Pool({
-  connectionString: process.env.SUPABASE_DB_URL,
-  ssl: { rejectUnauthorized: false },
-});
+if (process.env.SUPABASE_DB_URL) {
+  try {
+    pgPool = new Pool({
+      connectionString: process.env.SUPABASE_DB_URL,
+      ssl: { rejectUnauthorized: false },
+    });
+    console.log("🟢 Postgres PDF queue enabled");
+  } catch (err) {
+    console.error("❌ Postgres init failed:", err);
+    pgPool = null;
+  }
+} else {
+  console.log("⚠️ Postgres PDF queue disabled (local dev)");
+}
 
 /* ======================================================
    CORS
@@ -68,12 +80,17 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 /* ======================================================
-   🖨️ PDF GENERATION — QUEUE (SUPABASE / NON-BLOCKING)
+   🖨️ PDF GENERATION — QUEUE
 ====================================================== */
 app.post("/api/generate-pdf", async (req, res) => {
+  if (!pgPool) {
+    return res.status(503).json({
+      error: "PDF queue not available in local mode",
+    });
+  }
+
   try {
     const { printData } = req.body;
-
     if (!printData) {
       return res.status(400).json({ error: "printData required" });
     }
@@ -85,10 +102,7 @@ app.post("/api/generate-pdf", async (req, res) => {
       [printData]
     );
 
-    res.json({
-      jobId: rows[0].id,
-      status: "queued",
-    });
+    res.json({ jobId: rows[0].id, status: "queued" });
   } catch (err) {
     console.error("❌ PDF queue insert failed:", err);
     res.status(500).json({ error: "Failed to queue PDF job" });
@@ -99,12 +113,14 @@ app.post("/api/generate-pdf", async (req, res) => {
    🧾 PDF JOB STATUS
 ====================================================== */
 app.get("/api/pdf-status/:jobId", async (req, res) => {
-  try {
-    const { jobId } = req.params;
+  if (!pgPool) {
+    return res.status(503).json({ error: "Queue not available" });
+  }
 
+  try {
     const { rows } = await pgPool.query(
       "SELECT status, result_url, error FROM pdf_jobs WHERE id = $1",
-      [jobId]
+      [req.params.jobId]
     );
 
     if (!rows.length) {
@@ -122,12 +138,14 @@ app.get("/api/pdf-status/:jobId", async (req, res) => {
    📥 PDF DOWNLOAD
 ====================================================== */
 app.get("/api/pdf-download/:jobId", async (req, res) => {
-  try {
-    const { jobId } = req.params;
+  if (!pgPool) {
+    return res.status(503).json({ error: "Queue not available" });
+  }
 
+  try {
     const { rows } = await pgPool.query(
       "SELECT result_url FROM pdf_jobs WHERE id = $1 AND status = 'done'",
-      [jobId]
+      [req.params.jobId]
     );
 
     if (!rows.length || !rows[0].result_url) {
@@ -184,24 +202,34 @@ app.use("/api/secure", (req, res, next) => {
 });
 
 /* ======================================================
-   ROUTES (ONLY VALID ONES)
+   ROUTES
 ====================================================== */
 app.use("/api/pending", pendingRoutes);
 app.use("/webhook", telegramWebhook);
 
 /* ======================================================
-   START SERVER
+   START SERVER (SAFE)
 ====================================================== */
-try {
-  await mongoose.connect(process.env.MONGO_URI);
-  console.log("✅ MongoDB connected");
-} catch (err) {
-  console.error("❌ MongoDB connection failed");
-  process.exit(1);
-}
+(async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("✅ MongoDB connected");
+  } catch (err) {
+    console.error("❌ MongoDB connection failed");
+    process.exit(1);
+  }
 
+  const PORT = process.env.PORT || 5000;
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
-});
+  const server = app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+  });
+
+  server.on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+      console.error(`❌ Port ${PORT} already in use. Stop the other process.`);
+      process.exit(1);
+    }
+    throw err;
+  });
+})();
