@@ -6,7 +6,7 @@ import path from "path";
 import fs from "fs";
 import axios from "axios";
 import puppeteer from "puppeteer-core";
-import chromium from "chromium";
+import chromium from "@sparticuz/chromium";
 import { fileURLToPath } from "url";
 
 import telegramWebhook from "./routes/telegramWebhook.js";
@@ -44,14 +44,24 @@ app.use(
   cors({
     origin(origin, callback) {
       if (!origin) return callback(null, true);
-      const clean = origin.replace(/\/$/, "");
-      if (allowedOrigins.has(clean)) return callback(null, true);
+
+      const allowed = [
+        "localhost",
+        "netlify.app",
+        "onrender.com",
+      ];
+
+      if (allowed.some(d => origin.includes(d))) {
+        return callback(null, true);
+      }
+
       console.warn("🚫 CORS blocked:", origin);
-      callback(null, false);
+      return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
   })
 );
+
 
 /* ======================================================
    BODY PARSERS
@@ -70,12 +80,20 @@ app.post("/api/generate-pdf", async (req, res) => {
       return res.status(400).json({ error: "url and printData required" });
     }
 
-    const browser = await puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
-    });
+    const isLocal = process.env.NODE_ENV !== "production";
+
+    const browser = await puppeteer.launch(
+      isLocal
+        ? { headless: true }
+        : {
+          args: chromium.args,
+          defaultViewport: chromium.defaultViewport,
+          executablePath: await chromium.executablePath(),
+          headless: chromium.headless,
+        }
+    );
+
+
 
 
 

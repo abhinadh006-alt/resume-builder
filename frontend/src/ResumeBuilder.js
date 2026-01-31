@@ -182,7 +182,7 @@ export default function ResumeBuilder() {
 
             const printUrl = `${window.location.origin}/print/resume`;
 
-            const pdfBlob = await generateResumePDF({
+            const blob = await generateResumePDF({
                 url: printUrl,
                 printData: {
                     formData: normalizedFormData,
@@ -191,7 +191,7 @@ export default function ResumeBuilder() {
             });
 
             const pdfUrl = URL.createObjectURL(pdfBlob);
-            window.open(pdfUrl, "_blank", "noopener,noreferrer");
+            window.open(URL.createObjectURL(blob), "_blank", "noopener,noreferrer");
 
             toast.success("Resume generated successfully");
         } catch (err) {
