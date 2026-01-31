@@ -18,6 +18,7 @@ import Sidebar from "./Sidebar";
 import "./Sidebar.css";
 import PreviewZoomControl from "./PreviewZoomControl";
 import "./layout-preview.css";   // MUST be imported
+import { generateResumePDF } from "./api";
 
 export default function ResumeBuilder() {
     const [formData, setFormData] = useState({
@@ -174,49 +175,28 @@ export default function ResumeBuilder() {
             setLoading(true);
             setIsFinalView(true);
 
-            // ✅ Normalize photo BEFORE saving
             const normalizedFormData = {
                 ...formData,
                 photo: normalizePhoto(formData.photo),
             };
 
-            // ✅ Store for browser preview (optional but fine)
-            localStorage.setItem(
-                "resume-print-data",
-                JSON.stringify({
-                    formData: normalizedFormData,
-                    template,
-                })
-            );
-
-            // Allow React & storage to settle
-            await new Promise(r => setTimeout(r, 50));
-
             const printUrl = `${window.location.origin}/print/resume`;
 
-            const res = await fetch("http://localhost:5000/api/generate-pdf", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    url: printUrl,
-                    printData: {
-                        formData: normalizedFormData, // ✅ FIXED
-                        template,
-                    },
-                }),
+            const pdfBlob = await generateResumePDF({
+                url: printUrl,
+                printData: {
+                    formData: normalizedFormData,
+                    template,
+                },
             });
 
-            if (!res.ok) {
-                throw new Error("PDF generation failed");
-            }
-
-            const blob = await res.blob();
-            window.open(URL.createObjectURL(blob), "_blank", "noopener,noreferrer");
+            const pdfUrl = URL.createObjectURL(pdfBlob);
+            window.open(pdfUrl, "_blank", "noopener,noreferrer");
 
             toast.success("Resume generated successfully");
         } catch (err) {
             console.error(err);
-            toast.error("PDF generation failed");
+            toast.error(err.message || "PDF generation failed");
         } finally {
             setLoading(false);
             setIsFinalView(false);

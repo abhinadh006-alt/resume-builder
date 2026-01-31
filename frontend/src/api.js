@@ -4,8 +4,11 @@ const API_BASE =
     process.env.REACT_APP_API_URL ||
     "https://resume-builder-jv01.onrender.com";
 
-export async function generateResume(payload) {
-    const res = await fetch(`${API_BASE}/api/resume/generate`, {
+/**
+ * Generate resume PDF (returns Blob)
+ */
+export async function generateResumePDF(payload) {
+    const res = await fetch(`${API_BASE}/api/generate-pdf`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -13,23 +16,24 @@ export async function generateResume(payload) {
         body: JSON.stringify(payload),
     });
 
-    const contentType = res.headers.get("content-type") || "";
-
-    // Handle server-side errors safely
+    // Hard failure (network / server crash)
     if (!res.ok) {
-        if (contentType.includes("application/json")) {
-            const err = await res.json();
-            throw new Error(err.message || "Server error");
-        } else {
+        let message = "PDF generation failed";
+
+        try {
             const text = await res.text();
-            throw new Error(text);
-        }
+            message = text || message;
+        } catch (_) { }
+
+        throw new Error(message);
     }
 
-    // Expect JSON only
-    if (contentType.includes("application/json")) {
-        return await res.json();
+    // MUST be PDF
+    const contentType = res.headers.get("content-type") || "";
+    if (!contentType.includes("application/pdf")) {
+        const text = await res.text();
+        throw new Error("Invalid PDF response: " + text);
     }
 
-    throw new Error("Invalid server response");
+    return await res.blob(); // ✅ PDF blob
 }
