@@ -173,14 +173,28 @@ export default function ResumeBuilder() {
             }
 
             setLoading(true);
-            setIsFinalView(true);
 
             const normalizedFormData = {
                 ...formData,
                 photo: normalizePhoto(formData.photo),
             };
 
-            const printUrl = `${window.location.origin}/print/resume`;
+            // 🔑 UNIQUE print session (prevents stale data)
+            const printId = Date.now();
+
+            const isLocal =
+                window.location.hostname === "localhost" ||
+                window.location.hostname === "127.0.0.1";
+
+            const printUrl = isLocal
+                ? `http://localhost:3000/print/resume?printId=${printId}`
+                : `${window.location.origin}/print/resume?printId=${printId}`;
+
+            // 🔒 Lock preview BEFORE PDF snapshot
+            setIsFinalView(true);
+
+            // ⏱ Let React finish rendering
+            await new Promise((r) => setTimeout(r, 300));
 
             const blob = await generateResumePDF({
                 url: printUrl,
@@ -193,7 +207,6 @@ export default function ResumeBuilder() {
             const pdfUrl = URL.createObjectURL(blob);
             window.open(pdfUrl, "_blank", "noopener,noreferrer");
 
-
             toast.success("Resume generated successfully");
         } catch (err) {
             console.error(err);
@@ -203,6 +216,8 @@ export default function ResumeBuilder() {
             setIsFinalView(false);
         }
     };
+
+
 
     // ===== edit handlers =====
     const handleEditItem = (type, index) => {

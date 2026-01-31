@@ -3,11 +3,13 @@ import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import path from "path";
-import fs from "fs";
 import axios from "axios";
-import puppeteer from "puppeteer-core";
-import chromium from "@sparticuz/chromium";
 import { fileURLToPath } from "url";
+
+// 🔥 IMPORTANT: conditional puppeteer import
+import puppeteer from "puppeteer";
+import puppeteerCore from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
 
 import telegramWebhook from "./routes/telegramWebhook.js";
 import pendingRoutes from "./routes/pendingRoutes.js";
@@ -21,47 +23,22 @@ const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.join(__dirname, ".env") });
 
-console.log("🧩 MONGO_URI:", process.env.MONGO_URI ? "✅" : "❌");
+const isLocal = process.env.NODE_ENV !== "production";
+
+console.log("🧩 ENV:", isLocal ? "LOCAL" : "PRODUCTION");
 console.log("🌐 FRONTEND_URL:", process.env.FRONTEND_URL || "(none)");
 
 const app = express();
 
 /* ======================================================
-   CORS
+   CORS (LOCAL SAFE)
 ====================================================== */
-const allowedOrigins = new Set([
-  "http://localhost:3000",
-  "http://localhost:3001",
-  "http://localhost:3002",
-  "http://localhost:3003",
-  "http://localhost:5173",
-  "https://safetycrewindiaresume.netlify.app",
-  "https://safetycrewindiaresumes.netlify.app",
-  (process.env.FRONTEND_URL || "").replace(/\/$/, ""),
-]);
-
 app.use(
   cors({
-    origin(origin, callback) {
-      if (!origin) return callback(null, true);
-
-      const allowed = [
-        "localhost",
-        "netlify.app",
-        "onrender.com",
-      ];
-
-      if (allowed.some(d => origin.includes(d))) {
-        return callback(null, true);
-      }
-
-      console.warn("🚫 CORS blocked:", origin);
-      return callback(new Error("Not allowed by CORS"));
-    },
+    origin: true, // ✅ allow all in dev
     credentials: true,
   })
 );
-
 
 /* ======================================================
    BODY PARSERS
@@ -70,43 +47,40 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 /* ======================================================
-   🖨️ PDF GENERATION (URL-BASED — FINAL)
+   🖨️ PDF GENERATION
 ====================================================== */
-// server.js — replace your current /api/generate-pdf handler with this
 app.post("/api/generate-pdf", async (req, res) => {
+  let browser;
+
   try {
     const { url, printData } = req.body;
     if (!url || !printData) {
       return res.status(400).json({ error: "url and printData required" });
     }
 
-    const isLocal = process.env.NODE_ENV !== "production";
-
-    const browser = await puppeteer.launch(
-      isLocal
-        ? { headless: true }
-        : {
-          args: chromium.args,
-          defaultViewport: chromium.defaultViewport,
-          executablePath: await chromium.executablePath(),
-          headless: chromium.headless,
-        }
-    );
-
-
-
-
+    // ✅ Launch correct browser
+    if (isLocal) {
+      browser = await puppeteer.launch({
+        headless: true,
+      });
+    } else {
+      browser = await puppeteerCore.launch({
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(),
+        headless: chromium.headless,
+      });
+    }
 
     const page = await browser.newPage();
 
-    // 🔑 CRITICAL: preload localStorage BEFORE navigation
+    // preload localStorage
     await page.evaluateOnNewDocument((data) => {
       localStorage.setItem("resume-print-data", JSON.stringify(data));
     }, printData);
 
     await page.goto(url, { waitUntil: "domcontentloaded" });
 
-    // 🔑 Wait for ACTUAL content, not just DOM
     await page.waitForFunction(() => {
       const el = document.querySelector(".resume-preview");
       return el && el.innerText.trim().length > 20;
@@ -114,11 +88,9 @@ app.post("/api/generate-pdf", async (req, res) => {
 
     const pdf = await page.pdf({
       printBackground: true,
-      preferCSSPageSize: true, // ✅ MUST BE TRUE
-      margin: { top: 0, bottom: 0, left: 0, right: 0 }
+      preferCSSPageSize: true,
+      margin: { top: 0, bottom: 0, left: 0, right: 0 },
     });
-
-
 
     await browser.close();
 
@@ -127,65 +99,21 @@ app.post("/api/generate-pdf", async (req, res) => {
       "Content-Length": pdf.length,
     });
 
-    res.end(pdf);
+    return res.end(pdf);
   } catch (err) {
-    console.error("❌ PDF generation error:");
-    console.error(err);
-    console.error(err?.stack);
+    if (browser) await browser.close();
 
-    res.status(500).json({
+    console.error("❌ PDF generation error:", err.message);
+
+    return res.status(500).json({
       error: "PDF generation failed",
       details: err.message,
     });
   }
-
-});
-
-
-/* ======================================================
-   STATIC FILES
-====================================================== */
-app.use("/resumes", express.static(path.join(__dirname, "public", "resumes")));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-/* ======================================================
-   DAILY KEY
-====================================================== */
-app.get("/api/daily-key", (req, res) => {
-  const { chatId } = req.query;
-  if (!chatId) return res.status(400).json({ error: "chatId required" });
-
-  const d = new Date();
-  const key = `TG-SECRET-${d.getFullYear()}${String(d.getMonth() + 1).padStart(
-    2,
-    "0"
-  )}${String(d.getDate()).padStart(2, "0")}-${chatId}`;
-
-  res.json({ key });
 });
 
 /* ======================================================
-   SECURE MIDDLEWARE
-====================================================== */
-app.use("/api/secure", (req, res, next) => {
-  const auth = req.headers.authorization || "";
-  const origin = req.headers.origin || "";
-  const host = req.hostname || "";
-
-  if (origin.includes("localhost") || host.includes("localhost")) {
-    return next();
-  }
-
-  if (isValidDailyKey(auth)) {
-    logKeyUsage(req, auth);
-    return next();
-  }
-
-  return res.status(401).json({ error: "Unauthorized" });
-});
-
-/* ======================================================
-   ROUTES (ONLY VALID ONES)
+   ROUTES
 ====================================================== */
 app.use("/api/pending", pendingRoutes);
 app.use("/webhook", telegramWebhook);

@@ -10,6 +10,10 @@ import ResumePreview from "../resumepreview/ResumePreview";
 */
 
 export default function PrintResumeWrapper() {
+    // 🔑 STEP 3 — CACHE BUSTER (CRITICAL)
+    const params = new URLSearchParams(window.location.search);
+    const printId = params.get("printId") || "latest";
+
     let saved = {};
     try {
         saved = JSON.parse(localStorage.getItem("resume-print-data") || "{}");
@@ -22,7 +26,7 @@ export default function PrintResumeWrapper() {
 
     return (
         <>
-            {/* 🔒 GLOBAL PRINT RESET (SAFE) */}
+            {/* 🔒 GLOBAL PRINT RESET */}
             <style>{`
                 body {
                   margin: 0;
@@ -39,12 +43,7 @@ export default function PrintResumeWrapper() {
                 }
             `}</style>
 
-            {/* =====================================================
-               🔑 STEP 3 — HYBRID PRINT FLAG (CRITICAL)
-               - Executes immediately
-               - No React lifecycle needed
-               - Puppeteer-safe
-            ===================================================== */}
+            {/* 🔑 HYBRID PRINT FLAG */}
             <script
                 dangerouslySetInnerHTML={{
                     __html: `
@@ -57,8 +56,8 @@ export default function PrintResumeWrapper() {
                 }}
             />
 
-            {/* 🔑 ELEMENT PUPPETEER WAITS FOR */}
-            <div className="resume-print-root">
+            {/* 🔑 ROOT — Puppeteer waits for THIS */}
+            <div className="resume-print-root" data-print-id={printId}>
                 <ResumePreview
                     formData={formData}
                     template={template}

@@ -1,7 +1,12 @@
 // src/api.js
 
-const API_BASE =
-    process.env.REACT_APP_API_URL ||
+const isLocal =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+
+const API_BASE = isLocal
+    ? "http://localhost:5000"
+    : process.env.REACT_APP_API_URL ||
     "https://resume-builder-jv01.onrender.com";
 
 /**
@@ -19,12 +24,16 @@ export async function generateResumePDF(payload) {
             },
             body: JSON.stringify(payload),
         });
-    } catch (networkError) {
-        // 🔴 Network / CORS / backend-down errors
-        throw new Error("Unable to reach PDF server. Please try again.");
+    } catch (err) {
+        // 🔴 Network / backend not reachable
+        throw new Error(
+            isLocal
+                ? "Local PDF server is not running (port 5000)."
+                : "Unable to reach PDF server. Please try again."
+        );
     }
 
-    // ❌ Server returned error status
+    // ❌ Server-side error
     if (!res.ok) {
         let message = "PDF generation failed";
 
@@ -33,7 +42,7 @@ export async function generateResumePDF(payload) {
 
             if (contentType.includes("application/json")) {
                 const json = await res.json();
-                message = json?.details || json?.error || message;
+                message = json.details || json.error || message;
             } else {
                 const text = await res.text();
                 if (text) message = text;
@@ -47,9 +56,8 @@ export async function generateResumePDF(payload) {
     const contentType = res.headers.get("content-type") || "";
     if (!contentType.includes("application/pdf")) {
         const text = await res.text();
-        throw new Error("Invalid PDF response from server: " + text);
+        throw new Error("Invalid PDF response: " + text);
     }
 
-    // ✅ SUCCESS
-    return await res.blob();
+    return await res.blob(); // ✅ SUCCESS
 }
