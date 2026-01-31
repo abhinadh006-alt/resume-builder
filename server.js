@@ -3,17 +3,13 @@ import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import path from "path";
-import axios from "axios";
 import { fileURLToPath } from "url";
-
-// 🔥 IMPORTANT: conditional puppeteer import
 
 import puppeteerCore from "puppeteer-core";
 import chromium from "@sparticuz/chromium";
 
 import telegramWebhook from "./routes/telegramWebhook.js";
 import pendingRoutes from "./routes/pendingRoutes.js";
-import { isValidDailyKey, logKeyUsage } from "./middleware/verifyTgLink.js";
 
 /* ======================================================
    BASIC SETUP
@@ -31,11 +27,11 @@ console.log("🌐 FRONTEND_URL:", process.env.FRONTEND_URL || "(none)");
 const app = express();
 
 /* ======================================================
-   CORS (LOCAL SAFE)
+   CORS (SAFE)
 ====================================================== */
 app.use(
   cors({
-    origin: true, // ✅ allow all in dev
+    origin: true,
     credentials: true,
   })
 );
@@ -47,7 +43,7 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 /* ======================================================
-   🖨️ PDF GENERATION
+   🖨️ PDF GENERATION (FINAL, STABLE)
 ====================================================== */
 app.post("/api/generate-pdf", async (req, res) => {
   let browser;
@@ -58,8 +54,7 @@ app.post("/api/generate-pdf", async (req, res) => {
       return res.status(400).json({ error: "url and printData required" });
     }
 
-    // ✅ Launch correct browser
-    // ✅ Launch browser (SAME API for local & prod)
+    // ✅ Launch browser (same logic for local & prod)
     browser = await puppeteerCore.launch(
       isLocal
         ? {
@@ -74,21 +69,23 @@ app.post("/api/generate-pdf", async (req, res) => {
         }
     );
 
-
     const page = await browser.newPage();
 
-    // preload localStorage
+    // 🔑 PRELOAD localStorage BEFORE navigation
     await page.evaluateOnNewDocument((data) => {
       localStorage.setItem("resume-print-data", JSON.stringify(data));
     }, printData);
 
+    // 🚀 Load print page
     await page.goto(url, { waitUntil: "domcontentloaded" });
 
+    // 🔥 STEP 6 — WAIT FOR PRINT READY FLAG (CRITICAL)
     await page.waitForFunction(() => {
-      const el = document.querySelector(".resume-preview");
-      return el && el.innerText.trim().length > 20;
-    }, { timeout: 20000 });
+      const root = document.querySelector(".resume-print-root");
+      return root && root.dataset.printReady === "true";
+    }, { timeout: 30000 });
 
+    // 🖨️ Generate PDF
     const pdf = await page.pdf({
       printBackground: true,
       preferCSSPageSize: true,

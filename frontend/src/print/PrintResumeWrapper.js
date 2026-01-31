@@ -10,9 +10,9 @@ import ResumePreview from "../resumepreview/ResumePreview";
 */
 
 export default function PrintResumeWrapper() {
-    // 🔑 STEP 3 — CACHE BUSTER (CRITICAL)
+    // 🔑 CACHE BUSTER
     const params = new URLSearchParams(window.location.search);
-    const printId = params.get("printId") || "latest";
+    const printId = params.get("printId") || Date.now().toString();
 
     let saved = {};
     try {
@@ -28,36 +28,40 @@ export default function PrintResumeWrapper() {
         <>
             {/* 🔒 GLOBAL PRINT RESET */}
             <style>{`
-                body {
-                  margin: 0;
-                  padding: 0;
-                  background: white;
-                }
+        body {
+          margin: 0;
+          padding: 0;
+          background: white;
+        }
 
-                header,
-                nav,
-                .app-header,
-                .sidebar,
-                .builder-layout {
-                  display: none !important;
-                }
-            `}</style>
+        header,
+        nav,
+        .app-header,
+        .sidebar,
+        .builder-layout {
+          display: none !important;
+        }
+      `}</style>
 
             {/* 🔑 HYBRID PRINT FLAG */}
             <script
                 dangerouslySetInnerHTML={{
                     __html: `
-                        if (${JSON.stringify(template)} === "hybrid") {
-                            document.body.classList.add("hybrid-print");
-                        } else {
-                            document.body.classList.remove("hybrid-print");
-                        }
-                    `,
+            if (${JSON.stringify(template)} === "hybrid") {
+              document.body.classList.add("hybrid-print");
+            } else {
+              document.body.classList.remove("hybrid-print");
+            }
+          `,
                 }}
             />
 
-            {/* 🔑 ROOT — Puppeteer waits for THIS */}
-            <div className="resume-print-root" data-print-id={printId}>
+            {/* 🔑 ROOT — Puppeteer WAITS for this */}
+            <div
+                className="resume-print-root"
+                data-print-id={printId}
+                data-print-ready="true"
+            >
                 <ResumePreview
                     formData={formData}
                     template={template}
