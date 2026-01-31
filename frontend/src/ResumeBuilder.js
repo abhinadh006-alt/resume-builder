@@ -190,8 +190,9 @@ export default function ResumeBuilder() {
                 },
             });
 
-            const pdfUrl = URL.createObjectURL(pdfBlob);
-            window.open(URL.createObjectURL(blob), "_blank", "noopener,noreferrer");
+            const pdfUrl = URL.createObjectURL(blob);
+            window.open(pdfUrl, "_blank", "noopener,noreferrer");
+
 
             toast.success("Resume generated successfully");
         } catch (err) {
