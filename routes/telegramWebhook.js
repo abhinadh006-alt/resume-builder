@@ -13,7 +13,7 @@ dotenv.config({ path: path.join(__dirname, "../.env") });
 const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_API = `https://api.telegram.org/bot${TELEGRAM_TOKEN}`;
 const BACKEND_URL = process.env.BASE_URL || "https://resume-builder-jv01.onrender.com"; // ✅ your Render backend
-const FRONTEND_URL = process.env.FRONTEND_URL || "https://safetycrewindiaresumes.netlify.app";
+const FRONTEND_URL = process.env.FRONTEND_URL || "https://safetycrewindiaresume.netlify.app";
 
 console.log("🤖 Telegram Webhook Active");
 console.log("🌐 FRONTEND_URL:", FRONTEND_URL);

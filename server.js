@@ -34,7 +34,7 @@ const allowedOrigins = new Set([
   "http://localhost:3002",
   "http://localhost:3003",
   "http://localhost:5173",
-  "https://safetycrewindiaresumes.netlify.app",
+  "https://safetycrewindiaresume.netlify.app",
   (process.env.FRONTEND_URL || "").replace(/\/$/, ""),
 ]);
 
