@@ -7,7 +7,7 @@ import axios from "axios";
 import { fileURLToPath } from "url";
 
 // 🔥 IMPORTANT: conditional puppeteer import
-import puppeteer from "puppeteer";
+
 import puppeteerCore from "puppeteer-core";
 import chromium from "@sparticuz/chromium";
 
@@ -59,18 +59,21 @@ app.post("/api/generate-pdf", async (req, res) => {
     }
 
     // ✅ Launch correct browser
-    if (isLocal) {
-      browser = await puppeteer.launch({
-        headless: true,
-      });
-    } else {
-      browser = await puppeteerCore.launch({
-        args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(),
-        headless: chromium.headless,
-      });
-    }
+    // ✅ Launch browser (SAME API for local & prod)
+    browser = await puppeteerCore.launch(
+      isLocal
+        ? {
+          headless: true,
+          args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        }
+        : {
+          args: chromium.args,
+          defaultViewport: chromium.defaultViewport,
+          executablePath: await chromium.executablePath(),
+          headless: chromium.headless,
+        }
+    );
+
 
     const page = await browser.newPage();
 
