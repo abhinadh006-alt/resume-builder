@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App'; // ✅ FIX
+import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 // 1) Capture ?auth=... once and save it

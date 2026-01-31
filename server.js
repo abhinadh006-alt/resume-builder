@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
 import axios from "axios";
-import pkg from "pg";
+import puppeteer from "puppeteer";
 import { fileURLToPath } from "url";
 
 import telegramWebhook from "./routes/telegramWebhook.js";
@@ -21,31 +21,9 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, ".env") });
 
 console.log("🧩 MONGO_URI:", process.env.MONGO_URI ? "✅" : "❌");
-console.log("🧵 SUPABASE_DB_URL:", process.env.SUPABASE_DB_URL ? "✅" : "❌");
 console.log("🌐 FRONTEND_URL:", process.env.FRONTEND_URL || "(none)");
 
 const app = express();
-
-/* ======================================================
-   OPTIONAL POSTGRES (SUPABASE) CONNECTION
-====================================================== */
-let pgPool = null;
-const { Pool } = pkg;
-
-if (process.env.SUPABASE_DB_URL) {
-  try {
-    pgPool = new Pool({
-      connectionString: process.env.SUPABASE_DB_URL,
-      ssl: { rejectUnauthorized: false },
-    });
-    console.log("🟢 Postgres PDF queue enabled");
-  } catch (err) {
-    console.error("❌ Postgres init failed:", err);
-    pgPool = null;
-  }
-} else {
-  console.log("⚠️ Postgres PDF queue disabled (local dev)");
-}
 
 /* ======================================================
    CORS
@@ -80,84 +58,58 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 /* ======================================================
-   🖨️ PDF GENERATION — QUEUE
+   🖨️ PDF GENERATION (URL-BASED — FINAL)
 ====================================================== */
+// server.js — replace your current /api/generate-pdf handler with this
 app.post("/api/generate-pdf", async (req, res) => {
-  if (!pgPool) {
-    return res.status(503).json({
-      error: "PDF queue not available in local mode",
+  try {
+    const { url, printData } = req.body;
+    if (!url || !printData) {
+      return res.status(400).json({ error: "url and printData required" });
+    }
+
+    const browser = await puppeteer.launch({
+      headless: "new",
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
-  }
 
-  try {
-    const { printData } = req.body;
-    if (!printData) {
-      return res.status(400).json({ error: "printData required" });
-    }
+    const page = await browser.newPage();
 
-    const { rows } = await pgPool.query(
-      `INSERT INTO pdf_jobs (payload, status)
-       VALUES ($1, 'pending')
-       RETURNING id`,
-      [printData]
-    );
+    // 🔑 CRITICAL: preload localStorage BEFORE navigation
+    await page.evaluateOnNewDocument((data) => {
+      localStorage.setItem("resume-print-data", JSON.stringify(data));
+    }, printData);
 
-    res.json({ jobId: rows[0].id, status: "queued" });
+    await page.goto(url, { waitUntil: "domcontentloaded" });
+
+    // 🔑 Wait for ACTUAL content, not just DOM
+    await page.waitForFunction(() => {
+      const el = document.querySelector(".resume-preview");
+      return el && el.innerText.trim().length > 20;
+    }, { timeout: 20000 });
+
+    const pdf = await page.pdf({
+      printBackground: true,
+      preferCSSPageSize: true, // ✅ MUST BE TRUE
+      margin: { top: 0, bottom: 0, left: 0, right: 0 }
+    });
+
+
+
+    await browser.close();
+
+    res.set({
+      "Content-Type": "application/pdf",
+      "Content-Length": pdf.length,
+    });
+
+    res.end(pdf);
   } catch (err) {
-    console.error("❌ PDF queue insert failed:", err);
-    res.status(500).json({ error: "Failed to queue PDF job" });
+    console.error("❌ PDF generation error:", err);
+    res.status(500).json({ error: "PDF generation failed" });
   }
 });
 
-/* ======================================================
-   🧾 PDF JOB STATUS
-====================================================== */
-app.get("/api/pdf-status/:jobId", async (req, res) => {
-  if (!pgPool) {
-    return res.status(503).json({ error: "Queue not available" });
-  }
-
-  try {
-    const { rows } = await pgPool.query(
-      "SELECT status, result_url, error FROM pdf_jobs WHERE id = $1",
-      [req.params.jobId]
-    );
-
-    if (!rows.length) {
-      return res.status(404).json({ status: "not_found" });
-    }
-
-    res.json(rows[0]);
-  } catch (err) {
-    console.error("❌ Status check failed:", err);
-    res.status(500).json({ error: "Status check failed" });
-  }
-});
-
-/* ======================================================
-   📥 PDF DOWNLOAD
-====================================================== */
-app.get("/api/pdf-download/:jobId", async (req, res) => {
-  if (!pgPool) {
-    return res.status(503).json({ error: "Queue not available" });
-  }
-
-  try {
-    const { rows } = await pgPool.query(
-      "SELECT result_url FROM pdf_jobs WHERE id = $1 AND status = 'done'",
-      [req.params.jobId]
-    );
-
-    if (!rows.length || !rows[0].result_url) {
-      return res.status(404).json({ error: "PDF not ready" });
-    }
-
-    res.redirect(rows[0].result_url);
-  } catch (err) {
-    console.error("❌ PDF download failed:", err);
-    res.status(500).json({ error: "Download failed" });
-  }
-});
 
 /* ======================================================
    STATIC FILES
@@ -202,34 +154,20 @@ app.use("/api/secure", (req, res, next) => {
 });
 
 /* ======================================================
-   ROUTES
+   ROUTES (ONLY VALID ONES)
 ====================================================== */
 app.use("/api/pending", pendingRoutes);
 app.use("/webhook", telegramWebhook);
 
 /* ======================================================
-   START SERVER (SAFE)
+   START SERVER
 ====================================================== */
-(async () => {
-  try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log("✅ MongoDB connected");
-  } catch (err) {
-    console.error("❌ MongoDB connection failed");
-    process.exit(1);
-  }
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch((err) => console.error("❌ Mongo error:", err));
 
-  const PORT = process.env.PORT || 5000;
-
-  const server = app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-  });
-
-  server.on("error", (err) => {
-    if (err.code === "EADDRINUSE") {
-      console.error(`❌ Port ${PORT} already in use. Stop the other process.`);
-      process.exit(1);
-    }
-    throw err;
-  });
-})();
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
+});

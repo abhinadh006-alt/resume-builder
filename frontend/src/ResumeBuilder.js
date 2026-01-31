@@ -174,11 +174,13 @@ export default function ResumeBuilder() {
             setLoading(true);
             setIsFinalView(true);
 
+            // ✅ Normalize photo BEFORE saving
             const normalizedFormData = {
                 ...formData,
                 photo: normalizePhoto(formData.photo),
             };
 
+            // ✅ Store for browser preview (optional but fine)
             localStorage.setItem(
                 "resume-print-data",
                 JSON.stringify({
@@ -187,68 +189,35 @@ export default function ResumeBuilder() {
                 })
             );
 
-            await new Promise((r) => setTimeout(r, 50));
+            // Allow React & storage to settle
+            await new Promise(r => setTimeout(r, 50));
 
             const printUrl = `${window.location.origin}/print/resume`;
 
-            // ✅ STEP 3 — enqueue job
-            const res = await fetch(
-                `${process.env.REACT_APP_API_URL || "http://localhost:5000"}/api/generate-pdf`,
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        url: printUrl,
-                        printData: {
-                            formData: normalizedFormData,
-                            template,
-                        },
-                    }),
-                }
-            );
+            const res = await fetch("http://localhost:5000/api/generate-pdf", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    url: printUrl,
+                    printData: {
+                        formData: normalizedFormData, // ✅ FIXED
+                        template,
+                    },
+                }),
+            });
 
-            if (!res.ok) throw new Error("Failed to queue PDF job");
+            if (!res.ok) {
+                throw new Error("PDF generation failed");
+            }
 
-            const { jobId } = await res.json();
+            const blob = await res.blob();
+            window.open(URL.createObjectURL(blob), "_blank", "noopener,noreferrer");
 
-            // ✅ STEP 7 — poll status
-            const poll = setInterval(async () => {
-                try {
-                    const statusRes = await fetch(
-                        `${process.env.REACT_APP_API_URL || "http://localhost:5000"}/api/pdf-status/${jobId}`
-                    );
-                    const data = await statusRes.json();
-
-                    if (data.status === "completed") {
-                        clearInterval(poll);
-
-                        window.open(
-                            `${process.env.REACT_APP_API_URL || "http://localhost:5000"}/api/pdf-download/${jobId}`,
-                            "_blank",
-                            "noopener,noreferrer"
-                        );
-
-                        toast.success("Resume generated successfully");
-                        setLoading(false);
-                        setIsFinalView(false);
-                    }
-
-                    if (data.status === "failed") {
-                        clearInterval(poll);
-                        toast.error("PDF generation failed");
-                        setLoading(false);
-                        setIsFinalView(false);
-                    }
-                } catch (err) {
-                    clearInterval(poll);
-                    toast.error("Error checking PDF status");
-                    setLoading(false);
-                    setIsFinalView(false);
-                }
-            }, 1500);
+            toast.success("Resume generated successfully");
         } catch (err) {
             console.error(err);
             toast.error("PDF generation failed");
+        } finally {
             setLoading(false);
             setIsFinalView(false);
         }

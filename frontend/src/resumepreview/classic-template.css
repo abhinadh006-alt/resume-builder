@@ -449,6 +449,12 @@
     page-break-after: avoid;
 }
 
+/* Experience — allow flow */
+.classic-item {
+    break-inside: auto;
+    page-break-inside: auto;
+}
+
 /* Bullet orphan protection */
 .classic-bullets li {
     orphans: 2;

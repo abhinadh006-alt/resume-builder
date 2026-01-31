@@ -1,13 +1,11 @@
 // src/api.js
 
 const API_BASE =
-    process.env.REACT_APP_API_BASE_URL ||
-    (window.location.hostname === "localhost"
-        ? "http://localhost:5000/api"
-        : "https://resume-builder-jv01.onrender.com/api");
+    process.env.REACT_APP_API_URL ||
+    "https://resume-builder-jv01.onrender.com";
 
 export async function generateResume(payload) {
-    const res = await fetch(`${API_BASE}/resume/generate`, {
+    const res = await fetch(`${API_BASE}/api/resume/generate`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -17,15 +15,18 @@ export async function generateResume(payload) {
 
     const contentType = res.headers.get("content-type") || "";
 
+    // Handle server-side errors safely
     if (!res.ok) {
-        let message = "Resume generation failed";
-        try {
+        if (contentType.includes("application/json")) {
             const err = await res.json();
-            message = err.message || message;
-        } catch (_) { }
-        throw new Error(message);
+            throw new Error(err.message || "Server error");
+        } else {
+            const text = await res.text();
+            throw new Error(text);
+        }
     }
 
+    // Expect JSON only
     if (contentType.includes("application/json")) {
         return await res.json();
     }

@@ -235,7 +235,7 @@ export default function HybridTemplate({
                                     <div key={i} className="hybrid-item">
                                         <strong>{edu.degree} | {edu.school}</strong>
                                         <div className="hybrid-meta">
-                                            <div></div>{edu.location} • {edu.startDate} – {edu.endDate}<div />
+                                            {edu.location} • {edu.startDate} – {edu.endDate}
                                         </div>
                                         <ul>{renderBullets(edu.description)}</ul>
                                     </div>

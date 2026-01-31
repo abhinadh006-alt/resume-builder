@@ -1,0 +1,78 @@
+[33ma5f0966[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{0}: commit: Finalize gitignore (ignore node_modules, env, builds)
+[33m33f740d[m HEAD@{1}: commit: Add server folder
+[33m556a22a[m HEAD@{2}: commit: Stop tracking node_modules
+[33m1c215a5[m HEAD@{3}: commit: Clean repo, add PDF queue and worker
+[33mad26fae[m HEAD@{4}: reset: moving to HEAD
+[33mad26fae[m HEAD@{5}: commit: fix: generate fix
+[33m0b378ce[m HEAD@{6}: commit: Fix: updated api
+[33m5a503fd[m HEAD@{7}: commit: Fix: resume generate api
+[33m5d817b6[m HEAD@{8}: commit: Fix resume generate endpoint
+[33m633f487[m HEAD@{9}: commit: fix: route modify
+[33mfd74731[m HEAD@{10}: commit: fix: api modify
+[33m95c7239[m HEAD@{11}: commit: fix :resume generation issue by resume builder
+[33m716fa11[m HEAD@{12}: commit: fix: remove photo from resume templates and align sidebar
+[33mff47eb0[m HEAD@{13}: commit: ui: mobile zoom default, header cleanup, sidebar alignment
+[33ma4188e7[m HEAD@{14}: commit: chore: remove all access control and auth logic
+[33m2a0ed48[m HEAD@{15}: commit: UI overhaul: responsive header, sidebar polish, preview stability, security routes
+[33m21bd1ce[m HEAD@{16}: commit: pdf: load frontend built css, check additional template paths, embed fonts, increase wait
+[33mfa61d4e[m HEAD@{17}: commit: Updated resume preview and template paths
+[33mcfa5a61[m HEAD@{18}: commit: Updated ModernTemplate to match frontend ResumePreview layout
+[33m3e35e71[m HEAD@{19}: commit: Updated modern resume template for styled PDF
+[33m6cf5946[m HEAD@{20}: commit: Fix: PDF generation streaming directly to client
+[33m5272fbd[m HEAD@{21}: commit: Fix: modern PDF template and puppeteer configuration
+[33ma468b4b[m HEAD@{22}: commit: Fix: allow localhost:3001 for CORS
+[33m5edd203[m HEAD@{23}: commit: ✨ Added bullet entry + multiline display for Experience, Education & Certifications
+[33m3752802[m HEAD@{24}: commit: ✨ Added bullet entry + multiline display for Experience, Education & Certifications
+[33mb799ecf[m HEAD@{25}: commit: ✨ Added bullet entry + multiline display for Experience, Education & Certifications
+[33mcc6d759[m HEAD@{26}: commit: ✨ Added bullet entry + multiline display for Experience, Education & Certifications
+[33m8b65243[m HEAD@{27}: commit: ✨ Added bullet entry + multiline display for Experience, Education & Certifications
+[33mb059ec4[m HEAD@{28}: commit: ✨ Added bullet point typing for Experience description
+[33mc469130[m HEAD@{29}: commit: Add admin key protection for /queue-status
+[33m8d11596[m HEAD@{30}: commit: Fix: move /queue-status above :id route
+[33m5908a36[m HEAD@{31}: commit: Add /api/queue-status endpoint for monitoring job queue
+[33m1ad979b[m HEAD@{32}: commit: Enable safe parallel PDF processing (3 concurrent jobs)
+[33m41f0fa8[m HEAD@{33}: commit: Add in-memory queue for secure resume generation
+[33m66a5ade[m HEAD@{34}: commit: Add DailyKey TTL model and /api/daily-key route with 24h expiry
+[33m0f8521d[m HEAD@{35}: commit: Fix Telegram auth detection and access validation
+[33m7166840[m HEAD@{36}: commit: Fix Netlify SPA routing for Telegram links
+[33m4289686[m HEAD@{37}: commit: Add Telegram-only access control
+[33m83dc81b[m HEAD@{38}: commit: Use puppeteer-core + sparticuz/chromium for Render fix
+[33mec3821c[m HEAD@{39}: commit: Switch to puppeteer-core + sparticuz/chromium for Render
+[33mf927c72[m HEAD@{40}: commit: Fix Puppeteer executablePath for Render deployment
+[33m2844548[m HEAD@{41}: commit: Fix Puppeteer launch for Render Chrome environment
+[33me950deb[m HEAD@{42}: commit: Fix verifyTgLink import + inline Telegram key validation
+[33m3b7ae3b[m HEAD@{43}: commit: Fix: append chatId in daily-key fetch
+[33m3ade318[m HEAD@{44}: commit: fix: correct daily key format in root server.js (YYYYMMDD)
+[33m7a64ece[m HEAD@{45}: commit: fix: correct daily key format to YYYYMMDD
+[33m7639670[m HEAD@{46}: commit: fix: simplify CORS for Netlify frontend access
+[33m0f2a1e1[m HEAD@{47}: commit: refactor: reorder middleware and fix CORS for Netlify
+[33m0819035[m HEAD@{48}: commit: fix: restore default export and keep named helpers for verifyTgLink
+[33mcb96d58[m HEAD@{49}: commit: fix: export isValidDailyKey and logKeyUsage for secure route validation
+[33m4893df2[m HEAD@{50}: commit: fix: remove duplicate key helper functions and finalize CORS setup
+[33m524f314[m HEAD@{51}: commit: fix: remove duplicate CORS import and finalize Netlify access
+[33m151459e[m HEAD@{52}: commit: fix: allow Netlify domain in CORS whitelist
+[33m99dccc2[m HEAD@{53}: commit: fix: relax CORS for Netlify frontend domain
+[33m9c1d653[m HEAD@{54}: commit: fix: add REACT_APP_API_BASE_URL fallback for Netlify
+[33mfb2b7b6[m HEAD@{55}: commit: fix: use REACT_APP_API_BASE_URL for Netlify compatibility
+[33me4512dc[m HEAD@{56}: commit: fix: add react-toastify dependency and correct imports
+[33m833b806[m HEAD@{57}: commit: fix: correct api import/export mismatch
+[33mf5a9d2b[m HEAD@{58}: commit: fix: correct import paths and finalize secure integration
+[33mc6bb459[m HEAD@{59}: commit: fix: remove redundant handleSubmit + clean props
+[33mef578b6[m HEAD@{60}: commit: fix: auto TG-SECRET key and field alignment
+[33m139ec65[m HEAD@{61}: commit: fix: add generateResume export for secure route
+[33mf59f5c1[m HEAD@{62}: commit: fix: correct import path for generatePDF utility
+[33m18bffaf[m HEAD@{63}: commit: fix: add /api/secure/generate-cv route
+[33m7835f84[m HEAD@{64}: commit: fix: add /api/daily-key route + /api/secure/generate-cv
+[33mea2cbd0[m HEAD@{65}: commit: chore: add .gitignore and finalize App.js ESLint fix
+[33ma93298b[m HEAD@{66}: commit: chore: add .gitignore, remove resume-builder-worker and build artifacts
+[33macc3991[m HEAD@{67}: commit: fix: add /api/daily-key + CORS allowed origins for Netlify
+[33m2f88965[m HEAD@{68}: commit: fix: remove unused vars (auth, downloadLink) to fix ESLint CI build
+[33m8559fc1[m HEAD@{69}: commit: fix: frontend API_BASE -> /api/resume and axios endpoints
+[33mcc2d7bc[m HEAD@{70}: commit: Backup current state before deploy fix
+[33m00ce52e[m HEAD@{71}: commit: Switched to Render backend and fixed ESLint errors
+[33m44eb120[m HEAD@{72}: commit: Fixed unused vars and updated API to Render
+[33mc3a1c7e[m HEAD@{73}: Branch: renamed refs/heads/main to refs/heads/main
+[33mc3a1c7e[m HEAD@{75}: commit: Initial full project commit
+[33m2551475[m HEAD@{76}: commit: Fix ESLint unused variable errors
+[33m6244ff9[m HEAD@{77}: Branch: renamed refs/heads/master to refs/heads/main
+[33m6244ff9[m HEAD@{79}: commit (initial): Initial full project commit
