@@ -5,7 +5,8 @@ import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
 import axios from "axios";
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
+import chromium from "chromium";
 import { fileURLToPath } from "url";
 
 import telegramWebhook from "./routes/telegramWebhook.js";
@@ -35,6 +36,7 @@ const allowedOrigins = new Set([
   "http://localhost:3003",
   "http://localhost:5173",
   "https://safetycrewindiaresume.netlify.app",
+  "https://safetycrewindiaresumes.netlify.app",
   (process.env.FRONTEND_URL || "").replace(/\/$/, ""),
 ]);
 
@@ -69,15 +71,12 @@ app.post("/api/generate-pdf", async (req, res) => {
     }
 
     const browser = await puppeteer.launch({
-      headless: true,
-      args: [
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage",
-        "--disable-gpu",
-        "--font-render-hinting=none"
-      ],
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
     });
+
 
 
     const page = await browser.newPage();
