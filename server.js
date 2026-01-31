@@ -69,9 +69,16 @@ app.post("/api/generate-pdf", async (req, res) => {
     }
 
     const browser = await puppeteer.launch({
-      headless: "new",
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      headless: true,
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+        "--font-render-hinting=none"
+      ],
     });
+
 
     const page = await browser.newPage();
 
@@ -105,9 +112,16 @@ app.post("/api/generate-pdf", async (req, res) => {
 
     res.end(pdf);
   } catch (err) {
-    console.error("❌ PDF generation error:", err);
-    res.status(500).json({ error: "PDF generation failed" });
+    console.error("❌ PDF generation error:");
+    console.error(err);
+    console.error(err?.stack);
+
+    res.status(500).json({
+      error: "PDF generation failed",
+      details: err.message,
+    });
   }
+
 });
 
 
