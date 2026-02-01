@@ -166,34 +166,31 @@ export default function ResumeBuilder() {
 
 
     const handleSubmit = async () => {
+        if (loading) return; // 🔒 HARD GUARD (prevents double clicks)
+
         try {
             if (!formData.name || !formData.email) {
                 toast.error("Name & email required");
                 return;
             }
 
-            setLoading(true);
+            setLoading(true);          // 🔄 start loading
+            setIsFinalView(true);      // 👀 show final preview immediately
 
             const normalizedFormData = {
                 ...formData,
                 photo: normalizePhoto(formData.photo),
             };
 
-            // 🔑 UNIQUE print session (prevents stale data)
-            const printId = Date.now();
-
             const isLocal =
                 window.location.hostname === "localhost" ||
                 window.location.hostname === "127.0.0.1";
 
             const printUrl = isLocal
-                ? `http://localhost:3000/print/resume?printId=${printId}`
-                : `${window.location.origin}/print/resume?printId=${printId}`;
+                ? "http://localhost:3000/print/resume"
+                : `${window.location.origin}/print/resume`;
 
-            // 🔒 Lock preview BEFORE PDF snapshot
-            setIsFinalView(true);
-
-            // ⏱ Let React finish rendering
+            // small delay so preview fully settles
             await new Promise((r) => setTimeout(r, 300));
 
             const blob = await generateResumePDF({
@@ -205,17 +202,27 @@ export default function ResumeBuilder() {
             });
 
             const pdfUrl = URL.createObjectURL(blob);
-            window.open(pdfUrl, "_blank", "noopener,noreferrer");
+
+            // 🔽 safer than popup (works even if popup blocked)
+            const a = document.createElement("a");
+            a.href = pdfUrl;
+            a.download = "resume.pdf";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
 
             toast.success("Resume generated successfully");
         } catch (err) {
             console.error(err);
             toast.error(err.message || "PDF generation failed");
-        } finally {
-            setLoading(false);
+
+            // ❌ revert preview on error
             setIsFinalView(false);
+        } finally {
+            setLoading(false); // 🔓 unlock button
         }
     };
+
 
 
 
@@ -541,6 +548,7 @@ export default function ResumeBuilder() {
                 isFinalView={isFinalView}
                 toggleFinalView={toggleFinalView}
                 handleSubmit={handleSubmit}
+                loading={loading}        // ✅ ADD THIS LINE
                 handleSetPhoto={handleSetPhoto}
                 handleImportResume={handleImportResume}
                 isOpen={sidebarOpen}

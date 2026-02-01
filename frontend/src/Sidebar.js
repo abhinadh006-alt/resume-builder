@@ -37,6 +37,7 @@ export default function Sidebar(props) {
         isFinalView,
         toggleFinalView,
         handleSubmit,
+        loading,                 // ✅ ADD THIS
         handleSetPhoto,
         handleImportResume,
         isOpen: parentIsOpen,
@@ -253,11 +254,23 @@ export default function Sidebar(props) {
         <div className="panel-section">
             <h3>⬇️ Generate</h3>
             <div className="panel-card">
-                <button className="generate-btn" onClick={handleSubmit}>✅ Generate Resume</button>
-                <div style={{ marginTop: 8, color: "#666", fontSize: 13 }}>Your resume will open in a new tab.</div>
+                <button
+                    className="generate-btn"
+                    onClick={handleSubmit}
+                    disabled={loading}                 // 🔒 disable during generation
+                >
+                    {loading ? "⏳ Generating..." : "✅ Generate Resume"}
+                </button>
+
+                <div style={{ marginTop: 8, color: "#666", fontSize: 13 }}>
+                    {loading
+                        ? "Please wait while your resume is being generated…"
+                        : "Your resume will download automatically."}
+                </div>
             </div>
         </div>
     );
+
 
     const renderActivePanel = () => {
         switch (activePanel) {
