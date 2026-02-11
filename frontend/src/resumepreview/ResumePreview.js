@@ -41,7 +41,7 @@ export const PLACEHOLDERS = {
 
     education: {
         degree: "Bachelor’s in Engineering",
-        school: "Harvard University",
+        school: "University",
         location: "City, Country",
         dateRange: "e.g., Jan 2015 — Sep 2019",
         bullets: [

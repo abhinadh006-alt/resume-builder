@@ -439,7 +439,7 @@ export default function ResumeBuilder() {
                     toast.info("Template set: Modern");
                 }}
             >
-                Modern (Experienced)
+                Modern
             </button>
             <button
                 className={`template-btn ${template === "classic" ? "active" : ""}`}
@@ -448,7 +448,7 @@ export default function ResumeBuilder() {
                     toast.info("Template set: Classic");
                 }}
             >
-                Classic (Serif)
+                Classic
             </button>
             <button
                 className={`template-btn ${template === "hybrid" ? "active" : ""}`}
@@ -457,7 +457,7 @@ export default function ResumeBuilder() {
                     toast.info("Template set: Hybrid");
                 }}
             >
-                Hybrid (Two column)
+                Hybrid
             </button>
         </div>
     );
