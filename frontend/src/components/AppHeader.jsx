@@ -17,7 +17,7 @@ export default function AppHeader() {
 
                 {/* CENTER */}
                 <div className="header-center">
-                    Resume Builder
+                    ATS Resume Builder
                 </div>
 
                 {/* RIGHT */}

@@ -235,9 +235,9 @@ export default function Sidebar(props) {
         <div className="panel-section">
             <h3>🎨 Select Resume Style</h3>
             <div className="panel-card">
-                <button className={`template-btn ${template === "modern" ? "active" : ""}`} onClick={() => setTemplate("modern")}>💼 Modern </button>
-                <button className={`template-btn ${template === "classic" ? "active" : ""}`} onClick={() => setTemplate("classic")}>📘 Classic </button>
-                <button className={`template-btn ${template === "hybrid" ? "active" : ""}`} onClick={() => setTemplate("hybrid")}>🧩 Hybrid </button>
+                <button className={`template-btn ${template === "modern" ? "active" : ""}`} onClick={() => setTemplate("modern")}>💼 ATS Modern </button>
+                <button className={`template-btn ${template === "classic" ? "active" : ""}`} onClick={() => setTemplate("classic")}>📘 ATS Classic </button>
+                <button className={`template-btn ${template === "hybrid" ? "active" : ""}`} onClick={() => setTemplate("hybrid")}>🧩 ATS Hybrid </button>
             </div>
             <div className="panel-section" style={{ marginTop: 10 }}>
                 <h3>🔍 Preview Mode</h3>
