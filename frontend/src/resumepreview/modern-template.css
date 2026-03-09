@@ -289,3 +289,14 @@
         background: transparent !important;
     }
 }
+
+.mt-project-info {
+    margin-top: 4px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.mt-project-info strong {
+    font-weight: 600;
+}

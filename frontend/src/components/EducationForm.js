@@ -3,6 +3,8 @@ import MonthYearPicker from "./MonthYearPicker";
 import { format } from "date-fns";
 import "./EducationForm.css";
 import useBulletTextarea from "../hooks/useBulletTextarea";
+import SuggestionModal from "./SuggestionModal";
+import { educationSuggestions } from "../data/suggestions";
 
 export default function EducationForm({ onSave, onCancel, initialData }) {
     const [education, setEducation] = useState({
@@ -17,6 +19,7 @@ export default function EducationForm({ onSave, onCancel, initialData }) {
 
     // ✅ use bullet hook
     const { handleKeyDown, handleFocus } = useBulletTextarea();
+    const [showSuggestions, setShowSuggestions] = useState(false);
 
     useEffect(() => {
         if (initialData) {
@@ -56,6 +59,13 @@ export default function EducationForm({ onSave, onCancel, initialData }) {
         setEducation({ ...education, [name]: value });
     };
 
+    const insertSuggestions = (selected) => {
+        setEducation(prev => ({
+            ...prev,
+            description: selected.map(text => "• " + text).join("\n")
+        }));
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -87,106 +97,132 @@ export default function EducationForm({ onSave, onCancel, initialData }) {
     };
 
     return (
-        <form className="experience-form" onSubmit={handleSubmit}>
-            {/* === Degree & School === */}
-            <div className="form-row">
-                <div className="form-group">
-                    <label>Degree</label>
-                    <input
-                        name="degree"
-                        value={education.degree}
-                        onChange={handleChange}
-                        placeholder="e.g., Bachelor of Technology"
-                        required
-                    />
-                </div>
-                <div className="form-group">
-                    <label>School / University</label>
-                    <input
-                        name="school"
-                        value={education.school}
-                        onChange={handleChange}
-                        placeholder="e.g., Anna University"
-                        required
-                    />
-                </div>
-            </div>
-
-            {/* === Dates Section === */}
-            <div className="form-group">
-                <label>Dates</label>
-                <div className="month-picker-row">
-                    {/* Start Date */}
-                    <div className="month-picker-col">
-                        <label className="small-label">Start Date</label>
-                        <MonthYearPicker
-                            value={education.startDate}
-                            onChange={(date) => handleDateChange("startDate", date)}
+        <>
+            <form className="experience-form" onSubmit={handleSubmit}>
+                {/* === Degree & School === */}
+                <div className="form-row">
+                    <div className="form-group">
+                        <label>Degree</label>
+                        <input
+                            name="degree"
+                            value={education.degree}
+                            onChange={handleChange}
+                            placeholder="e.g., Bachelor of Technology"
+                            required
                         />
                     </div>
 
-                    {/* End Date */}
-                    <div className="month-picker-col">
-                        <label className="small-label">End Date</label>
-                        {!education.currentlyStudying && (
-                            <MonthYearPicker
-                                value={education.endDate}
-                                onChange={(date) => handleDateChange("endDate", date)}
-                            />
-                        )}
+                    <div className="form-group">
+                        <label>School / University</label>
+                        <input
+                            name="school"
+                            value={education.school}
+                            onChange={handleChange}
+                            placeholder="e.g., Anna University"
+                            required
+                        />
                     </div>
                 </div>
 
-                <div className="checkbox-group">
-                    <input
-                        type="checkbox"
-                        checked={education.currentlyStudying}
-                        onChange={handleCurrentlyStudying}
-                    />
-                    <label>Currently Studying Here</label>
+                {/* === Dates Section === */}
+                <div className="form-group">
+                    <label>Dates</label>
+
+                    <div className="month-picker-row">
+                        <div className="month-picker-col">
+                            <label className="small-label">Start Date</label>
+                            <MonthYearPicker
+                                value={education.startDate}
+                                onChange={(date) => handleDateChange("startDate", date)}
+                            />
+                        </div>
+
+                        <div className="month-picker-col">
+                            <label className="small-label">End Date</label>
+
+                            {!education.currentlyStudying && (
+                                <MonthYearPicker
+                                    value={education.endDate}
+                                    onChange={(date) => handleDateChange("endDate", date)}
+                                />
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="checkbox-group">
+                        <input
+                            type="checkbox"
+                            checked={education.currentlyStudying}
+                            onChange={handleCurrentlyStudying}
+                        />
+                        <label>Currently Studying Here</label>
+                    </div>
                 </div>
-            </div>
 
-            {/* === Location === */}
-            <div className="form-group">
-                <label>Location</label>
-                <input
-                    name="location"
-                    value={education.location}
-                    onChange={handleChange}
-                    placeholder="e.g., Chennai, India"
+                {/* === Location === */}
+                <div className="form-group">
+                    <label>Location</label>
+
+                    <input
+                        name="location"
+                        value={education.location}
+                        onChange={handleChange}
+                        placeholder="e.g., Chennai, India"
+                    />
+                </div>
+
+                {/* === Description === */}
+                <div className="form-group">
+
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <label>Description</label>
+
+                        <button
+                            type="button"
+                            className="suggest-btn"
+                            onClick={() => setShowSuggestions(true)}
+                        >
+                            💡 Suggestions
+                        </button>
+                    </div>
+
+                    <textarea
+                        name="description"
+                        value={education.description}
+                        onChange={handleChange}
+                        onFocus={handleFocus}
+                        onKeyDown={handleKeyDown}
+                        rows="5"
+                        placeholder="• Add details like GPA, specialization, projects..."
+                        style={{
+                            whiteSpace: "pre-wrap",
+                            fontFamily: "Arial, sans-serif",
+                            lineHeight: "1.6",
+                        }}
+                    />
+                </div>
+
+                {/* === Buttons === */}
+                <div className="form-buttons">
+                    <button type="button" className="cancel-btn" onClick={onCancel}>
+                        Cancel
+                    </button>
+
+                    <button type="submit" className="submit-btn">
+                        Save
+                    </button>
+                </div>
+
+            </form>
+
+            {showSuggestions && (
+                <SuggestionModal
+                    suggestions={educationSuggestions}
+                    onInsert={insertSuggestions}
+                    onClose={() => setShowSuggestions(false)}
                 />
-            </div>
+            )}
 
-            {/* === Description === */}
-            <div className="form-group">
-                <label>Description</label>
-                <textarea
-                    name="description"
-                    value={education.description}
-                    onChange={handleChange}
-                    onFocus={handleFocus}
-                    onKeyDown={handleKeyDown}
-                    rows="5"
-                    placeholder="Add details like GPA, specialization, projects, etc."
-                    style={{
-                        whiteSpace: "pre-wrap",
-                        fontFamily: "Arial, sans-serif",
-                        lineHeight: "1.6",
-                    }}
-                />
-
-            </div>
-
-            {/* === Buttons === */}
-            <div className="form-buttons">
-                <button type="button" className="cancel-btn" onClick={onCancel}>
-                    Cancel
-                </button>
-                <button type="submit" className="submit-btn">
-                    Save
-                </button>
-            </div>
-        </form>
+        </>
     );
 }

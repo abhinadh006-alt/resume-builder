@@ -162,6 +162,20 @@ export default function ModernTemplate({
                                         </div>
                                     </div>
 
+                                    {/* PROJECT / CLIENT */}
+
+                                    {(exp.project || exp.client) && (
+                                        <div className="mt-project-info">
+                                            {exp.project && (
+                                                <div><strong>Project:</strong> {exp.project}</div>
+                                            )}
+
+                                            {exp.client && (
+                                                <div><strong>Client:</strong> {exp.client}</div>
+                                            )}
+                                        </div>
+                                    )}
+
                                     {bullets.length > 0 && (
                                         <ul className="mt-bullets">
                                             {bullets.map((b, idx) => (

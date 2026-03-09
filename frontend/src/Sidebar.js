@@ -8,6 +8,8 @@ import EducationSection from "./components/EducationSection";
 import CertificationsSection from "./components/CertificationsSection";
 import SkillsSection from "./components/SkillsSection";
 import LanguagesSection from "./components/LanguagesSection";
+import SuggestionModal from "./components/SuggestionModal";
+import { summarySuggestions } from "./data/suggestions";
 
 /**
  Props expected from parent:
@@ -140,6 +142,15 @@ export default function Sidebar(props) {
         e.target.value = null;
     };
 
+    // ---------- suggestion modal state ----------
+    const [showSummarySuggestions, setShowSummarySuggestions] = React.useState(false);
+    const insertSummarySuggestions = (selected) => {
+        setFormData(prev => ({
+            ...prev,
+            summary: selected.join(" ")
+        }));
+    };
+
     // ---------- form helpers ----------
     const onPersonalChange = (e) => {
         if (typeof handleChange === "function") return handleChange(e);
@@ -167,8 +178,22 @@ export default function Sidebar(props) {
                         onChange={onPersonalChange}
                     />
                 ))}
-                <label style={{ marginTop: 8, marginBottom: 6, display: "block", fontSize: 13, color: "#666" }}>Summary</label>
-                <textarea name="summary" placeholder="Write your professional summary..." value={formData.summary || ""} onChange={onPersonalChange} />
+
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <label>Summary</label>
+                    <button
+                        className="suggest-btn"
+                        onClick={() => setShowSummarySuggestions(true)}
+                    >
+                        💡 Suggestions
+                    </button>
+                </div>
+
+                <textarea
+                    name="summary"
+                    value={formData.summary || ""}
+                    onChange={onPersonalChange}
+                />
             </div>
         </div>
     );
@@ -253,11 +278,14 @@ export default function Sidebar(props) {
     const renderGenerate = () => (
         <div className="panel-section">
             <h3>⬇️ Generate</h3>
+
             <div className="panel-card">
+
+                {/* Generate Resume */}
                 <button
                     className="generate-btn"
                     onClick={handleSubmit}
-                    disabled={loading}                 // 🔒 disable during generation
+                    disabled={loading}
                 >
                     {loading ? "⏳ Generating..." : "✅ Generate Resume"}
                 </button>
@@ -267,6 +295,49 @@ export default function Sidebar(props) {
                         ? "Please wait while your resume is being generated…"
                         : "Your resume will download automatically."}
                 </div>
+
+                {/* ---------- WhatsApp Channel ---------- */}
+
+                <div style={{
+                    marginTop: 16,
+                    marginBottom: 8,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    color: "#333"
+                }}>
+                    🎁 Free Safety Resources
+                </div>
+
+                <a
+                    href="https://whatsapp.com/channel/0029Vb6E8OM6xCSGHKPkQK40"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="whatsapp-channel-btn"
+                >
+                    💬 Join WhatsApp Channel
+                </a>
+
+                <div className="generate-desc">
+                    Follow this channel for lifetime access to the resume builder,
+                    safety notes, learning resources, and latest job updates.
+                </div>
+
+                {/* ---------- Safety Quiz ---------- */}
+
+                <a
+                    href="https://safety-quiz.vercel.app"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="quiz-btn"
+                >
+                    🧠 Practice Safety Quiz
+                </a>
+
+                <div className="generate-desc">
+                    Test your safety knowledge and prepare for interviews with
+                    practice safety questions.
+                </div>
+
             </div>
         </div>
     );
@@ -351,6 +422,13 @@ export default function Sidebar(props) {
                     {renderActivePanel()}
                 </div>
             </aside>
+            {showSummarySuggestions && (
+                <SuggestionModal
+                    suggestions={summarySuggestions}
+                    onInsert={insertSummarySuggestions}
+                    onClose={() => setShowSummarySuggestions(false)}
+                />
+            )}
         </>
     );
 }

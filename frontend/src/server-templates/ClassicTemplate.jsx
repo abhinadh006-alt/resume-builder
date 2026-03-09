@@ -280,6 +280,26 @@ export default function ClassicTemplate({
                                         </div>
                                     </div>
                                 </div>
+
+                                {/* PROJECT / CLIENT SECTION */}
+                                <div className="classic-project-info"></div>
+
+                                {(exp.project || exp.client) && (
+                                    <div style={{ marginTop: "6px", marginBottom: "4px", fontSize: "13px" }}>
+                                        {exp.project && (
+                                            <div>
+                                                <strong>Project:</strong> {exp.project}
+                                            </div>
+                                        )}
+
+                                        {exp.client && (
+                                            <div>
+                                                <strong>Client:</strong> {exp.client}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
                                 {renderBullets(
                                     exp.description,
                                     safePH.experience.bullets || safePH.experience.sampleBullets

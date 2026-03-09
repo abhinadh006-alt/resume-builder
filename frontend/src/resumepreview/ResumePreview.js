@@ -32,6 +32,8 @@ export const PLACEHOLDERS = {
         company: "Company Name",
         location: "City, Country",
         dateRange: "e.g., Sep 2019 — May 2023",
+        project: "ADNOC Gas Processing Plant",
+        client: "ADNOC",
         bullets: [
             "Implemented and monitored safety systems.",
             "Conducted audits and trained staff.",

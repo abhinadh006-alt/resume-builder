@@ -209,11 +209,29 @@ export default function HybridTemplate({
 
                                 return (
                                     <div key={i} className="hybrid-item">
+
                                         <strong>{exp.title} | {exp.company}</strong>
+
                                         <div className="hybrid-meta">
                                             {exp.location} • {exp.startDate} – {exp.endDate}
                                         </div>
+
+                                        {/* PROJECT / CLIENT */}
+
+                                        {(exp.project || exp.client) && (
+                                            <div className="hybrid-project-info">
+                                                {exp.project && (
+                                                    <div><strong>Project:</strong> {exp.project}</div>
+                                                )}
+
+                                                {exp.client && (
+                                                    <div><strong>Client:</strong> {exp.client}</div>
+                                                )}
+                                            </div>
+                                        )}
+
                                         <ul>{renderBullets(exp.description)}</ul>
+
                                     </div>
                                 );
                             })}

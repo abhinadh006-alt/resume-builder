@@ -21,17 +21,27 @@ export default function AppHeader() {
                 </div>
 
                 {/* RIGHT */}
+                {/* RIGHT */}
                 <nav className="header-right">
-                    <a href="https://visawayglobal.in/" target="_blank" rel="noreferrer">
-                        🌐 Website
-                    </a>
-                    <a
-                        href="https://whatsapp.com/channel/0029VbC2gxdDzgT8e4Uw4D34"
-                        target="_blank"
-                        rel="noreferrer"
-                    >
-                        🟢 WhatsApp Channel
-                    </a>
+
+                    <div className="header-links">
+                        <a href="https://visawayglobal.in/" target="_blank" rel="noreferrer">
+                            🌐 Website
+                        </a>
+
+                        <a
+                            href="https://whatsapp.com/channel/0029VbC2gxdDzgT8e4Uw4D34"
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            🟢 WhatsApp Channel
+                        </a>
+                    </div>
+
+                    <div className="header-tagline">
+                        Resume Builder for Safety Professionals     .
+                    </div>
+
                 </nav>
 
             </div>
