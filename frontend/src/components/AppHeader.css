@@ -80,7 +80,7 @@
 
     .header-inner {
         grid-template-columns: auto 1fr;
-        padding: 0 4px;
+        padding: 0 2px;
     }
 
     /* LEFT */
@@ -89,7 +89,7 @@
     }
 
     .header-left img {
-        height: 38px;
+        height: 34px;
         padding: 0;
     }
 
@@ -98,7 +98,7 @@
     }
 
     .brand-text span {
-        font-size: 10px;
+        display: none;
     }
 
     /* ❌ HIDE CENTER TEXT COMPLETELY */
@@ -109,8 +109,8 @@
     /* RIGHT — place inside header properly */
     .header-right {
         grid-column: 2;
-        justify-self: start;
-        align-items: center;
+        justify-self: end;
+        align-items: flex-end;
         display: flex;
         gap: 0px;
         padding: 0;
@@ -122,6 +122,23 @@
         font-size: 10px;
         padding: 6px 0px;
         white-space: nowrap;
+    }
+
+    .header-links a {
+        font-size: 10px;
+        color: #00329e;
+        text-decoration: none;
+        padding: 4px 6px;
+        border-radius: 6px;
+        background: #f8fafc;
+    }
+
+    .header-links a:hover {
+        background: #eef6ff;
+    }
+
+    .header-links a:last-child {
+        color: #16a34a;
     }
 }
 

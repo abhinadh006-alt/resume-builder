@@ -39,7 +39,7 @@ export default function AppHeader() {
                     </div>
 
                     <div className="header-tagline">
-                        Resume Builder for Safety Professionals     .
+                        ATS Resume Builder for Safety Professionals             .
                     </div>
 
                 </nav>
