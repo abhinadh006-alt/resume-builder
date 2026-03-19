@@ -31,7 +31,7 @@ export default function SkillForm({ onSave, onCancel, initialData }) {
                     name="skill"
                     value={form.skill}
                     onChange={handleChange}
-                    placeholder="e.g., Python, React, Safety Inspection"
+                    placeholder="e.g., e.g., Risk Assessment, Permit to Work (PTW), HAZOP, Fire Safety"
                 />
             </div>
 

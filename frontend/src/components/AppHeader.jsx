@@ -8,9 +8,9 @@ export default function AppHeader() {
 
                 {/* LEFT */}
                 <div className="header-left">
-                    <img src={logo} alt="Visa Way Global" />
+                    <img src={logo} alt="Safety crew India" />
                     <div className="brand-text">
-                        <strong>Visa Way Global</strong>
+                        <strong>Safety crew India</strong>
                         <span>Immigration · Careers · Resume Services</span>
                     </div>
                 </div>
@@ -30,7 +30,7 @@ export default function AppHeader() {
                         </a>
 
                         <a
-                            href="https://whatsapp.com/channel/0029VbC2gxdDzgT8e4Uw4D34"
+                            href="https://whatsapp.com/channel/0029Vb6E8OM6xCSGHKPkQK40"
                             target="_blank"
                             rel="noreferrer"
                         >

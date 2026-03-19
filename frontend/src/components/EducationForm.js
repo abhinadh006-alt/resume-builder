@@ -118,7 +118,7 @@ export default function EducationForm({ onSave, onCancel, initialData }) {
                             name="school"
                             value={education.school}
                             onChange={handleChange}
-                            placeholder="e.g., Anna University"
+                            placeholder="e.g., Kerala University"
                             required
                         />
                     </div>
@@ -167,7 +167,7 @@ export default function EducationForm({ onSave, onCancel, initialData }) {
                         name="location"
                         value={education.location}
                         onChange={handleChange}
-                        placeholder="e.g., Chennai, India"
+                        placeholder="e.g., Thiruvananthapuram, India"
                     />
                 </div>
 

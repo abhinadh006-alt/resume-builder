@@ -163,7 +163,7 @@ export default function ExperienceForm({ onSave, onCancel, initialData }) {
                         name="location"
                         value={experience.location}
                         onChange={handleChange}
-                        placeholder="e.g., Mumbai, India"
+                        placeholder="e.g., Gujarat, India"
                     />
                 </div>
 
@@ -175,7 +175,7 @@ export default function ExperienceForm({ onSave, onCancel, initialData }) {
                             name="project"
                             value={experience.project || ""}
                             onChange={handleChange}
-                            placeholder="e.g., ADNOC Gas Processing Plant"
+                            placeholder="e.g., Jamnagar Refinery Expansion"
                         />
                     </div>
 
@@ -185,7 +185,7 @@ export default function ExperienceForm({ onSave, onCancel, initialData }) {
                             name="client"
                             value={experience.client || ""}
                             onChange={handleChange}
-                            placeholder="e.g., Petrofac International"
+                            placeholder="e.g., Reliance Industries"
                         />
                     </div>
 
