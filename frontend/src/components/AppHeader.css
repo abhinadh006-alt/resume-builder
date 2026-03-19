@@ -89,12 +89,12 @@
     }
 
     .header-left img {
-        height: 32px;
+        height: 30px;
         padding: 0;
     }
 
     .brand-text strong {
-        font-size: 12px;
+        font-size: 10px;
     }
 
     .brand-text span {
