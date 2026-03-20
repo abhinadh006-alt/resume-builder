@@ -102,14 +102,40 @@ export default function EducationForm({ onSave, onCancel, initialData }) {
                 {/* === Degree & School === */}
                 <div className="form-row">
                     <div className="form-group">
-                        <label>Degree</label>
+                        <label>Qualification</label>
                         <input
                             name="degree"
                             value={education.degree}
                             onChange={handleChange}
-                            placeholder="e.g., Bachelor of Technology"
+                            placeholder="e.g., B.Tech, Diploma, Plus Two"
+                            list="degreeOptions"
                             required
                         />
+                        <datalist id="degreeOptions">
+                            <option value="SSLC (10th)" />
+                            <option value="Plus Two (12th)" />
+
+                            <option value="Diploma in Engineering" />
+                            <option value="ITI" />
+
+                            {/* 🔥 SAFETY DIPLOMAS */}
+                            <option value="Diploma in Fire and Safety Engineering" />
+                            <option value="Diploma in Industrial Safety" />
+                            <option value="Diploma in Occupational Health and Safety" />
+                            <option value="Diploma in Health, Safety and Environment (HSE)" />
+                            <option value="Diploma in Construction Safety" />
+                            <option value="Diploma in Fire and Industrial Safety Management" />
+
+                            {/* DEGREE */}
+                            <option value="Bachelor of Engineering (B.E.)" />
+                            <option value="Bachelor of Technology (B.Tech)" />
+                            <option value="BSc Occupational Safety" />
+
+                            {/* PG */}
+                            <option value="Master of Engineering (M.E.)" />
+                            <option value="Master of Technology (M.Tech)" />
+                            <option value="PG Diploma in HSE" />
+                        </datalist>
                     </div>
 
                     <div className="form-group">

@@ -53,9 +53,7 @@ export default function CertificationsForm({ onSave, onCancel, initialData }) {
         const stripParens = (s) =>
             (s || "")
                 .toString()
-                .trim()
-                .replace(/^[\s()]+|[\s()]+$/g, "")
-                .replace(/\)+$/, "");
+                .trim();
 
         const formatted = {
             name: stripParens(cert.name),
@@ -66,7 +64,6 @@ export default function CertificationsForm({ onSave, onCancel, initialData }) {
             credentialId: stripParens(cert.credentialId),
             description: (cert.description || "")
                 .toString()
-                .replace(/\)+$/, "")
                 .trim(),
         };
 
@@ -91,19 +88,52 @@ export default function CertificationsForm({ onSave, onCancel, initialData }) {
                         name="name"
                         value={cert.name}
                         onChange={handleChange}
-                        placeholder="e.g., NEBOSH International General Certificate"
+                        placeholder="e.g., NEBOSH, IOSH, OSHA"
+                        list="certificationOptions"
                         required
                     />
+                    <datalist id="certificationOptions">
+                        <option value="NEBOSH International General Certificate (IGC)" />
+                        <option value="NEBOSH Diploma" />
+                        <option value="IOSH Managing Safely" />
+                        <option value="IOSH Working Safely" />
+                        <option value="OSHA 30-Hour Construction Safety" />
+                        <option value="OSHA 30-Hour General Industry" />
+                        <option value="OSHA 10-Hour Safety" />
+                        <option value="First Aid Certification" />
+                        <option value="Fire Fighting Training" />
+                        <option value="Confined Space Entry Training" />
+                        <option value="Work at Height Training" />
+                        <option value="Scaffolding Safety Training" />
+                        <option value="H2S Safety Training" />
+                    </datalist>
                 </div>
 
                 <div className="form-group">
                     <label>Issuing Organization</label>
+
                     <input
                         name="organization"
                         value={cert.organization}
                         onChange={handleChange}
                         placeholder="e.g., National Examination Board in Occupational Safety and Health"
+                        list="organizationOptions"
                     />
+
+                    <datalist id="organizationOptions">
+                        <option value="NEBOSH (National Examination Board in Occupational Safety and Health)" />
+                        <option value="IOSH (Institution of Occupational Safety and Health)" />
+                        <option value="OSHA (Occupational Safety and Health Administration)" />
+                        <option value="IADC (International Association of Drilling Contractors)" />
+                        <option value="OPITO" />
+                        <option value="British Safety Council" />
+                        <option value="NSDC (National Skill Development Corporation)" />
+                        <option value="NCVT / SCVT" />
+                        <option value="State Technical Board" />
+                        <option value="Directorate General of Training (DGT)" />
+                        <option value="Red Cross Society" />
+                        <option value="Fire and Safety Training Institute" />
+                    </datalist>
                 </div>
 
                 <div className="form-group">

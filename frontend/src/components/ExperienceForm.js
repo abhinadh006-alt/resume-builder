@@ -6,6 +6,18 @@ import useBulletTextarea from "../hooks/useBulletTextarea"; // ✅ NEW import
 import SuggestionModal from "./SuggestionModal";
 import { experienceSuggestions } from "../data/suggestions";
 
+const JOB_TITLE_SUGGESTIONS = [
+    "Safety Officer",
+    "HSE Officer",
+    "Safety Supervisor",
+    "HSE Engineer",
+    "Safety Engineer",
+    "HSE Advisor",
+    "Safety Inspector",
+    "EHS Officer",
+    "Safety Coordinator"
+];
+
 export default function ExperienceForm({ onSave, onCancel, initialData }) {
     const [experience, setExperience] = useState({
         title: "",
@@ -105,13 +117,31 @@ export default function ExperienceForm({ onSave, onCancel, initialData }) {
                 <div className="form-row">
                     <div className="form-group">
                         <label>Job Title</label>
+
                         <input
                             name="title"
                             value={experience.title}
                             onChange={handleChange}
                             placeholder="e.g., Safety Officer"
+                            list="jobTitleOptions"
                             required
                         />
+
+                        <datalist id="jobTitleOptions">
+                            <option value="Safety Officer" />
+                            <option value="HSE Officer" />
+                            <option value="Safety Supervisor" />
+                            <option value="HSE Engineer" />
+                            <option value="Safety Engineer" />
+                            <option value="HSE Advisor" />
+                            <option value="Safety Inspector" />
+                            <option value="EHS Officer" />
+                            <option value="Safety Coordinator" />
+                            <option value="Senior Safety Officer" />
+                            <option value="Lead HSE Engineer" />
+                            <option value="HSE Manager" />
+                            <option value="Safety Manager" />
+                        </datalist>
                     </div>
                     <div className="form-group">
                         <label>Company</label>

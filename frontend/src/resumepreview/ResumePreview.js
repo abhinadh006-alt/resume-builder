@@ -17,61 +17,70 @@ import HybridTemplate from "../server-templates/HybridTemplate.jsx";
 ====================================================== */
 
 export const PLACEHOLDERS = {
-    name: "Your Full Name",
-    title: "Your Professional Title",
+    name: "STEPHEN GEORGE",
+    title: "Senior HSE Officer",
     email: "Email@example.com",
     phone: "+91 98765 43210",
     location: "City, Country",
     website: "yourwebsite.com",
 
     summary:
-        "Experienced Safety Officer with 5+ years of expertise in industrial safety, audits, and compliance management.",
+        "NEBOSH-certified Safety Officer with 5+ years of experience in oil & gas and construction projects. Skilled in risk assessment, permit-to-work systems, incident investigation, and compliance with international safety standards. Proven track record of reducing workplace incidents by 40%.",
 
     experience: {
-        jobTitle: "Job Title",
-        company: "Company Name",
-        location: "City, Country",
+        jobTitle: "Safety Officer ",
+        company: "L&T Construction",
+        location: "Abu Dhabi, UAE",
         dateRange: "e.g., Sep 2019 — May 2023",
-        project: "ADNOC Gas Processing Plant",
-        client: "ADNOC",
+        project: "ADNOC Gas Processing Plant Expansion (Habshan)",
+        client: "Abu Dhabi National Oil Company (ADNOC)",
         bullets: [
-            "Implemented and monitored safety systems.",
-            "Conducted audits and trained staff.",
-            "Performed risk assessments and led investigations."
+            "Implemented site-wide safety management system across 3 projects (500+ workers).",
+            "Reduced workplace incidents by 40% through proactive hazard identification.",
+            "Conducted toolbox talks and safety training for 100+ employees.",
+            "Led incident investigations and ensured corrective actions.",
+            "Ensured compliance with OSHA & ISO 45001 standards."
         ]
     },
 
     education: {
-        degree: "Bachelor’s in Engineering",
-        school: "University",
-        location: "City, Country",
-        dateRange: "e.g., Jan 2015 — Sep 2019",
+        degree: "Diploma in Fire & Safety Engineering",
+        school: "Kerala Technical Institute",
+        location: "Kochi, India",
+        dateRange: "e.g., Jun 2016 — Apr 2018",
         bullets: [
-            "Key coursework and academic achievements.",
-            "Graduation project and specialization."
+            "Studied industrial safety, fire prevention, hazard identification, and risk assessment.",
+            "Completed training in HIRA, PTW systems, and emergency response planning.",
+            "Completed training in HIRA, PTW systems, and emergency response planning.",
+            "Final project: Fire Risk Assessment and Safety Audit for Industrial Facility."
         ]
     },
 
     certifications: {
-        name: "Certification Title",
-        organization: "Issuing Organization",
-        issueDate: "e.g., Jun 2021",
-        credentialId: "ID/URL: 12345",
+        name: "NEBOSH International General Certificate (IGC)",
+        organization: "NEBOSH (National Examination Board in Occupational Safety and Health)",
+        issueDate: "e.g., Jan 2019",
+        credentialId: "12345",
         bullets: [
-            "Credential verified and industry recognized.",
-            "Relevant to occupational safety standards."
+            "Internationally recognized qualification in occupational health & safety.",
+            "Covered risk assessment, hazard control, and safety management systems.",
+            "Covered risk assessment, hazard control, and safety management systems."
         ]
     },
 
     skills: [
         "Risk Assessment - Advanced",
-        "Fire Safety Management - Expert"
+        "Fire Safety Management - Expert",
+        "Safety Audits & Inspections",
+        "Hazard Identification & Control",
+        "Toolbox Talks & Safety Training"
     ],
 
     languages: [
         "English - Fluent",
-        "Hindi - Native",
-        "Italian - Intermediate"
+        "Hindi - Fluent",
+        "Malayalam - Native",
+        "Arabic - Intermediate"
     ]
 };
 

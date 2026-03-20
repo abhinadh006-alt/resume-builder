@@ -400,7 +400,9 @@ export default function ClassicTemplate({
                                 <li key={i}>
                                     {typeof l === "string"
                                         ? l
-                                        : `${l.language || l.name} - ${l.proficiency || ""}`}
+                                        : l?.proficiency
+                                            ? `${l.language || l.name} - ${l.proficiency}`
+                                            : (l?.language || l?.name || "")}
                                 </li>
                             ))}
                         </ul>

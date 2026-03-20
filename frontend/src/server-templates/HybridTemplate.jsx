@@ -213,7 +213,14 @@ export default function HybridTemplate({
                                         <strong>{exp.title} | {exp.company}</strong>
 
                                         <div className="hybrid-meta">
-                                            {exp.location} • {exp.startDate} – {exp.endDate}
+                                            {[
+                                                exp?.location,
+                                                (exp?.startDate || exp?.endDate)
+                                                    ? `${exp?.startDate || ""}${exp?.startDate && exp?.endDate ? " – " : ""}${exp?.endDate || (exp?.startDate ? "Present" : "")}`
+                                                    : null
+                                            ]
+                                                .filter(Boolean)
+                                                .join(" • ")}
                                         </div>
 
                                         {/* PROJECT / CLIENT */}
@@ -253,7 +260,14 @@ export default function HybridTemplate({
                                     <div key={i} className="hybrid-item">
                                         <strong>{edu.degree} | {edu.school}</strong>
                                         <div className="hybrid-meta">
-                                            {edu.location} • {edu.startDate} – {edu.endDate}
+                                            {[
+                                                edu?.location,
+                                                (edu?.startDate || edu?.endDate)
+                                                    ? `${edu?.startDate || ""}${edu?.startDate && edu?.endDate ? " – " : ""}${edu?.endDate || (edu?.startDate ? "Present" : "")}`
+                                                    : null
+                                            ]
+                                                .filter(Boolean)
+                                                .join(" • ")}
                                         </div>
                                         <ul>{renderBullets(edu.description)}</ul>
                                     </div>
@@ -277,7 +291,9 @@ export default function HybridTemplate({
                                     <div key={i} className="hybrid-item">
                                         <strong>{cert.name}</strong>
                                         <div className="hybrid-meta">
-                                            {cert.organization} • {cert.issueDate}
+                                            {[cert?.organization, cert?.issueDate]
+                                                .filter(Boolean)
+                                                .join(" • ")}
                                         </div>
                                         {cert.credentialId && (
                                             <div className="hybrid-meta">

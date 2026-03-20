@@ -152,13 +152,15 @@ export default function ModernTemplate({
                                                 {exp.title || placeholders.experience.jobTitle}
                                             </div>
                                             <div className="mt-company">
-                                                {(exp.company || placeholders.experience.company)},{" "}
-                                                {(exp.location || placeholders.experience.location)}
+                                                {[exp?.company || placeholders?.experience?.company,
+                                                exp?.location || placeholders?.experience?.location]
+                                                    .filter(Boolean)
+                                                    .join(", ")}
                                             </div>
                                         </div>
                                         <div className="mt-date">
                                             {formatDateRange(exp.startDate, exp.endDate) ||
-                                                placeholders.experience.dateRange}
+                                                placeholders?.experience?.dateRange || ""}
                                         </div>
                                     </div>
 
@@ -210,13 +212,15 @@ export default function ModernTemplate({
                                                 {edu.degree || placeholders.education.degree}
                                             </div>
                                             <div className="mt-company">
-                                                {(edu.school || placeholders.education.school)},{" "}
-                                                {(edu.location || placeholders.education.location)}
+                                                {[edu?.school || placeholders?.education?.school,
+                                                edu?.location || placeholders?.education?.location]
+                                                    .filter(Boolean)
+                                                    .join(", ")}
                                             </div>
                                         </div>
                                         <div className="mt-date">
                                             {formatDateRange(edu.startDate, edu.endDate) ||
-                                                placeholders.education.dateRange}
+                                                placeholders?.education?.dateRange || ""}
                                         </div>
                                     </div>
 
@@ -254,16 +258,16 @@ export default function ModernTemplate({
                                                 {c.name || placeholders.certifications.name}
                                             </div>
                                             <div className="mt-company">
-                                                {c.organization || placeholders.certifications.organization}
+                                                {c.organization || placeholders?.certifications?.organization || ""}
                                             </div>
-                                            {(c.credentialId || placeholders.certifications.credentialId) && (
+                                            {(c.credentialId || placeholders?.certifications?.credentialId || "") && (
                                                 <div className="mt-text">
-                                                    Credential ID: {c.credentialId || placeholders.certifications.credentialId}
+                                                    Credential ID: {c.credentialId || placeholders?.certifications?.credentialId || ""}
                                                 </div>
                                             )}
                                         </div>
                                         <div className="mt-date">
-                                            {c.issueDate || placeholders.certifications.issueDate}
+                                            {c.issueDate || placeholders?.certifications?.issueDate || ""}
                                         </div>
                                     </div>
 
@@ -286,7 +290,11 @@ export default function ModernTemplate({
                         <div className="mt-section-title">SKILLS</div>
                         {skills.map((s, i) => (
                             <div key={i} className="mt-skill">
-                                • {typeof s === "string" ? s : `${s.skill} - ${s.level}`}
+                                • {typeof s === "string"
+                                    ? s
+                                    : s?.level
+                                        ? `${s.skill} - ${s.level}`
+                                        : s?.skill || ""}
                             </div>
                         ))}
                     </section>
@@ -298,7 +306,11 @@ export default function ModernTemplate({
                         <div className="mt-section-title">LANGUAGES</div>
                         {languages.map((l, i) => (
                             <div key={i}>
-                                • {typeof l === "string" ? l : `${l.language} - ${l.proficiency}`}
+                                • {typeof l === "string"
+                                    ? l
+                                    : l?.proficiency
+                                        ? `${l.language} - ${l.proficiency}`
+                                        : l?.language || ""}
                             </div>
                         ))}
                     </section>

@@ -1,4 +1,20 @@
 import React, { useState, useEffect } from "react";
+import SuggestionModal from "./SuggestionModal";
+
+const LANGUAGE_SUGGESTIONS = [
+    "English",
+    "Hindi",
+    "Malayalam",
+    "Tamil",
+    "Telugu",
+    "Kannada",
+    "Arabic",
+    "Urdu",
+    "French",
+    "German",
+    "Spanish",
+    "Italian"
+];
 
 export default function LanguageForm({ onSave, onCancel, initialData }) {
 
@@ -8,6 +24,8 @@ export default function LanguageForm({ onSave, onCancel, initialData }) {
             proficiency: "",
         }
     );
+
+    const [showSuggestions, setShowSuggestions] = useState(false);
 
     useEffect(() => {
         if (initialData) {
@@ -26,16 +44,31 @@ export default function LanguageForm({ onSave, onCancel, initialData }) {
 
     return (
         <div className="form-container">
+
+            {/* LANGUAGE INPUT */}
             <div className="form-group">
                 <label>Language</label>
-                <input
-                    name="language"
-                    value={form.language}
-                    onChange={handleChange}
-                    placeholder="e.g., English, Hindi, Italian"
-                />
+
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <input
+                        name="language"
+                        value={form.language}
+                        onChange={handleChange}
+                        placeholder="e.g., English, Hindi, Arabic"
+                        style={{ flex: 1 }}
+                    />
+
+                    <button
+                        type="button"
+                        className="suggest-btn"
+                        onClick={() => setShowSuggestions(true)}
+                    >
+                        💡 Suggestions
+                    </button>
+                </div>
             </div>
 
+            {/* PROFICIENCY */}
             <div className="form-group">
                 <label>Proficiency</label>
                 <select
@@ -51,10 +84,26 @@ export default function LanguageForm({ onSave, onCancel, initialData }) {
                 </select>
             </div>
 
+            {/* FOOTER */}
             <div className="modal-footer">
                 <button className="cancel-btn" onClick={onCancel}>Cancel</button>
                 <button className="save-btn" onClick={handleSave}>Save</button>
             </div>
+
+            {/* ✅ SUGGESTION MODAL */}
+            {showSuggestions && (
+                <SuggestionModal
+                    suggestions={LANGUAGE_SUGGESTIONS}
+                    onInsert={(selectedLanguages) => {
+                        setForm({
+                            ...form,
+                            language: selectedLanguages.join(", ")
+                        });
+                        setShowSuggestions(false);
+                    }}
+                    onClose={() => setShowSuggestions(false)}
+                />
+            )}
         </div>
     );
 }
