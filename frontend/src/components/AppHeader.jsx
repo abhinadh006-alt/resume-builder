@@ -25,7 +25,7 @@ export default function AppHeader() {
                 <nav className="header-right">
 
                     <div className="header-links">
-                        <a href="https://visawayglobal.in/" target="_blank" rel="noreferrer">
+                        <a href="https://safetycrewindia.com/" target="_blank" rel="noreferrer">
                             🌐 Website
                         </a>
 
