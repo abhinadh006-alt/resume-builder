@@ -1,5 +1,11 @@
 export const summarySuggestions = [
 
+    "Safety Officer with over 3 years of experience in construction and industrial projects, ensuring compliance with HSE regulations and workplace safety standards. Skilled in risk assessment, hazard identification, incident investigation, safety inspections, and conducting toolbox talks to maintain a safe working environment. Holding NEBOSH IGC, IOSH, and Fire & Safety certifications, with a strong commitment to reducing workplace accidents and promoting a positive safety culture.",
+
+    "Safety professional with a strong academic background in Occupational Health and Safety and a keen interest in workplace risk management. Skilled in hazard identification, risk assessment, safety inspections, and HSE documentation, with knowledge of international safety standards. Holding NEBOSH IGC and Fire & Safety certifications, committed to ensuring safe work practices and continuous professional development.",
+
+    "Safety Officer with over 3 years of experience in construction projects, ensuring compliance with HSE policies and UAE safety regulations. Experienced in conducting risk assessments, site inspections, incident investigations, permit-to-work monitoring, and delivering toolbox talks to workers. Certified in NEBOSH IGC and Fire & Safety, with a proven ability to promote a strong safety culture and prevent workplace incidents.",
+
     "Dedicated Safety Officer with strong experience in implementing health, safety, and environmental (HSE) policies to ensure safe working conditions and compliance with occupational safety regulations in industrial and construction environments.",
 
     "NEBOSH-certified Safety Officer skilled in hazard identification, risk assessment, and safety compliance, committed to maintaining high safety standards and reducing workplace incidents.",
